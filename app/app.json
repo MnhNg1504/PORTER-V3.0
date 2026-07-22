@@ -41,7 +41,10 @@
       ]
     ],
     "extra": {
-      "note": "Map dùng MapLibre native — CẦN development build (không chạy Expo Go). Xem README."
+      "note": "Map dùng MapLibre native — CẦN development build (không chạy Expo Go). Xem README.",
+      "eas": {
+        "projectId": "0ca472bf-ac55-4136-8f64-47ac2dab0f08"
+      }
     }
   }
 }
