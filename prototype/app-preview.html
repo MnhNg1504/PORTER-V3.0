@@ -895,7 +895,7 @@ function init3D(){
   const cv=document.getElementById('m3-canvas');
   M3.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
   M3.scene=new THREE.Scene();M3.scene.background=new THREE.Color(0x0e1712);
-  M3.camera=new THREE.PerspectiveCamera(45,1,.05,60);
+  M3.camera=new THREE.PerspectiveCamera(45,1,.02,60);
   // --- Mesh địa hình (màu nền Pine — che khuất đường phía sau núi) ---
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
@@ -910,16 +910,24 @@ function init3D(){
     const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
     segs.forEach((p,k)=>{const[x,z]=gxy(p[0],p[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
     const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
-    const col=new THREE.Color(`rgb(${Math.round(100+hN*101)},${Math.round(140+hN*86)},${Math.round(60+hN*41)})`);
-    M3.scene.add(new THREE.LineSegments(bg,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.28+hN*.72})));
+    // Sáng tối thiểu cao (dễ nhìn như ảnh mẫu), vẫn sáng dần lên Lime ở đỉnh
+    const col=new THREE.Color(`rgb(${Math.round(148+hN*53)},${Math.round(168+hN*58)},${Math.round(118+hN*-17)})`);
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.6+hN*.4});
+    M3.scene.add(new THREE.LineSegments(bg,mat));
+    // Lớp thứ 2 lệch nhẹ -> nét dày ~2px, rõ khi zoom xa lẫn gần
+    const bg2=bg.clone();bg2.translate(0,.0022,0);
+    M3.scene.add(new THREE.LineSegments(bg2,mat));
   }
   // --- Track GPX THẬT phủ sườn (trắng nét đứt) ---
   const b=g.bbox,tp=[];
   TAXUA.forEach(p=>{const pi=(p[0]-b.minLon)/(b.maxLon-b.minLon)*n,pj=(b.maxLat-p[1])/(b.maxLat-b.minLat)*n;
     const[x,z]=gxy(pi,pj);tp.push(new THREE.Vector3(x,h3(p[2]??g.min)+OFF*2,z));});
   const tg=new THREE.BufferGeometry().setFromPoints(tp);
-  const track=new THREE.Line(tg,new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022}));
+  const trackMat=new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022});
+  const track=new THREE.Line(tg,trackMat);
   track.computeLineDistances();M3.scene.add(track);
+  const tg2=tg.clone();tg2.translate(0,.0025,0);
+  const track2=new THREE.Line(tg2,trackMat);track2.computeLineDistances();M3.scene.add(track2);
   // --- Pin đầu/đỉnh/cuối (cột + cầu màu) ---
   let pk=0,mx=-1e9;TAXUA.forEach((p,i)=>{if(p[2]!=null&&p[2]>mx){mx=p[2];pk=i;}});
   [[0,0x7FB069],[pk,0xE8C877],[TAXUA.length-1,0xFF5233]].forEach(([idx,c])=>{
@@ -940,12 +948,23 @@ function init3D(){
     sp.scale.set(.12,.12,1);sp.position.set(x,.02,z);M3.scene.add(sp);
   });
   // --- Điều khiển: kéo xoay, lăn thu phóng ---
-  cv.addEventListener('pointerdown',e=>{M3.drag=true;M3.lx=e.clientX;M3.ly=e.clientY;cv.style.cursor='grabbing';});
-  addEventListener('pointerup',()=>{M3.drag=false;cv.style.cursor='grab';});
-  addEventListener('pointermove',e=>{if(!M3.drag)return;
+  const ptrs=new Map();let pinchD=0;
+  cv.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+    if(ptrs.size===1){M3.drag=true;M3.lx=e.clientX;M3.ly=e.clientY;cv.style.cursor='grabbing';}
+    if(ptrs.size===2){M3.drag=false;const a=[...ptrs.values()];pinchD=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);}});
+  addEventListener('pointerup',e=>{ptrs.delete(e.pointerId);if(ptrs.size===0){M3.drag=false;cv.style.cursor='grab';}});
+  addEventListener('pointermove',e=>{
+    if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[e.clientX,e.clientY]);
+    if(ptrs.size===2){ // pinch 2 ngón -> zoom
+      const a=[...ptrs.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);
+      if(pinchD>0)M3.dist=Math.min(4.5,Math.max(.65,M3.dist*pinchD/d));
+      pinchD=d;return;}
+    if(!M3.drag)return;
     M3.az+=(e.clientX-M3.lx)*.006;M3.pol=Math.min(1.45,Math.max(.25,M3.pol-(e.clientY-M3.ly)*.004));
     M3.lx=e.clientX;M3.ly=e.clientY;});
-  cv.addEventListener('wheel',e=>{e.preventDefault();M3.dist=Math.min(4.5,Math.max(1.5,M3.dist+e.deltaY*.002));},{passive:false});
+  // Zoom sát để soi từng đoạn đường (0.65) — bước mịn
+  cv.addEventListener('wheel',e=>{e.preventDefault();M3.dist=Math.min(4.5,Math.max(.65,M3.dist+e.deltaY*.0015));},{passive:false});
+  cv.addEventListener('dblclick',()=>{M3.dist=M3.dist>1.4?.85:2.7;});
   resize3D();
 }
 function loop3D(){
