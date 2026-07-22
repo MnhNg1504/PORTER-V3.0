@@ -5,14 +5,12 @@
   },
   "build": {
     "preview": {
-      "comment-vi": "Build APK cài trực tiếp lên điện thoại (không cần USB/Google Play)",
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       }
     },
     "development": {
-      "comment-vi": "Dev build + dev client — nạp JS qua Wi-Fi từ máy tính (expo start --dev-client)",
       "developmentClient": true,
       "distribution": "internal",
       "android": {
@@ -20,7 +18,6 @@
       }
     },
     "production": {
-      "comment-vi": "Bản phát hành (AAB cho Google Play) — GĐ sau",
       "autoIncrement": true
     }
   }
