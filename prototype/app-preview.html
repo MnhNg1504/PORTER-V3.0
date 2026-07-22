@@ -7,6 +7,8 @@
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="taxua-track.js"></script>
+<script src="taxua-dem.js"></script>
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
 <style>
   /* ============================================================
      POTTER 3.0 — preview UI theo NGÔN NGỮ THIẾT KẾ GỐC Porter
@@ -207,6 +209,19 @@
   .mile b{color:var(--ink)}
   .premium{margin:14px 16px 96px;background:var(--go);color:var(--go-ink);border-radius:16px;padding:15px;text-align:center;
     font-weight:700;font-size:13px;cursor:pointer}
+  /* ===== Núi 3D Core Map (contour isometric brand, mesh xoay 360°) ===== */
+  #mount3d{position:absolute;inset:0;background:#0e1712;display:none;z-index:12;flex-direction:column}
+  #mount3d.on{display:flex}
+  .m3-head{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-shrink:0}
+  .m3-head .back{background:rgba(234,241,228,.12);border-color:transparent;color:#EAF1E4}
+  .m3-head h2{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:18px}
+  .m3-head .sub{font-size:11px;color:#8FA07F}
+  #m3-canvas{flex:1;touch-action:none;cursor:grab}
+  .m3-stats{display:flex;gap:0;padding:10px 14px 14px;flex-shrink:0}
+  .m3-stats>div{flex:1;text-align:center}
+  .m3-stats .k{color:#8FA07F}
+  .m3-stats .v{color:#EAF1E4}
+  .m3-note{text-align:center;font-size:10.5px;color:#8FA07F;padding-bottom:10px}
   /* ===== Overlay chung (StartPoint, Chat) ===== */
   .ovl{position:absolute;inset:0;background:var(--ground);display:none;flex-direction:column;z-index:11;overflow-y:auto;scrollbar-width:none}
   .ovl::-webkit-scrollbar{display:none}
@@ -368,7 +383,7 @@
       </div>
       <div class="sec">Thời tiết · Bản Tà Xùa (Open-Meteo — thật)</div>
       <div class="card wx" id="wx"><div class="now"><span class="e">⏳</span><span style="font-size:13px;color:var(--mute)">Đang lấy thời tiết thật…</span></div></div>
-      <p class="contour-note">🗻 Thẻ "Route covered" (núi bình độ isometric) xem bản tương tác tại <b>contour-iso.html</b> — trong app RN đã tích hợp ở màn này.</p>
+      <div style="margin:0 16px"><button class="buybtn" style="background:#16281A;color:#C9E265" onclick="open3D()">🗻 XEM NÚI 3D — ROUTE COVERED</button></div>
       <div class="sec">Điểm xuất phát (bắt buộc có ảnh)</div>
       <div class="card startcard">
         <div class="sph"><img src="photos/yty-2.jpg" alt="Đường đất đầu bản Tà Xùa"/></div>
@@ -414,6 +429,23 @@
       <div class="cinput"><span style="font-size:20px">📎</span>
         <div class="cfield">Nhắn tin cho A Của…</div>
         <span class="csend">➤</span></div>
+    </section>
+
+    <!-- ==== NÚI 3D CORE MAP (mesh DEM thật, contour brand, xoay 360°) ==== -->
+    <section id="mount3d">
+      <div class="m3-head">
+        <span class="back" onclick="close3D()">←</span>
+        <div><h2>Núi 3D · Tà Xùa</h2>
+        <div class="sub">DEM thật 96×96 (terrarium z13) · kéo xoay · lăn chuột thu phóng</div></div>
+      </div>
+      <canvas id="m3-canvas"></canvas>
+      <div class="m3-stats">
+        <div><div class="k">ĐỈNH</div><div class="v">2.871 m</div></div>
+        <div><div class="k">CHÂN NÚI</div><div class="v">818 m</div></div>
+        <div><div class="k">VÙNG</div><div class="v">~10 km</div></div>
+        <div><div class="k">TRACK</div><div class="v">17,2 km</div></div>
+      </div>
+      <div class="m3-note">Đường bình độ mỗi 60m — sáng dần theo độ cao (phong cách Route covered)</div>
     </section>
 
     <!-- ==== SOS sheet (docs/05 §5 — SMS + gọi, không qua server) ==== -->
@@ -464,6 +496,7 @@
           <span class="mtool" data-b="topo" onclick="setBase(this)">⛰</span>
           <span class="mtool" data-b="sat" onclick="setBase(this)">🛰</span>
           <span class="mtool" onclick="fitTrack()">🎯</span>
+          <span class="mtool" onclick="open3D()">🗻</span>
         </div>
         <span class="sos" onclick="openSos()">SOS</span>
         <div id="navcard">
@@ -692,6 +725,110 @@ function closeSos(){
 // ===== Chat view =====
 function openChat(){document.getElementById('chatview').classList.add('on');}
 function closeChat(){document.getElementById('chatview').classList.remove('on');}
+
+// ===== NÚI 3D CORE MAP — mesh DEM THẬT + bình độ brand, xoay 360° (three.js) =====
+const M3={inited:false,az:.65,pol:1.02,dist:2.7,drag:false,lx:0,ly:0,raf:null};
+function h3(e){const g=TAXUA_DEM;return (e-g.min)/((g.max-g.min)||1)*0.55;}
+function open3D(){
+  document.getElementById('mount3d').classList.add('on');
+  if(!M3.inited)init3D(); else resize3D();
+  loop3D();
+}
+function close3D(){
+  document.getElementById('mount3d').classList.remove('on');
+  if(M3.raf)cancelAnimationFrame(M3.raf);M3.raf=null;
+}
+function resize3D(){
+  const cv=document.getElementById('m3-canvas');
+  const w=cv.clientWidth,h=cv.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+  M3.renderer.setSize(w*dpr,h*dpr,false);
+  M3.camera.aspect=w/h;M3.camera.updateProjectionMatrix();
+}
+// marching squares trên lưới DEM (16 case, nội suy cạnh)
+function m3Segs(level){
+  const g=TAXUA_DEM,n=g.n,W=n+1,E=g.elev,out=[];
+  const it=(a,b)=>(level-a)/((b-a)||1e-9);
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){
+    const tl=E[j*W+i],tr=E[j*W+i+1],br=E[(j+1)*W+i+1],bl=E[(j+1)*W+i];
+    const c=(tl>=level?8:0)|(tr>=level?4:0)|(br>=level?2:0)|(bl>=level?1:0);
+    if(c===0||c===15)continue;
+    const T=[i+it(tl,tr),j],R=[i+1,j+it(tr,br)],B=[i+it(bl,br),j+1],L=[i,j+it(tl,bl)];
+    const P=(A,Bb)=>out.push(A,Bb);
+    switch(c){case 1:P(L,B);break;case 2:P(B,R);break;case 3:P(L,R);break;case 4:P(T,R);break;
+     case 5:P(L,T);P(B,R);break;case 6:P(T,B);break;case 7:P(L,T);break;case 8:P(T,L);break;
+     case 9:P(T,B);break;case 10:P(T,R);P(L,B);break;case 11:P(T,R);break;case 12:P(R,L);break;
+     case 13:P(B,R);break;case 14:P(L,B);break;}
+  }
+  return out;
+}
+function gxy(pi,pj){const n=TAXUA_DEM.n;return [pi/n*2-1,pj/n*2-1];}
+function init3D(){
+  M3.inited=true;
+  const g=TAXUA_DEM,n=g.n,W=n+1;
+  const cv=document.getElementById('m3-canvas');
+  M3.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+  M3.scene=new THREE.Scene();M3.scene.background=new THREE.Color(0x0e1712);
+  M3.camera=new THREE.PerspectiveCamera(45,1,.05,60);
+  // --- Mesh địa hình (màu nền Pine — che khuất đường phía sau núi) ---
+  const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position;
+  for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
+  geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x101c14,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
+  M3.scene.add(mesh);
+  // --- Đường bình độ 60m: rêu tối -> Lime theo độ cao ---
+  const OFF=.006,interval=60,start=Math.ceil(g.min/interval)*interval;
+  for(let lv=start;lv<=g.max;lv+=interval){
+    const segs=m3Segs(lv);if(!segs.length)continue;
+    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
+    segs.forEach((p,k)=>{const[x,z]=gxy(p[0],p[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
+    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
+    const col=new THREE.Color(`rgb(${Math.round(100+hN*101)},${Math.round(140+hN*86)},${Math.round(60+hN*41)})`);
+    M3.scene.add(new THREE.LineSegments(bg,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.28+hN*.72})));
+  }
+  // --- Track GPX THẬT phủ sườn (trắng nét đứt) ---
+  const b=g.bbox,tp=[];
+  TAXUA.forEach(p=>{const pi=(p[0]-b.minLon)/(b.maxLon-b.minLon)*n,pj=(b.maxLat-p[1])/(b.maxLat-b.minLat)*n;
+    const[x,z]=gxy(pi,pj);tp.push(new THREE.Vector3(x,h3(p[2]??g.min)+OFF*2,z));});
+  const tg=new THREE.BufferGeometry().setFromPoints(tp);
+  const track=new THREE.Line(tg,new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022}));
+  track.computeLineDistances();M3.scene.add(track);
+  // --- Pin đầu/đỉnh/cuối (cột + cầu màu) ---
+  let pk=0,mx=-1e9;TAXUA.forEach((p,i)=>{if(p[2]!=null&&p[2]>mx){mx=p[2];pk=i;}});
+  [[0,0x7FB069],[pk,0xE8C877],[TAXUA.length-1,0xFF5233]].forEach(([idx,c])=>{
+    const v=tp[Math.min(idx,tp.length-1)];
+    const lg=new THREE.BufferGeometry().setFromPoints([v,new THREE.Vector3(v.x,v.y+.09,v.z)]);
+    M3.scene.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.5})));
+    const s=new THREE.Mesh(new THREE.SphereGeometry(.02,12,12),new THREE.MeshBasicMaterial({color:c}));
+    s.position.set(v.x,v.y+.1,v.z);M3.scene.add(s);
+  });
+  // --- Vòng la bàn + nhãn N/E/S/W (sprite canvas) ---
+  const ring=[];for(let k=0;k<=96;k++){const a=k/96*Math.PI*2;ring.push(new THREE.Vector3(Math.cos(a)*1.12,0,Math.sin(a)*1.12));}
+  M3.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ring),
+    new THREE.LineBasicMaterial({color:0x8FA07F,transparent:true,opacity:.4})));
+  [['N',0,-1.24],['E',1.24,0],['S',0,1.24],['W',-1.24,0]].forEach(([t,x,z])=>{
+    const c2=document.createElement('canvas');c2.width=c2.height=64;const g2=c2.getContext('2d');
+    g2.fillStyle='rgba(234,241,228,.85)';g2.font='bold 40px Segoe UI';g2.textAlign='center';g2.textBaseline='middle';g2.fillText(t,32,34);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c2),transparent:true}));
+    sp.scale.set(.12,.12,1);sp.position.set(x,.02,z);M3.scene.add(sp);
+  });
+  // --- Điều khiển: kéo xoay, lăn thu phóng ---
+  cv.addEventListener('pointerdown',e=>{M3.drag=true;M3.lx=e.clientX;M3.ly=e.clientY;cv.style.cursor='grabbing';});
+  addEventListener('pointerup',()=>{M3.drag=false;cv.style.cursor='grab';});
+  addEventListener('pointermove',e=>{if(!M3.drag)return;
+    M3.az+=(e.clientX-M3.lx)*.006;M3.pol=Math.min(1.45,Math.max(.25,M3.pol-(e.clientY-M3.ly)*.004));
+    M3.lx=e.clientX;M3.ly=e.clientY;});
+  cv.addEventListener('wheel',e=>{e.preventDefault();M3.dist=Math.min(4.5,Math.max(1.5,M3.dist+e.deltaY*.002));},{passive:false});
+  resize3D();
+}
+function loop3D(){
+  if(!M3.drag)M3.az+=.0012; // tự xoay chậm khi không kéo
+  const sp=Math.sin(M3.pol),c=M3.camera;
+  c.position.set(Math.cos(M3.az)*sp*M3.dist,Math.cos(M3.pol)*M3.dist,Math.sin(M3.az)*sp*M3.dist);
+  c.lookAt(0,.16,0);
+  M3.renderer.render(M3.scene,M3.camera);
+  M3.raf=requestAnimationFrame(loop3D);
+}
 </script>
 </body>
 </html>
