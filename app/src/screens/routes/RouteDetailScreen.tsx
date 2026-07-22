@@ -6,6 +6,7 @@ import { colors, radius, space, shadow, type } from '../../theme';
 import { DifficultyChip } from '../../components/DifficultyChip';
 import { StatCell } from '../../components/StatCell';
 import { ContourCard } from '../../components/ContourCard';
+import { WeatherCard } from '../../components/WeatherCard';
 import { mockRoutes, currentUser } from '../../lib/mockData';
 import { loadBundledTaXua } from '../../lib/gpxAsset';
 import type { GpxPoint } from '../../lib/gpx';
@@ -73,6 +74,15 @@ export function RouteDetailScreen({ route }: Props) {
               </Text>
             </View>
           )}
+
+          {/* Thời tiết THẬT tại điểm xuất phát (Open-Meteo) + đánh giá an toàn */}
+          <View style={{ marginBottom: space[4] }}>
+            <WeatherCard
+              lat={data.startPoint.lat}
+              lon={data.startPoint.lon}
+              label={data.startPoint.label}
+            />
+          </View>
 
           <Text style={styles.section}>Mô tả</Text>
           <Text style={styles.paragraph}>
