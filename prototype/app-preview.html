@@ -146,6 +146,61 @@
   .mile .ic{font-size:18px}
   .premium{margin:14px 16px 90px;background:var(--lime);border-radius:14px;padding:14px;text-align:center;
     font-weight:700;font-size:13px;cursor:pointer}
+  /* ===== Overlay chung (StartPoint, Chat) ===== */
+  .ovl{position:absolute;inset:0;background:var(--cream);display:none;flex-direction:column;z-index:11;overflow-y:auto}
+  .ovl.on{display:flex}
+  .back{width:34px;height:34px;border-radius:50%;background:rgba(234,241,228,.94);display:flex;
+    align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid var(--sand)}
+  /* Bước 1 — điểm xuất phát */
+  .sphoto{height:38%;min-height:230px;background:linear-gradient(150deg,#3b5a3e,#557a4b 60%,#8FA07F);
+    position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .sphoto .back{position:absolute;top:12px;left:12px}
+  .sphoto-inner{text-align:center;color:var(--cream);font-size:13px;line-height:1.6}
+  .spdist{display:flex;justify-content:space-between;align-items:center;background:var(--lime);
+    border-radius:12px;padding:11px 14px;font-size:13px;margin:10px 0}
+  /* Nav mode (Bước 2) */
+  #navcard{position:absolute;left:12px;right:12px;top:46px;z-index:7;background:rgba(255,255,255,.97);
+    border-radius:16px;padding:13px;box-shadow:0 10px 26px rgba(22,40,26,.28);display:none}
+  #navcard.on{display:block}
+  #navcard .row{display:flex;gap:12px;align-items:center}
+  #navcard .arr{width:46px;height:46px;border-radius:13px;background:var(--forest);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:22px}
+  #navcard .big{font-size:17px;font-weight:800}
+  #navcard .sm{font-size:12px;color:var(--text2)}
+  #navcard .ft{display:flex;justify-content:space-between;margin-top:9px;padding-top:8px;
+    border-top:1px solid var(--surface);font-size:11.5px;color:var(--text2)}
+  #navcard .ft b{color:var(--pine)}
+  #navx{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;background:var(--pine);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+  /* Chat view */
+  .chd{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--sand);
+    background:var(--cream);flex-shrink:0}
+  .cbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
+  .bub{max-width:75%;padding:9px 13px;border-radius:16px;font-size:13.5px;line-height:1.45}
+  .bub.them{background:#fff;border:1px solid var(--sand);align-self:flex-start;border-bottom-left-radius:5px}
+  .bub.me{background:var(--pine);color:var(--cream);align-self:flex-end;border-bottom-right-radius:5px}
+  .bub.recalled{background:var(--surface);color:var(--sage);font-style:italic;border:1px dashed var(--sand)}
+  .sub{font-size:10px;color:var(--sage)} .me-sub{align-self:flex-end}
+  .bub.typing{display:flex;gap:4px;padding:12px 14px}
+  .bub.typing span{width:7px;height:7px;border-radius:50%;background:var(--sage);animation:tp 1s infinite}
+  .bub.typing span:nth-child(2){animation-delay:.2s} .bub.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes tp{0%,100%{opacity:.3}50%{opacity:1}}
+  .cinput{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--sand);
+    background:var(--cream);flex-shrink:0}
+  .cfield{flex:1;background:var(--surface);border:1px solid var(--sand);border-radius:999px;
+    padding:10px 14px;font-size:13px;color:var(--text2)}
+  .csend{width:38px;height:38px;border-radius:50%;background:var(--lime);display:flex;
+    align-items:center;justify-content:center;font-weight:800;cursor:pointer}
+  /* SOS sheet */
+  #sos-back{position:absolute;inset:0;background:rgba(14,18,14,.55);z-index:14;display:none}
+  #sos-sheet{position:absolute;left:0;right:0;bottom:-100%;background:var(--cream);z-index:15;
+    border-radius:22px 22px 0 0;padding:18px 16px 26px;transition:bottom .28s;display:flex;
+    flex-direction:column;gap:8px}
+  #sos-sheet.on{bottom:0} #sos-back.on{display:block}
+  .sos-pos{background:var(--surface);border:1px solid var(--sand);border-radius:12px;padding:10px 12px}
+  .sos-call{background:var(--ember);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+  .sos-sms{background:var(--pine);color:var(--cream);border-radius:12px;padding:12px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .sos-share{background:#fff;border:1px solid var(--sand);border-radius:12px;padding:12px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -232,8 +287,61 @@
         <div style="height:110px;background:linear-gradient(115deg,#3b5a3e,#8FA07F);display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:13px">📷 Ảnh thực địa: Cổng gỗ đầu bản Tà Xùa</div>
         <div style="padding:10px 12px;font-size:12.5px;color:var(--text2)">Gửi xe nhà anh Sơn cuối đường bê tông · Guide: <b style="color:var(--pine)">A Của ★4.9</b></div>
       </div>
-      <div class="cta"><button class="buybtn">MUA CUNG HƯỚNG DẪN — 350.000đ</button></div>
+      <div class="cta"><button class="buybtn" onclick="openStart()">MUA CUNG HƯỚNG DẪN — 350.000đ</button></div>
     </section>
+
+    <!-- ==== BƯỚC 1: Dẫn tới ĐIỂM XUẤT PHÁT (docs/00 §4 — bắt buộc có ảnh) ==== -->
+    <section id="startpoint" class="ovl">
+      <div class="sphoto">
+        <span class="back" onclick="closeStart()">←</span>
+        <div class="sphoto-inner">📷<br/>Ảnh thực địa THẬT<br/><b>Cổng gỗ đầu bản, biển "Tà Xùa"</b></div>
+      </div>
+      <div style="padding:14px 16px">
+        <h2 style="font-family:'YoungDisplay',serif;font-size:20px">Bước 1 — Tới điểm xuất phát</h2>
+        <div class="spdist"><span>📍 Cách bạn</span><b>3,2 km · ~9 phút xe máy</b></div>
+        <div class="card" style="padding:12px;font-size:13px;line-height:1.5">
+          🪧 <b>Mốc nhận diện:</b> Cổng gỗ đầu bản, có biển "Tà Xùa".<br/>
+          🛵 Gửi xe tại nhà anh Sơn cuối đường bê tông.<br/>
+          👤 Guide: <b>A Của ★4.9</b> — sẽ đợi tại điểm xuất phát.
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:10px">Khi bạn tới gần 50m, app tự thông báo và chuyển Bước 2.</div>
+      </div>
+      <div class="cta"><button class="buybtn" onclick="startTrek()">✅ ĐÃ TỚI NƠI — BẮT ĐẦU ĐI CUNG (Bước 2)</button></div>
+    </section>
+
+    <!-- ==== Chat view (bubble, đã xem, thu hồi, typing) ==== -->
+    <section id="chatview" class="ovl">
+      <div class="chd"><span class="back" onclick="closeChat()">←</span>
+        <div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
+        <div><div style="font-weight:700;font-size:14px">A Của — Guide Tà Xùa</div>
+        <div style="font-size:11px;color:var(--forest)">● Đang hoạt động</div></div></div>
+      <div class="cbody">
+        <div class="bub them">Chào bạn, mình là A Của — guide cung Tà Xùa 👋</div>
+        <div class="bub them">Đoàn mình 6h sáng xuất phát nhé, nhớ mang áo mưa ⛈</div>
+        <div class="bub me">Ok anh! Em tới điểm gửi xe lúc 5h45</div>
+        <div class="sub me-sub">Đã xem ✓✓</div>
+        <div class="bub me recalled">Tin nhắn đã thu hồi</div>
+        <div class="bub them typing"><span></span><span></span><span></span></div>
+      </div>
+      <div class="cinput"><span style="font-size:20px">📎</span>
+        <div class="cfield">Nhắn tin cho A Của…</div>
+        <span class="csend">➤</span></div>
+    </section>
+
+    <!-- ==== SOS sheet (docs/05 §5 — SMS + gọi, không qua server) ==== -->
+    <div id="sos-back" onclick="closeSos()"></div>
+    <div id="sos-sheet">
+      <h3 style="color:var(--ember);font-family:'YoungDisplay',serif;font-size:19px">🆘 Khẩn cấp</h3>
+      <div class="sos-pos">
+        <div style="font-size:10.5px;color:var(--text2)">VỊ TRÍ GPS CỦA BẠN — đọc khi gọi cứu hộ</div>
+        <div id="sos-coords" style="font-size:16px;font-weight:800;margin:3px 0">…</div>
+      </div>
+      <div class="sos-call">📞 Gọi 112 — Cứu nạn cứu hộ quốc gia</div>
+      <div class="sos-call">📞 Gọi 115 — Cấp cứu y tế</div>
+      <div class="sos-sms">✉️ SMS SOS cho Minh (0912•••678) — kèm toạ độ + link bản đồ</div>
+      <div class="sos-share">📍 Chia sẻ vị trí (không khẩn cấp)</div>
+      <div style="font-size:10.5px;color:var(--text2);margin-top:8px">POTTER hỗ trợ liên lạc — KHÔNG thay thế dịch vụ cứu hộ. Cần sóng di động.</div>
+    </div>
 
     <!-- ============ TAB 3: BẢN ĐỒ ============ -->
     <section class="screen" id="s-map">
@@ -245,7 +353,13 @@
           <span class="mtool" data-b="sat" onclick="setBase(this)">🛰</span>
           <span class="mtool" onclick="fitTrack()">🎯</span>
         </div>
-        <span class="sos" onclick="alert('SOS (bản thật): GPS thật + gọi 112/115/113 + SMS người thân kèm toạ độ — không qua server')">SOS</span>
+        <span class="sos" onclick="openSos()">SOS</span>
+        <div id="navcard">
+          <span id="navx" onclick="stopNav()">✕</span>
+          <div class="row"><div class="arr" id="nv-arr">➤</div>
+            <div><div class="big" id="nv-main">Rẽ phải</div><div class="sm" id="nv-sub">sau 220 m</div></div></div>
+          <div class="ft"><span>Còn lại <b id="nv-rem">—</b></span><span>ETA <b id="nv-eta">—</b></span><span>Độ cao <b id="nv-ele">—</b></span></div>
+        </div>
         <div class="mapstats">
           <div><div class="v" id="mx-km">…</div><div class="k">KM</div></div>
           <div><div class="v" id="mx-gain">…</div><div class="k">TỔNG LEO</div></div>
@@ -259,7 +373,7 @@
     <section class="screen" id="s-msg">
       <div class="hd"><h1>Tin nhắn</h1><span class="act">＋ Nhóm</span></div>
       <div class="convs">
-        <div class="conv"><div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
+        <div class="conv" onclick="openChat()"><div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
           <div class="p"><div class="nm">A Của — Guide Tà Xùa</div><div class="last">Đoàn mình 6h sáng xuất phát nhé, nhớ mang áo mưa ⛈</div></div>
           <div class="meta">17:02<br/><span class="badge">2</span></div></div>
         <div class="conv"><div class="ava" style="background:var(--mist)">PT</div>
@@ -386,6 +500,76 @@ function fitTrack(){
   if(!map)return;const b=new maplibregl.LngLatBounds();
   TAXUA.forEach(p=>b.extend([p[0],p[1]]));map.fitBounds(b,{padding:50});
 }
+
+// ===== BƯỚC 1: Điểm xuất phát =====
+function openStart(){document.getElementById('startpoint').classList.add('on');}
+function closeStart(){document.getElementById('startpoint').classList.remove('on');}
+
+// ===== BƯỚC 2: Điều hướng — khúc rẽ THẬT từ hình học track =====
+const CUM=[0];for(let i=1;i<TAXUA.length;i++)CUM.push(CUM[i-1]+hav(TAXUA[i-1],TAXUA[i]));
+const TOTAL=CUM[CUM.length-1];
+function brg(a,b){const r=Math.PI/180,y=Math.sin((b[0]-a[0])*r)*Math.cos(b[1]*r),
+ x=Math.cos(a[1]*r)*Math.sin(b[1]*r)-Math.sin(a[1]*r)*Math.cos(b[1]*r)*Math.cos((b[0]-a[0])*r);
+ return (Math.atan2(y,x)*180/Math.PI+360)%360;}
+const TURNS=[];{let last=0;
+ for(let i=3;i<TAXUA.length-3;i++){const d=((brg(TAXUA[i],TAXUA[i+3])-brg(TAXUA[i-3],TAXUA[i])+540)%360)-180;
+  if(Math.abs(d)>32&&CUM[i]-last>150){TURNS.push({at:CUM[i],dir:d>0?'right':'left'});last=CUM[i];}}}
+let navTimer=null,navIdx=0;
+function fmt(m){return m>=1000?(m/1000).toFixed(1)+' km':Math.round(m/10)*10+' m';}
+function startTrek(){
+  closeStart();closeDetail();
+  document.querySelector('nav .fab').click(); // sang tab map
+  document.getElementById('navcard').classList.add('on');
+  navIdx=0;
+  if(navTimer)clearInterval(navTimer);
+  navTimer=setInterval(()=>{
+    navIdx=Math.min(navIdx+2,TAXUA.length-1);
+    updNav();
+    if(navIdx>=TAXUA.length-1)clearInterval(navTimer);
+  },400);
+  setTimeout(updNav,600);
+}
+function stopNav(){document.getElementById('navcard').classList.remove('on');
+ if(navTimer)clearInterval(navTimer);removeMe();}
+function updNav(){
+  const d=CUM[navIdx],rem=TOTAL-d;
+  const t=TURNS.find(t=>t.at>d+8);
+  document.getElementById('nv-arr').textContent=t?(t.dir==='right'?'➤':'⬅'):'◎';
+  document.getElementById('nv-main').textContent=t?(t.dir==='right'?'Rẽ phải':'Rẽ trái'):'Tới đỉnh';
+  document.getElementById('nv-sub').textContent=t?('sau '+fmt(t.at-d)):fmt(rem);
+  document.getElementById('nv-rem').textContent=fmt(rem);
+  const h=rem/1000/2.5;const hh=Math.floor(h),mm=Math.round((h-hh)*60);
+  document.getElementById('nv-eta').textContent=hh>0?hh+'h'+String(mm).padStart(2,'0'):mm+' phút';
+  document.getElementById('nv-ele').textContent=TAXUA[navIdx][2]!=null?TAXUA[navIdx][2]+'m':'—';
+  drawMe();
+}
+function drawMe(){
+  if(!map)return;const p=[TAXUA[navIdx][0],TAXUA[navIdx][1]];
+  const fc={type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'Point',coordinates:p}}]};
+  if(map.getSource('me')){map.getSource('me').setData(fc);}
+  else{map.addSource('me',{type:'geojson',data:fc});
+   map.addLayer({id:'me-h',type:'circle',source:'me',paint:{'circle-radius':14,'circle-color':'#2F6BFF','circle-opacity':.2}});
+   map.addLayer({id:'me-d',type:'circle',source:'me',paint:{'circle-radius':7,'circle-color':'#2F6BFF','circle-stroke-width':3,'circle-stroke-color':'#fff'}});}
+  map.easeTo({center:p,duration:350});
+}
+function removeMe(){if(map&&map.getSource('me')){['me-h','me-d'].forEach(l=>map.getLayer(l)&&map.removeLayer(l));map.removeSource('me');}}
+
+// ===== SOS sheet =====
+function openSos(){
+  const p=TAXUA[Math.min(navIdx,TAXUA.length-1)];
+  document.getElementById('sos-coords').textContent=
+    p[1].toFixed(6)+', '+p[0].toFixed(6)+(p[2]!=null?', cao ~'+p[2]+'m':'');
+  document.getElementById('sos-back').classList.add('on');
+  document.getElementById('sos-sheet').classList.add('on');
+}
+function closeSos(){
+  document.getElementById('sos-back').classList.remove('on');
+  document.getElementById('sos-sheet').classList.remove('on');
+}
+
+// ===== Chat view =====
+function openChat(){document.getElementById('chatview').classList.add('on');}
+function closeChat(){document.getElementById('chatview').classList.remove('on');}
 </script>
 </body>
 </html>
