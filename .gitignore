@@ -26,6 +26,9 @@ Thumbs.db
 *.zip
 prototype/gpx/
 
+# Ảnh user upload (dev — LocalStorageService)
+server/uploads/
+
 # IDE
 .vscode/
 .idea/

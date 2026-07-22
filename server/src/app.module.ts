@@ -13,6 +13,7 @@ import { ModerationModule } from './moderation/moderation.module';
 import { AdminModule } from './admin/admin.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     AdminModule,
     ChatModule,
     NotificationsModule,
+    MediaModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

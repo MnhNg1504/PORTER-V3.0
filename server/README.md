@@ -31,10 +31,14 @@ Chạy cả API trong Docker: `docker compose --profile full up`.
 - **Moderation**: báo cáo nội dung + chặn user (checklist §1).
 - **Admin API**: duyệt GPX, xử lý report, set tier (web admin ở GĐ4).
 - **Chat**: Socket.IO namespace `/chat` — auth JWT, join/message/typing/presence (GĐ3 hoàn thiện).
+- **Media**: `POST /media/upload` (JWT, multipart field `file`) — ảnh jpeg/png/webp ≤10MB,
+  validate magic bytes; dev lưu `uploads/` + serve `/uploads` (`TODO(storage)`: S3/R2 — user chọn).
 - **Bảo mật**: helmet, ValidationPipe whitelist (chống injection qua DTO), rate limit toàn cục.
+- **Test**: `npx jest` — unit test route-utils/gpx/auth/chat/media (jest 29 + ts-jest 29,
+  KHÔNG nâng jest 30 — xung khắc ts-jest). CI chạy typecheck + jest (checklist §8).
 - Swagger `/docs` (checklist §12).
 
 ## Chưa có (GĐ kế)
-- OAuth Google/Apple, xác thực email (GĐ3) · upload ảnh/video + storage (GĐ3)
-- Push notification (GĐ3) · Web admin (GĐ4) · Queue BullMQ, backup tự động, monitoring, CI/CD (GĐ5)
+- OAuth Google/Apple chờ key thật (GĐ3) · storage S3/R2 cho ảnh (user chọn dịch vụ)
+- Web admin (GĐ4) · Queue BullMQ, monitoring (GĐ5)
 - Tạo TrekRoute tự động khi admin approve GPX (`TODO(api)` trong admin.controller)

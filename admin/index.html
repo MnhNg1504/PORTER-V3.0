@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POTTER 3.0 — Quản trị</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --border: #dde3e9;
+    --text: #1c2733;
+    --muted: #64748b;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --green: #16a34a;
+    --green-hover: #15803d;
+    --red: #dc2626;
+    --red-hover: #b91c1c;
+    --amber-bg: #fef3c7;
+    --amber-border: #f59e0b;
+    --amber-text: #92400e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  /* ---------- Thanh trên ---------- */
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand { font-weight: 700; font-size: 16px; white-space: nowrap; }
+  .brand small { color: var(--muted); font-weight: 400; }
+  .api-config { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 260px; }
+  .api-config label { color: var(--muted); white-space: nowrap; }
+  .api-config input { flex: 1; max-width: 340px; }
+  .session { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .session .who { color: var(--muted); }
+  .session .who strong { color: var(--text); }
+
+  /* ---------- Khối chung ---------- */
+  main { max-width: 1100px; margin: 24px auto; padding: 0 20px 60px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  h2 { font-size: 16px; margin-bottom: 12px; }
+  .muted { color: var(--muted); }
+  input, select, textarea, button {
+    font: inherit;
+    color: inherit;
+  }
+  input[type="text"], input[type="email"], input[type="password"], input[type="url"], select {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  input:focus, select:focus { outline: 2px solid #bfdbfe; border-color: var(--primary); }
+  button {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+  }
+  button:hover { background: #f1f5f9; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+  button.primary:hover:not(:disabled) { background: var(--primary-hover); }
+  button.approve { background: var(--green); border-color: var(--green); color: #fff; }
+  button.approve:hover:not(:disabled) { background: var(--green-hover); }
+  button.reject { background: var(--red); border-color: var(--red); color: #fff; }
+  button.reject:hover:not(:disabled) { background: var(--red-hover); }
+
+  .alert { border-radius: 6px; padding: 10px 14px; margin: 12px 0; }
+  .alert.error { background: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
+  .alert.success { background: #dcfce7; border: 1px solid #86efac; color: #14532d; }
+  .alert.warn { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber-text); }
+
+  /* ---------- Đăng nhập ---------- */
+  .login-card { max-width: 400px; margin: 60px auto 0; }
+  .login-card form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .login-card label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+  .login-card input { width: 100%; }
+
+  /* ---------- Tab ---------- */
+  .tabs { display: flex; gap: 4px; margin: 20px 0 0; border-bottom: 2px solid var(--border); }
+  .tabs button {
+    border: none; background: none; border-radius: 6px 6px 0 0;
+    padding: 9px 18px; font-weight: 600; color: var(--muted);
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+  }
+  .tabs button:hover { background: #e8edf3; }
+  .tabs button.active { color: var(--primary); border-bottom-color: var(--primary); background: none; }
+  .tab-panel { margin-top: 16px; }
+
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .toolbar .spacer { flex: 1; }
+
+  /* ---------- Bảng ---------- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: #f8fafc; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); white-space: nowrap; }
+  tr:hover td { background: #f8fafc; }
+  td .sub { color: var(--muted); font-size: 12px; }
+  .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+  .empty { padding: 24px; text-align: center; color: var(--muted); }
+
+  .chip { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chip.pending, .chip.open { background: #fef9c3; color: #854d0e; }
+  .chip.approved, .chip.resolved { background: #dcfce7; color: #166534; }
+  .chip.rejected, .chip.dismissed { background: #fee2e2; color: #991b1b; }
+  .chip.tier { background: #e0e7ff; color: #3730a3; }
+
+  .row-actions { display: flex; flex-direction: column; gap: 6px; min-width: 210px; }
+  .row-actions input { width: 100%; }
+  .row-actions .btns { display: flex; gap: 6px; }
+  .row-actions .btns button { flex: 1; }
+
+  /* ---------- Tab người dùng ---------- */
+  .tier-form { display: flex; flex-direction: column; gap: 14px; max-width: 620px; }
+  .tier-form .field { display: flex; flex-direction: column; gap: 4px; }
+  .tier-form .field label { font-weight: 600; }
+  .tier-desc { border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; background: #f8fafc; }
+  .tier-desc ul { margin-left: 18px; }
+  .tier-desc li { margin: 3px 0; }
+
+  #toast {
+    position: fixed; bottom: 20px; right: 20px; z-index: 50;
+    display: flex; flex-direction: column; gap: 8px; max-width: 380px;
+  }
+  #toast .t {
+    background: #1c2733; color: #fff; border-radius: 6px; padding: 10px 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.25); font-size: 13px;
+  }
+  #toast .t.ok { background: var(--green-hover); }
+  #toast .t.err { background: var(--red-hover); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">POTTER 3.0 <small>· Trang quản trị (nội bộ)</small></div>
+  <div class="api-config">
+    <label for="api-url">API URL</label>
+    <input type="url" id="api-url" placeholder="http://localhost:3000">
+    <button id="api-save" title="Lưu vào localStorage">Lưu</button>
+  </div>
+  <div class="session" id="session-info" hidden>
+    <span class="who">Đăng nhập: <strong id="session-user"></strong></span>
+    <button id="btn-logout">Đăng xuất</button>
+  </div>
+</header>
+
+<main>
+  <!-- ========== ĐĂNG NHẬP ========== -->
+  <section id="view-login" class="card login-card">
+    <h1>Đăng nhập quản trị</h1>
+    <p class="muted">Chỉ tài khoản <strong>role = admin</strong> dùng được các API quản trị.</p>
+    <form id="form-login" autocomplete="on">
+      <label>Email
+        <input type="email" id="login-email" required autocomplete="username">
+      </label>
+      <label>Mật khẩu
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+      <button type="submit" id="btn-login" class="primary">Đăng nhập</button>
+    </form>
+    <div id="login-error" class="alert error" hidden></div>
+  </section>
+
+  <!-- ========== SAU ĐĂNG NHẬP ========== -->
+  <section id="view-app" hidden>
+    <div id="role-warning" class="alert warn" hidden>
+      Tài khoản này <strong>không có role=admin</strong> — mọi thao tác quản trị sẽ bị máy chủ từ chối (403).
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button data-tab="gpx" class="active">Duyệt GPX</button>
+      <button data-tab="reports">Báo cáo</button>
+      <button data-tab="users">Người dùng</button>
+    </nav>
+
+    <!-- ===== TAB 1: DUYỆT GPX ===== -->
+    <section class="tab-panel" id="tab-gpx">
+      <div class="toolbar">
+        <label class="muted" for="gpx-status">Trạng thái</label>
+        <select id="gpx-status">
+          <option value="pending" selected>Chờ duyệt (pending)</option>
+          <option value="approved">Đã duyệt (approved)</option>
+          <option value="rejected">Đã từ chối (rejected)</option>
+        </select>
+        <button id="gpx-refresh">Tải lại</button>
+        <div class="spacer"></div>
+        <span class="muted" id="gpx-count"></span>
+      </div>
+      <div id="gpx-error" class="alert error" hidden></div>
+      <div id="gpx-result" class="alert success" hidden></div>
+      <div class="table-wrap card" style="padding:0">
+        <table>
+          <thead>
+            <tr>
+              <th>Tên cung</th>
+              <th>Người nộp</th>
+              <th>Số điểm</th>
+              <th>Quãng đường</th>
+              <th>Ngày nộp</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="gpx-body"><tr><td colspan="7" class="empty">Chưa tải dữ liệu.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:8px">
+        Duyệt (approved) sẽ <strong>tự tạo cung công khai</strong> từ GPX, seller = người nộp, và gửi push báo kết quả.
+      </p>
+    </section>
+
+    <!-- ===== TAB 2: BÁO CÁO ===== -->
+    <section class="tab-panel" id="tab-reports" hidden>
+      <div class="toolbar">
+        <label class="muted" for="report-status">Trạng thái</label>
+        <select id="report-status">
+          <option value="open" selected>Đang mở (open)</option>
+          <option value="resolved">Đã xử lý (resolved)</option>
+          <option value="dismissed">Đã bỏ qua (dismissed)</option>
+        </select>
+        <button id="report-refresh">Tải lại</button>
+        <div class="spacer"></div>
+        <span class="muted" id="report-count"></span>
+      </div>
+      <div id="report-error" class="alert error" hidden></div>
+      <div id="report-result" class="alert success" hidden></div>
+      <div class="table-wrap card" style="padding:0">
+        <table>
+          <thead>
+            <tr>
+              <th>Đối tượng</th>
+              <th>Lý do</th>
+              <th>Người báo cáo</th>
+              <th>Ngày</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="report-body"><tr><td colspan="6" class="empty">Chưa tải dữ liệu.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== TAB 3: NGƯỜI DÙNG ===== -->
+    <section class="tab-panel" id="tab-users" hidden>
+      <div class="card">
+        <h2>Đổi cấp người dùng (tier)</h2>
+        <div class="tier-desc" style="margin-bottom:14px">
+          <strong>Hệ 3 cấp (docs/04-user-tiers-scoring):</strong>
+          <ul>
+            <li><strong>Cấp 1 — Mới (Newbie):</strong> chỉ tự đi cung DỄ; cung khó bắt buộc có guide.</li>
+            <li><strong>Cấp 2 — Có kinh nghiệm (Verified Leader):</strong> gate cứng: KYC đạt + ≥10 cung hoàn thành + ≥1 GPX được duyệt + rating TB ≥ 4.0. Được mở/bán cung, dẫn cấp 1.</li>
+            <li><strong>Cấp 3 — Doanh nghiệp/Tổ chức (Operator):</strong> ⚠️ <em>Ý nghĩa pháp lý:</em> yêu cầu pháp nhân + <strong>giấy phép kinh doanh dịch vụ lữ hành</strong> (Luật Du lịch 2017) + hợp đồng hợp tác với POTTER (+ khuyến nghị bảo hiểm trách nhiệm). Cấp 3 chịu toàn bộ nghĩa vụ tuân thủ luật lữ hành với tour mình bán; xét duyệt <strong>luôn thủ công theo hồ sơ pháp lý</strong>, không tự động.</li>
+          </ul>
+        </div>
+        <form class="tier-form" id="form-tier">
+          <div class="field">
+            <label for="tier-userid">User ID (UUID)</label>
+            <input type="text" id="tier-userid" class="mono" placeholder="vd: 3f2a9c1e-5b6d-4e7f-8a9b-0c1d2e3f4a5b" required>
+          </div>
+          <div class="field">
+            <label for="tier-value">Cấp mới</label>
+            <select id="tier-value">
+              <option value="1">Cấp 1 — Mới (Newbie)</option>
+              <option value="2">Cấp 2 — Có kinh nghiệm (Verified Leader)</option>
+              <option value="3">Cấp 3 — Doanh nghiệp/Tổ chức (Operator)</option>
+            </select>
+          </div>
+          <div id="tier3-warning" class="alert warn" hidden style="margin:0">
+            <strong>CẢNH BÁO PHÁP LÝ — Cấp 3:</strong> chỉ gán khi đã kiểm tra đủ hồ sơ: pháp nhân,
+            giấy phép kinh doanh dịch vụ lữ hành còn hiệu lực, hợp đồng hợp tác đã ký.
+            Gán sai có thể khiến nền tảng liên đới trách nhiệm với hoạt động lữ hành không phép.
+          </div>
+          <div>
+            <button type="submit" class="primary" id="btn-tier">Cập nhật cấp</button>
+          </div>
+        </form>
+        <div id="tier-error" class="alert error" hidden></div>
+        <div id="tier-result" class="alert success" hidden></div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ==================== Trạng thái & tiện ích ====================
+var LS_API_URL = 'potter_admin_api_url';
+var state = {
+  apiUrl: localStorage.getItem(LS_API_URL) || 'http://localhost:3000',
+  accessToken: null,   // chỉ giữ in-memory, không ghi localStorage
+  refreshToken: null,  // in-memory — F5 là phải đăng nhập lại (chấp nhận cho công cụ nội bộ)
+  user: null,
+};
+
+function $(sel) { return document.querySelector(sel); }
+
+function esc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function fmtDate(v) {
+  if (!v) return '—';
+  var d = new Date(v);
+  return isNaN(d) ? '—' : d.toLocaleString('vi-VN');
+}
+
+function fmtKm(m) {
+  return (Number(m || 0) / 1000).toFixed(1) + ' km';
+}
+
+function toast(msg, kind) {
+  var el = document.createElement('div');
+  el.className = 't ' + (kind || '');
+  el.textContent = msg;
+  $('#toast').appendChild(el);
+  setTimeout(function () { el.remove(); }, 5000);
+}
+
+function showBox(sel, msg) {
+  var el = $(sel);
+  if (msg) { el.innerHTML = msg; el.hidden = false; }
+  else { el.hidden = true; el.innerHTML = ''; }
+}
+
+var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// ==================== Gọi API (kèm refresh khi 401) ====================
+function ApiError(status, message) {
+  this.status = status;
+  this.message = message;
+}
+
+function apiBase() {
+  return state.apiUrl.replace(/\/+$/, '') + '/api/v1';
+}
+
+async function api(path, opts) {
+  opts = opts || {};
+  var method = opts.method || 'GET';
+  var headers = {};
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  if (opts.auth !== false && state.accessToken) headers['Authorization'] = 'Bearer ' + state.accessToken;
+
+  var res;
+  try {
+    res = await fetch(apiBase() + path, {
+      method: method,
+      headers: headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+  } catch (e) {
+    throw new ApiError(0,
+      'Không kết nối được API tại ' + apiBase() +
+      ' — kiểm tra server đã chạy chưa và API URL đúng chưa.');
+  }
+
+  // Access token hết hạn -> thử refresh 1 lần rồi gọi lại
+  if (res.status === 401 && opts.auth !== false && !opts._retried && state.refreshToken) {
+    var refreshed = await tryRefresh();
+    if (refreshed) {
+      return api(path, {
+        method: method, body: opts.body, auth: opts.auth, _retried: true,
+      });
+    }
+  }
+
+  var data = null;
+  try { data = await res.json(); } catch (e) { /* body rỗng */ }
+
+  if (!res.ok) {
+    var serverMsg = data && data.message;
+    if (Array.isArray(serverMsg)) serverMsg = serverMsg.join('; ');
+    var msg = serverMsg || ('Lỗi HTTP ' + res.status);
+    if (res.status === 401) {
+      clearSession();
+      msg = 'Phiên đăng nhập hết hạn hoặc không hợp lệ — vui lòng đăng nhập lại.';
+    } else if (res.status === 403 && path.indexOf('/admin') === 0) {
+      msg = 'Không đủ quyền (403): tài khoản của bạn không có role=admin nên máy chủ từ chối API quản trị.';
+    } else if (res.status === 429) {
+      msg = 'Quá nhiều yêu cầu (429) — chờ một lát rồi thử lại.';
+    }
+    throw new ApiError(res.status, msg);
+  }
+  return data;
+}
+
+async function tryRefresh() {
+  try {
+    var data = await api('/auth/refresh', {
+      method: 'POST', auth: false, body: { refreshToken: state.refreshToken },
+    });
+    state.accessToken = data.accessToken;
+    state.refreshToken = data.refreshToken;
+    if (data.user) state.user = data.user;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ==================== Phiên đăng nhập ====================
+function setSession(data) {
+  state.accessToken = data.accessToken;
+  state.refreshToken = data.refreshToken;
+  state.user = data.user || null;
+
+  $('#view-login').hidden = true;
+  $('#view-app').hidden = false;
+  $('#session-info').hidden = false;
+  $('#session-user').textContent =
+    (state.user ? state.user.email : '?') + (state.user && state.user.role === 'admin' ? ' (admin)' : '');
+  $('#role-warning').hidden = !state.user || state.user.role === 'admin';
+}
+
+function clearSession(msg) {
+  state.accessToken = null;
+  state.refreshToken = null;
+  state.user = null;
+  $('#view-app').hidden = true;
+  $('#session-info').hidden = true;
+  $('#view-login').hidden = false;
+  if (msg) showBox('#login-error', esc(msg));
+}
+
+$('#form-login').addEventListener('submit', async function (ev) {
+  ev.preventDefault();
+  showBox('#login-error', null);
+  var btn = $('#btn-login');
+  btn.disabled = true; btn.textContent = 'Đang đăng nhập…';
+  try {
+    var data = await api('/auth/login', {
+      method: 'POST', auth: false,
+      body: { email: $('#login-email').value.trim(), password: $('#login-password').value },
+    });
+    setSession(data);
+    $('#login-password').value = '';
+    if (state.user && state.user.role !== 'admin') {
+      toast('Cảnh báo: tài khoản không phải admin — API quản trị sẽ trả 403.', 'err');
+    } else {
+      toast('Đăng nhập thành công.', 'ok');
+    }
+    loadGpx(); // tab mặc định
+  } catch (e) {
+    showBox('#login-error', esc(e.message));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Đăng nhập';
+  }
+});
+
+$('#btn-logout').addEventListener('click', function () {
+  var token = state.accessToken;
+  clearSession(); // UI thoát ngay, không chờ mạng
+  toast('Đã đăng xuất.', 'ok');
+  if (token) {
+    // best-effort thu hồi refresh token phía server
+    fetch(apiBase() + '/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+    }).catch(function () { /* bỏ qua */ });
+  }
+});
+
+// ==================== Cấu hình API URL ====================
+$('#api-url').value = state.apiUrl;
+$('#api-save').addEventListener('click', function () {
+  var v = $('#api-url').value.trim().replace(/\/+$/, '');
+  if (!v) { toast('API URL không được rỗng.', 'err'); return; }
+  if (!/^https?:\/\//i.test(v)) { toast('API URL phải bắt đầu bằng http:// hoặc https://', 'err'); return; }
+  state.apiUrl = v;
+  $('#api-url').value = v;
+  localStorage.setItem(LS_API_URL, v);
+  toast('Đã lưu API URL: ' + v, 'ok');
+});
+
+// ==================== Chuyển tab ====================
+$('#tabs').addEventListener('click', function (ev) {
+  var btn = ev.target.closest('button[data-tab]');
+  if (!btn) return;
+  document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('active', b === btn); });
+  ['gpx', 'reports', 'users'].forEach(function (t) {
+    $('#tab-' + t).hidden = (t !== btn.dataset.tab);
+  });
+  if (btn.dataset.tab === 'gpx') loadGpx();
+  if (btn.dataset.tab === 'reports') loadReports();
+});
+
+// ==================== TAB 1: Duyệt GPX ====================
+async function loadGpx() {
+  var status = $('#gpx-status').value;
+  showBox('#gpx-error', null);
+  $('#gpx-body').innerHTML = '<tr><td colspan="7" class="empty">Đang tải…</td></tr>';
+  try {
+    var list = await api('/admin/gpx?status=' + encodeURIComponent(status));
+    renderGpx(list || [], status);
+  } catch (e) {
+    $('#gpx-body').innerHTML = '<tr><td colspan="7" class="empty">Không tải được dữ liệu.</td></tr>';
+    $('#gpx-count').textContent = '';
+    showBox('#gpx-error', esc(e.message));
+  }
+}
+
+function renderGpx(list, status) {
+  $('#gpx-count').textContent = list.length + ' bản nộp';
+  if (!list.length) {
+    $('#gpx-body').innerHTML = '<tr><td colspan="7" class="empty">Không có bản nộp nào ở trạng thái "' + esc(status) + '".</td></tr>';
+    return;
+  }
+  $('#gpx-body').innerHTML = list.map(function (s) {
+    var u = s.user || {};
+    var actions;
+    if (s.status === 'pending') {
+      actions =
+        '<div class="row-actions">' +
+          '<input type="text" maxlength="500" placeholder="Ghi chú duyệt (tuỳ chọn)" data-note="' + esc(s.id) + '">' +
+          '<div class="btns">' +
+            '<button class="approve" data-action="approved" data-id="' + esc(s.id) + '">Duyệt</button>' +
+            '<button class="reject" data-action="rejected" data-id="' + esc(s.id) + '">Từ chối</button>' +
+          '</div>' +
+        '</div>';
+    } else {
+      actions = s.reviewNote
+        ? '<span class="sub">Ghi chú: ' + esc(s.reviewNote) + '</span>'
+        : '<span class="sub">—</span>';
+    }
+    return '<tr>' +
+      '<td><strong>' + esc(s.routeName) + '</strong><div class="sub mono">' + esc(s.id) + '</div></td>' +
+      '<td>' + esc(u.displayName || '?') +
+        '<div class="sub">' + esc(u.email || '') + '</div>' +
+        (u.tier ? '<span class="chip tier">Cấp ' + esc(u.tier) + '</span>' : '') + '</td>' +
+      '<td>' + esc(s.pointCount) + '</td>' +
+      '<td>' + fmtKm(s.distanceM) + '</td>' +
+      '<td>' + fmtDate(s.createdAt) + '</td>' +
+      '<td><span class="chip ' + esc(s.status) + '">' + esc(s.status) + '</span></td>' +
+      '<td>' + actions + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+$('#gpx-refresh').addEventListener('click', loadGpx);
+$('#gpx-status').addEventListener('change', loadGpx);
+
+$('#gpx-body').addEventListener('click', async function (ev) {
+  var btn = ev.target.closest('button[data-action]');
+  if (!btn) return;
+  var id = btn.dataset.id;
+  var status = btn.dataset.action; // 'approved' | 'rejected'
+  var noteInput = $('#gpx-body').querySelector('input[data-note="' + id + '"]');
+  var note = noteInput ? noteInput.value.trim() : '';
+
+  if (status === 'approved' &&
+      !confirm('DUYỆT bản nộp này?\nHệ thống sẽ TỰ TẠO cung công khai từ GPX (seller = người nộp) và gửi push cho họ.')) return;
+  if (status === 'rejected' && !note &&
+      !confirm('Từ chối mà KHÔNG có ghi chú? Người nộp sẽ không biết lý do.\nBấm OK để vẫn từ chối, Cancel để quay lại nhập ghi chú.')) return;
+
+  var body = { status: status };
+  if (note) body.reviewNote = note;
+
+  var rowButtons = btn.closest('.row-actions').querySelectorAll('button');
+  rowButtons.forEach(function (b) { b.disabled = true; });
+  showBox('#gpx-error', null);
+  showBox('#gpx-result', null);
+  try {
+    var r = await api('/admin/gpx/' + encodeURIComponent(id), { method: 'PATCH', body: body });
+    var name = r && r.submission ? r.submission.routeName : '';
+    if (status === 'approved' && r && r.createdRoute) {
+      showBox('#gpx-result',
+        'Đã duyệt "' + esc(name) + '" — cung mới đã tạo với slug: <strong class="mono">' +
+        esc(r.createdRoute.slug) + '</strong> (id: <span class="mono">' + esc(r.createdRoute.id) + '</span>).');
+      toast('Đã duyệt và tạo cung: ' + r.createdRoute.slug, 'ok');
+    } else {
+      showBox('#gpx-result', 'Đã từ chối "' + esc(name) + '"' + (note ? ' — ghi chú: ' + esc(note) : '') + '.');
+      toast('Đã từ chối bản nộp.', 'ok');
+    }
+    loadGpx();
+  } catch (e) {
+    showBox('#gpx-error', esc(e.message));
+    rowButtons.forEach(function (b) { b.disabled = false; });
+  }
+});
+
+// ==================== TAB 2: Báo cáo ====================
+var TARGET_LABEL = { user: 'Người dùng', post: 'Bài viết', route: 'Cung đường', message: 'Tin nhắn' };
+
+async function loadReports() {
+  var status = $('#report-status').value;
+  showBox('#report-error', null);
+  $('#report-body').innerHTML = '<tr><td colspan="6" class="empty">Đang tải…</td></tr>';
+  try {
+    var list = await api('/admin/reports?status=' + encodeURIComponent(status));
+    renderReports(list || [], status);
+  } catch (e) {
+    $('#report-body').innerHTML = '<tr><td colspan="6" class="empty">Không tải được dữ liệu.</td></tr>';
+    $('#report-count').textContent = '';
+    showBox('#report-error', esc(e.message));
+  }
+}
+
+function renderReports(list, status) {
+  $('#report-count').textContent = list.length + ' báo cáo';
+  if (!list.length) {
+    $('#report-body').innerHTML = '<tr><td colspan="6" class="empty">Không có báo cáo nào ở trạng thái "' + esc(status) + '".</td></tr>';
+    return;
+  }
+  $('#report-body').innerHTML = list.map(function (r) {
+    var rep = r.reporter || {};
+    var actions;
+    if (r.status === 'open') {
+      actions =
+        '<div class="row-actions">' +
+          '<input type="text" maxlength="500" placeholder="Ghi chú xử lý (tuỳ chọn)" data-note="' + esc(r.id) + '">' +
+          '<div class="btns">' +
+            '<button class="approve" data-action="resolved" data-id="' + esc(r.id) + '">Xử lý xong</button>' +
+            '<button class="reject" data-action="dismissed" data-id="' + esc(r.id) + '">Bỏ qua</button>' +
+          '</div>' +
+        '</div>';
+    } else {
+      actions = r.resolutionNote
+        ? '<span class="sub">Ghi chú: ' + esc(r.resolutionNote) + '</span>'
+        : '<span class="sub">—</span>';
+    }
+    return '<tr>' +
+      '<td>' + esc(TARGET_LABEL[r.targetType] || r.targetType) +
+        '<div class="sub mono">' + esc(r.targetId) + '</div></td>' +
+      '<td>' + esc(r.reason) + '</td>' +
+      '<td>' + esc(rep.displayName || '?') + '<div class="sub">' + esc(rep.email || '') + '</div></td>' +
+      '<td>' + fmtDate(r.createdAt) + '</td>' +
+      '<td><span class="chip ' + esc(r.status) + '">' + esc(r.status) + '</span></td>' +
+      '<td>' + actions + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+$('#report-refresh').addEventListener('click', loadReports);
+$('#report-status').addEventListener('change', loadReports);
+
+$('#report-body').addEventListener('click', async function (ev) {
+  var btn = ev.target.closest('button[data-action]');
+  if (!btn) return;
+  var id = btn.dataset.id;
+  var status = btn.dataset.action; // 'resolved' | 'dismissed'
+  var noteInput = $('#report-body').querySelector('input[data-note="' + id + '"]');
+  var note = noteInput ? noteInput.value.trim() : '';
+
+  var body = { status: status };
+  if (note) body.resolutionNote = note;
+
+  var rowButtons = btn.closest('.row-actions').querySelectorAll('button');
+  rowButtons.forEach(function (b) { b.disabled = true; });
+  showBox('#report-error', null);
+  showBox('#report-result', null);
+  try {
+    await api('/admin/reports/' + encodeURIComponent(id), { method: 'PATCH', body: body });
+    showBox('#report-result',
+      (status === 'resolved' ? 'Đã đánh dấu xử lý xong' : 'Đã bỏ qua') + ' báo cáo' +
+      (note ? ' — ghi chú: ' + esc(note) : '') + '.');
+    toast(status === 'resolved' ? 'Báo cáo: đã xử lý.' : 'Báo cáo: đã bỏ qua.', 'ok');
+    loadReports();
+  } catch (e) {
+    showBox('#report-error', esc(e.message));
+    rowButtons.forEach(function (b) { b.disabled = false; });
+  }
+});
+
+// ==================== TAB 3: Người dùng (đổi tier) ====================
+$('#tier-value').addEventListener('change', function () {
+  $('#tier3-warning').hidden = this.value !== '3';
+});
+
+var TIER_CONFIRM = {
+  1: 'Giáng về CẤP 1 (Mới): thu hồi quyền mở/bán cung và quyền dẫn người khác.\nTiếp tục?',
+  2: 'Lên CẤP 2 (Có kinh nghiệm): theo docs/04 phải qua gate: KYC đạt + ≥10 cung hoàn thành + ≥1 GPX được duyệt + rating TB ≥ 4.0.\nBạn xác nhận đã kiểm tra các điều kiện này?',
+  3: 'CẢNH BÁO PHÁP LÝ — CẤP 3 (Doanh nghiệp/Tổ chức/Tour):\n' +
+     '• Yêu cầu PHÁP NHÂN + GIẤY PHÉP kinh doanh dịch vụ lữ hành (Luật Du lịch 2017) + HỢP ĐỒNG hợp tác với POTTER.\n' +
+     '• Khuyến nghị có bảo hiểm trách nhiệm cho khách.\n' +
+     '• Xét duyệt cấp 3 LUÔN là quy trình thủ công theo hồ sơ pháp lý — gán sai có thể khiến nền tảng liên đới trách nhiệm.\n\n' +
+     'Bạn xác nhận ĐÃ KIỂM TRA ĐỦ hồ sơ pháp lý và muốn tiếp tục?',
+};
+
+$('#form-tier').addEventListener('submit', async function (ev) {
+  ev.preventDefault();
+  showBox('#tier-error', null);
+  showBox('#tier-result', null);
+
+  var userId = $('#tier-userid').value.trim();
+  var tier = Number($('#tier-value').value);
+
+  if (!UUID_RE.test(userId)) {
+    showBox('#tier-error', 'User ID không đúng định dạng UUID (vd: 3f2a9c1e-5b6d-4e7f-8a9b-0c1d2e3f4a5b).');
+    return;
+  }
+  if (!confirm(TIER_CONFIRM[tier])) return;
+
+  var btn = $('#btn-tier');
+  btn.disabled = true; btn.textContent = 'Đang cập nhật…';
+  try {
+    var u = await api('/admin/users/' + encodeURIComponent(userId) + '/tier', {
+      method: 'PATCH', body: { tier: tier },
+    });
+    if (u) {
+      showBox('#tier-result',
+        'Đã cập nhật: <strong>' + esc(u.displayName || '?') + '</strong> (' + esc(u.email || '') + ') → ' +
+        '<span class="chip tier">Cấp ' + esc(u.tier) + '</span>' +
+        ' · role: ' + esc(u.role || '?') + ' · reputation: ' + esc(u.reputation != null ? u.reputation : '?'));
+      toast('Đã đổi cấp thành công.', 'ok');
+    } else {
+      showBox('#tier-result', 'Đã gửi yêu cầu — máy chủ không trả về thông tin user.');
+    }
+  } catch (e) {
+    var msg = e.message;
+    if (e.status === 404) msg = 'Không tìm thấy user với ID này (404).';
+    showBox('#tier-error', esc(msg));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Cập nhật cấp';
+  }
+});
+</script>
+</body>
+</html>

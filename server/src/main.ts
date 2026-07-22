@@ -2,7 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import express from 'express';
 import { AppModule } from './app.module';
+import { uploadDir } from './media/local-storage.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +16,10 @@ async function bootstrap() {
   );
   app.enableCors({ origin: true, credentials: true });
   app.setGlobalPrefix('api/v1');
+
+  // Ảnh upload (checklist §3) — dev serve tĩnh từ đĩa local (ngoài prefix api/v1).
+  // TODO(storage): production dùng URL S3/R2/CDN trực tiếp, bỏ đoạn này.
+  app.use('/uploads', express.static(uploadDir()));
 
   // API docs (checklist §12 — Swagger)
   const doc = SwaggerModule.createDocument(
