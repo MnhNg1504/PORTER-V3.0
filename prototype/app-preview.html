@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>POTTER — App Preview (UI 5 tab)</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="taxua-track.js"></script>
+<style>
+  /* ===== BRAND PORTER (Porter Brand Guidelines) ===== */
+  @font-face{font-family:'YoungDisplay';src:url('brand/Young-Bold-Display.otf') format('opentype')}
+  @font-face{font-family:'Young';src:url('brand/Young.otf') format('opentype')}
+  :root{
+    --pine:#16281A; --pine-mid:#1F3A22; --forest:#2F5233; --lime:#C9E265;
+    --cream:#EAF1E4; --sand:#E3DFD2; --mist:#A9CDD8; --ember:#FF5233;
+    --gold:#E8C877; --sage:#8FA07F; --night:#0E120E; --surface:#F2F6ED;
+    --text2:#5A6552;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:#d8ded2;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    display:flex;justify-content:center;padding:22px;color:var(--pine)}
+  .hint{position:fixed;left:14px;top:14px;max-width:210px;font-size:12px;color:#5a6552;line-height:1.5}
+  .hint b{color:var(--pine)}
+  /* ===== Khung điện thoại ===== */
+  #phone{width:390px;height:800px;background:var(--cream);border-radius:38px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(20,35,20,.45), 0 0 0 10px var(--night);position:relative;display:flex;flex-direction:column}
+  .statusbar{height:34px;display:flex;justify-content:space-between;align-items:center;
+    padding:0 22px;font-size:12px;font-weight:700;flex-shrink:0}
+  main{flex:1;overflow:hidden;position:relative}
+  .screen{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--cream)}
+  .screen.on{display:block}
+  /* ===== Header ===== */
+  .hd{display:flex;align-items:flex-end;justify-content:space-between;padding:10px 16px 12px;
+    border-bottom:1px solid var(--sand);position:sticky;top:0;background:var(--cream);z-index:5}
+  .hd h1{font-family:'YoungDisplay',serif;font-size:22px}
+  .hd .act{font-size:13px;font-weight:600;color:var(--forest);cursor:pointer}
+  /* ===== Bottom nav ===== */
+  nav{height:74px;background:var(--cream);border-top:1px solid var(--sand);display:flex;
+    align-items:stretch;flex-shrink:0;position:relative}
+  nav .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;font-size:10.5px;color:var(--text2);cursor:pointer;user-select:none}
+  nav .tab .ic{font-size:22px}
+  nav .tab.on{color:var(--pine);font-weight:700}
+  nav .fabwrap{flex:1.15;display:flex;justify-content:center}
+  nav .fab{width:62px;height:62px;border-radius:50%;background:var(--lime);margin-top:-24px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+    border:4px solid var(--cream);box-shadow:0 8px 20px rgba(22,40,26,.35);font-weight:800}
+  nav .fab .ic{font-size:22px}
+  nav .fab .lb{font-size:9px;letter-spacing:.3px}
+  /* ===== Cards chung ===== */
+  .card{background:#fff;border:1px solid var(--sand);border-radius:14px;overflow:hidden}
+  .px{padding:0 16px}
+  .chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+  .chip.easy{background:#E4EFDD;color:var(--forest)} .chip.std{background:#F6ECCF;color:#8a6d1c}
+  .chip.hard{background:#FBDDD5;color:var(--ember)}
+  /* ===== Tab Cung đường ===== */
+  .search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--sand);
+    border-radius:12px;padding:10px 12px;margin:12px 16px;color:var(--text2);font-size:14px;cursor:pointer}
+  .filters{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto}
+  .fchip{padding:6px 14px;border-radius:999px;border:1px solid var(--sand);background:#fff;
+    font-size:12.5px;white-space:nowrap;cursor:pointer}
+  .fchip.on{background:var(--pine);color:var(--cream);border-color:var(--pine);font-weight:600}
+  .rlist{display:flex;flex-direction:column;gap:12px;padding:0 16px 90px}
+  .rcard .ph{height:120px;background:linear-gradient(120deg,var(--pine-mid),var(--forest) 55%,#557a4b);
+    position:relative;display:flex;align-items:flex-end;padding:10px}
+  .rcard .ph .nm{font-family:'YoungDisplay',serif;color:var(--cream);font-size:17px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .rcard .ph .chip{position:absolute;top:10px;right:10px}
+  .rcard .meta{display:flex;gap:14px;padding:10px 12px 4px;font-size:12.5px;color:var(--text2)}
+  .rcard .meta b{color:var(--pine);font-size:14px}
+  .rcard .foot{display:flex;justify-content:space-between;align-items:center;padding:6px 12px 12px;font-size:12px;color:var(--sage)}
+  .rcard .price{font-weight:800;color:var(--forest);font-size:14px}
+  .warnguide{background:#FBDDD5;color:#9c2e14;font-size:11.5px;padding:6px 12px}
+  /* ===== Chi tiết cung (overlay) ===== */
+  #detail{position:absolute;inset:0;background:var(--cream);display:none;overflow-y:auto;z-index:9}
+  #detail.on{display:block}
+  .dhero{height:190px;background:linear-gradient(160deg,var(--pine),var(--forest));display:flex;
+    align-items:flex-end;padding:14px;position:relative}
+  .dhero .back{position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;
+    background:rgba(234,241,228,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+  .dhero h2{font-family:'YoungDisplay',serif;color:var(--cream);font-size:24px}
+  .stats{display:flex;border-bottom:1px solid var(--sand);margin:0 16px;padding:14px 0}
+  .stats>div{flex:1;text-align:center}
+  .stats .v{font-size:17px;font-weight:800} .stats .k{font-size:10.5px;color:var(--text2);margin-top:2px}
+  .sec{font-family:'YoungDisplay',serif;font-size:16px;margin:16px 16px 8px}
+  /* weather */
+  .wx{margin:0 16px;background:var(--surface)}
+  .wx .now{display:flex;align-items:center;gap:12px;padding:14px}
+  .wx .t{font-size:30px;font-weight:800} .wx .e{font-size:30px}
+  .wx .days{display:flex;gap:8px;padding:0 12px 12px;overflow-x:auto}
+  .wx .d{background:var(--cream);border-radius:10px;padding:8px 10px;text-align:center;font-size:11px;min-width:56px}
+  .wx .safety{padding:10px 14px;font-size:12.5px;background:#E4EFDD}
+  .wx .safety.warn{background:#F4EAD1} .wx .safety.danger{background:#F9DAD3}
+  .contour-note{margin:10px 16px 0;font-size:12px;color:var(--text2)}
+  .cta{position:sticky;bottom:0;background:var(--cream);padding:12px 16px;border-top:1px solid var(--sand)}
+  .buybtn{display:block;width:100%;background:var(--lime);border:none;border-radius:13px;padding:15px;
+    font-weight:800;font-size:14.5px;color:var(--pine);cursor:pointer}
+  /* ===== Tab Map ===== */
+  #mapscreen{display:flex;flex-direction:column}
+  #map{flex:1}
+  .maptools{position:absolute;right:12px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}
+  .mtool{width:42px;height:42px;border-radius:12px;background:rgba(234,241,228,.95);border:1px solid var(--sand);
+    display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+  .mtool.on{background:var(--lime)}
+  .mapstats{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;background:rgba(234,241,228,.96);
+    border:1px solid var(--sand);border-radius:14px;display:flex;padding:10px 6px}
+  .mapstats>div{flex:1;text-align:center}
+  .mapstats .v{font-weight:800;font-size:15px} .mapstats .k{font-size:10px;color:var(--text2)}
+  .sos{position:absolute;right:12px;bottom:86px;z-index:6;width:52px;height:52px;border-radius:50%;
+    background:var(--ember);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;
+    justify-content:center;border:3px solid #fff;box-shadow:0 6px 16px rgba(255,82,51,.4);cursor:pointer}
+  /* ===== Tab Cộng đồng ===== */
+  .feed{display:flex;flex-direction:column;gap:12px;padding:12px 16px 90px}
+  .post .u{display:flex;align-items:center;gap:10px;padding:12px}
+  .ava{width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;
+    justify-content:center;font-weight:800;font-size:14px}
+  .post .nm{font-weight:700;font-size:13.5px} .post .lv{font-size:11px;color:var(--forest)}
+  .post .img{height:150px;background:linear-gradient(115deg,#2F5233,#557a4b 50%,#8FA07F);display:flex;
+    align-items:flex-end;padding:10px;color:var(--cream);font-size:12px}
+  .post .txt{padding:10px 12px;font-size:13.5px;line-height:1.45}
+  .post .acts{display:flex;gap:18px;padding:0 12px 12px;font-size:12.5px;color:var(--text2)}
+  /* ===== Tab Tin nhắn ===== */
+  .convs{padding:6px 0 90px}
+  .conv{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--surface);cursor:pointer}
+  .conv .p{flex:1;min-width:0}
+  .conv .nm{font-weight:700;font-size:14px}
+  .conv .last{font-size:12.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conv .meta{text-align:right;font-size:11px;color:var(--sage)}
+  .badge{background:var(--ember);color:#fff;border-radius:999px;font-size:10.5px;font-weight:800;
+    padding:2px 7px;display:inline-block;margin-top:3px}
+  .online{width:9px;height:9px;border-radius:50%;background:#4caf50;position:absolute;right:0;bottom:0;border:2px solid #fff}
+  .avwrap{position:relative}
+  /* ===== Tab Hồ sơ ===== */
+  .cover{background:var(--pine);padding:22px 16px 18px;text-align:center;color:var(--cream)}
+  .cover .ava{width:64px;height:64px;margin:0 auto 8px;font-size:22px}
+  .cover h2{font-family:'YoungDisplay',serif;font-size:20px}
+  .cover .lv{color:var(--lime);font-size:12.5px;margin-top:3px}
+  .rep{margin:10px auto 0;max-width:250px}
+  .rep .bar{height:6px;background:var(--pine-mid);border-radius:3px;overflow:hidden}
+  .rep .fill{height:100%;width:78%;background:var(--lime)}
+  .rep .t{font-size:10.5px;color:var(--sage);margin-top:4px}
+  .pstats{display:flex;margin:14px 16px;gap:10px}
+  .pstats .card{flex:1;text-align:center;padding:12px 4px}
+  .pstats .v{font-family:'YoungDisplay',serif;font-size:18px} .pstats .k{font-size:10.5px;color:var(--text2)}
+  .mile{display:flex;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--surface);font-size:13px}
+  .mile .ic{font-size:18px}
+  .premium{margin:14px 16px 90px;background:var(--lime);border-radius:14px;padding:14px;text-align:center;
+    font-weight:700;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="hint">
+  <b>POTTER — Preview UI</b><br/>Mô phỏng giao diện app RN để duyệt thiết kế.<br/><br/>
+  • Bấm 5 tab dưới cùng<br/>• Tab Cung đường → bấm thẻ <b>Tà Xùa</b> xem chi tiết + thời tiết THẬT<br/>
+  • Tab Bản đồ: map + track THẬT<br/><br/>Bản chạy thật = APK đang build.
+</div>
+
+<div id="phone">
+  <div class="statusbar"><span>12:31</span><span>POTTER · preview</span><span>▮▮▮ 🔋</span></div>
+  <main>
+
+    <!-- ============ TAB 1: CỘNG ĐỒNG ============ -->
+    <section class="screen on" id="s-community">
+      <div class="hd"><h1>Cộng đồng</h1><span class="act">＋ Đăng bài</span></div>
+      <div class="feed">
+        <div class="card post">
+          <div class="u"><div class="ava">AC</div><div><div class="nm">A Của</div><div class="lv">Cấp 2 · Hướng dẫn viên ★4.9</div></div></div>
+          <div class="img">📍 Sống lưng khủng long — Tà Xùa</div>
+          <div class="txt">Săn mây cuối tuần trên sống lưng khủng long. Đoàn 6 người an toàn xuống núi 🎉</div>
+          <div class="acts"><span>❤️ 128</span><span>💬 24</span><span>↗ Chia sẻ</span></div>
+        </div>
+        <div class="card post">
+          <div class="u"><div class="ava" style="background:var(--mist)">NC</div><div><div class="nm">Nao Chi</div><div class="lv">Cấp 2 · 168km</div></div></div>
+          <div class="txt">Check-in cột mốc: hoàn thành cung thứ 14! Putaleng mùa đỗ quyên đẹp không lời nào tả nổi 🌸</div>
+          <div class="acts"><span>❤️ 86</span><span>💬 12</span><span>↗ Chia sẻ</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 2: CUNG ĐƯỜNG ============ -->
+    <section class="screen" id="s-routes">
+      <div class="hd"><h1>Cung đường</h1><span class="act">🔍 Tìm kiếm</span></div>
+      <div class="search">🔍 Tìm cung, đỉnh, khu vực…</div>
+      <div class="filters">
+        <span class="fchip on">Tất cả</span><span class="fchip">Dễ</span>
+        <span class="fchip">Chuẩn</span><span class="fchip">Khó</span><span class="fchip">Có hướng dẫn</span>
+      </div>
+      <div class="rlist">
+        <div class="card rcard" onclick="openDetail()">
+          <div class="ph"><span class="nm">Tà Xùa – Sống lưng khủng long</span><span class="chip hard">Khó</span></div>
+          <div class="meta"><span>🥾 <b id="tx-km">…</b> km</span><span>⛰ <b id="tx-gain">…</b>m leo</span><span>🕐 <b>~8h</b></span><span>🍂 <b>Thu</b></span></div>
+          <div class="warnguide">⚠ Cấp 1 cần người hướng dẫn đi kèm</div>
+          <div class="foot"><span>💾 1.204 lưu · 🔥 82</span><span class="price">350.000đ · GPX + guide</span></div>
+        </div>
+        <div class="card rcard">
+          <div class="ph" style="background:linear-gradient(120deg,#1F3A22,#3b5a3e 55%,#6b8a5f)">
+            <span class="nm">Bạch Mộc Lương Tử (Kỳ Quan San)</span><span class="chip hard">Khó</span></div>
+          <div class="meta"><span>🥾 <b>27.5</b> km</span><span>⛰ <b>2600</b>m leo</span><span>🕐 <b>2N1Đ</b></span><span>❄ <b>Đông</b></span></div>
+          <div class="warnguide">⚠ Cấp 1 cần người hướng dẫn đi kèm</div>
+          <div class="foot"><span>💾 980 lưu · 🔥 76</span><span class="price">550.000đ</span></div>
+        </div>
+        <div class="card rcard">
+          <div class="ph" style="background:linear-gradient(120deg,#2F5233,#6b8a5f)">
+            <span class="nm">Lảo Thẩn – Nóc nhà Y Tý</span><span class="chip std">Chuẩn</span></div>
+          <div class="meta"><span>🥾 <b>16.2</b> km</span><span>⛰ <b>1100</b>m leo</span><span>🕐 <b>2N1Đ</b></span><span>🍂 <b>Thu</b></span></div>
+          <div class="foot"><span>💾 720 lưu · 🔥 64</span><span class="price">400.000đ</span></div>
+        </div>
+        <div class="card rcard">
+          <div class="ph" style="background:linear-gradient(120deg,#557a4b,#8FA07F)">
+            <span class="nm">Núi Hàm Lợn (gần Hà Nội)</span><span class="chip easy">Dễ</span></div>
+          <div class="meta"><span>🥾 <b>7.5</b> km</span><span>⛰ <b>320</b>m leo</span><span>🕐 <b>~3h</b></span><span>☀ <b>Quanh năm</b></span></div>
+          <div class="foot"><span>💾 2.100 lưu · 🔥 71</span><span class="price" style="color:var(--sage)">Miễn phí</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==== Chi tiết cung (overlay) ==== -->
+    <section id="detail">
+      <div class="dhero"><span class="back" onclick="closeDetail()">←</span>
+        <h2>Tà Xùa – Sống lưng khủng long</h2></div>
+      <div class="stats">
+        <div><div class="v" id="dx-km">…</div><div class="k">KM</div></div>
+        <div><div class="v" id="dx-gain">…</div><div class="k">TỔNG LEO</div></div>
+        <div><div class="v" id="dx-peak">…</div><div class="k">ĐỈNH (M)</div></div>
+        <div><div class="v">★4.7</div><div class="k">88 REVIEW</div></div>
+      </div>
+      <div class="sec">Thời tiết · Bản Tà Xùa <span style="font-size:11px;color:var(--sage)">(Open-Meteo — THẬT)</span></div>
+      <div class="card wx" id="wx"><div class="now"><span class="e">⏳</span><span style="font-size:13px;color:var(--text2)">Đang lấy thời tiết thật…</span></div></div>
+      <p class="contour-note">🗻 Thẻ "Route covered" (núi bình độ isometric) xem bản tương tác tại <b>contour-iso.html</b> — trong app RN đã tích hợp ở màn này.</p>
+      <div class="sec">Điểm xuất phát (bắt buộc có ảnh)</div>
+      <div class="card" style="margin:0 16px">
+        <div style="height:110px;background:linear-gradient(115deg,#3b5a3e,#8FA07F);display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:13px">📷 Ảnh thực địa: Cổng gỗ đầu bản Tà Xùa</div>
+        <div style="padding:10px 12px;font-size:12.5px;color:var(--text2)">Gửi xe nhà anh Sơn cuối đường bê tông · Guide: <b style="color:var(--pine)">A Của ★4.9</b></div>
+      </div>
+      <div class="cta"><button class="buybtn">MUA CUNG HƯỚNG DẪN — 350.000đ</button></div>
+    </section>
+
+    <!-- ============ TAB 3: BẢN ĐỒ ============ -->
+    <section class="screen" id="s-map">
+      <div id="mapscreen" style="position:absolute;inset:0">
+        <div id="map"></div>
+        <div class="maptools">
+          <span class="mtool on" data-b="clean" onclick="setBase(this)">🗺</span>
+          <span class="mtool" data-b="topo" onclick="setBase(this)">⛰</span>
+          <span class="mtool" data-b="sat" onclick="setBase(this)">🛰</span>
+          <span class="mtool" onclick="fitTrack()">🎯</span>
+        </div>
+        <span class="sos" onclick="alert('SOS (bản thật): GPS thật + gọi 112/115/113 + SMS người thân kèm toạ độ — không qua server')">SOS</span>
+        <div class="mapstats">
+          <div><div class="v" id="mx-km">…</div><div class="k">KM</div></div>
+          <div><div class="v" id="mx-gain">…</div><div class="k">TỔNG LEO</div></div>
+          <div><div class="v" id="mx-peak">…</div><div class="k">ĐỈNH</div></div>
+          <div><div class="v" style="color:var(--forest)">Tà Xùa</div><div class="k">GPX THẬT</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 4: TIN NHẮN ============ -->
+    <section class="screen" id="s-msg">
+      <div class="hd"><h1>Tin nhắn</h1><span class="act">＋ Nhóm</span></div>
+      <div class="convs">
+        <div class="conv"><div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
+          <div class="p"><div class="nm">A Của — Guide Tà Xùa</div><div class="last">Đoàn mình 6h sáng xuất phát nhé, nhớ mang áo mưa ⛈</div></div>
+          <div class="meta">17:02<br/><span class="badge">2</span></div></div>
+        <div class="conv"><div class="ava" style="background:var(--mist)">PT</div>
+          <div class="p"><div class="nm">Nhóm Putaleng 23-25/11</div><div class="last">Bạn: đã gửi GPX cung dự phòng</div></div>
+          <div class="meta">Hôm qua</div></div>
+        <div class="conv"><div class="ava" style="background:var(--gold)">PO</div>
+          <div class="p"><div class="nm">POTTER Support</div><div class="last">Hồ sơ Cấp 2 của bạn đã được duyệt 🎉</div></div>
+          <div class="meta">T2</div></div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 5: HỒ SƠ ============ -->
+    <section class="screen" id="s-profile">
+      <div class="cover">
+        <div class="ava">NC</div><h2>Nao Chi</h2>
+        <div class="lv">● Cấp 2 — Có kinh nghiệm · được mở & bán cung</div>
+        <div class="rep"><div class="bar"><div class="fill"></div></div><div class="t">Uy tín 780/1000 — còn 220 điểm tới Cấp 3</div></div>
+      </div>
+      <div class="pstats">
+        <div class="card"><div class="v">14</div><div class="k">CUNG</div></div>
+        <div class="card"><div class="v">168</div><div class="k">KM</div></div>
+        <div class="card"><div class="v">9.400</div><div class="k">M LEO</div></div>
+        <div class="card"><div class="v">21</div><div class="k">NGÀY</div></div>
+      </div>
+      <div class="sec" style="margin-top:4px">Cột mốc</div>
+      <div class="mile"><span class="ic">🏔</span><span><b>Nóc nhà Đông Dương</b> — Fansipan 3.143m · 10/2024</span></div>
+      <div class="mile"><span class="ic">🦖</span><span><b>Sống lưng khủng long</b> — Tà Xùa · 3 lần</span></div>
+      <div class="mile"><span class="ic">🧭</span><span><b>Người mở đường</b> — 2 cung được duyệt</span></div>
+      <div class="premium">👑 Nâng cấp Premium — offline map + lớp vệ tinh</div>
+    </section>
+
+  </main>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav>
+    <span class="tab on" data-s="s-community"><span class="ic">🏠</span>Cộng đồng</span>
+    <span class="tab" data-s="s-routes"><span class="ic">🥾</span>Cung đường</span>
+    <span class="fabwrap"><span class="fab" data-s="s-map"><span class="ic">🧭</span><span class="lb">XUẤT PHÁT</span></span></span>
+    <span class="tab" data-s="s-msg"><span class="ic">💬</span>Tin nhắn</span>
+    <span class="tab" data-s="s-profile"><span class="ic">👤</span>Hồ sơ</span>
+  </nav>
+</div>
+
+<script>
+// ===== Điều hướng tab =====
+const tabs=[...document.querySelectorAll('nav .tab'),document.querySelector('nav .fab')];
+tabs.forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(t.dataset.s).classList.add('on');
+  document.querySelectorAll('nav .tab').forEach(x=>x.classList.toggle('on',x===t));
+  closeDetail();
+  if(t.dataset.s==='s-map') initMap();
+});
+function openDetail(){document.getElementById('detail').classList.add('on');loadWeather();}
+function closeDetail(){document.getElementById('detail').classList.remove('on');}
+
+// ===== Số liệu THẬT từ track Tà Xùa nhúng =====
+function hav(a,b){const R=6371000,r=Math.PI/180,dLat=(b[1]-a[1])*r,dLon=(b[0]-a[0])*r,
+ s=Math.sin(dLat/2)**2+Math.cos(a[1]*r)*Math.cos(b[1]*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+let dist=0,gain=0,peak=-1e9;
+for(let i=1;i<TAXUA.length;i++){dist+=hav(TAXUA[i-1],TAXUA[i]);
+ const e1=TAXUA[i-1][2],e2=TAXUA[i][2];if(e1!=null&&e2!=null&&e2>e1)gain+=e2-e1;
+ if(TAXUA[i][2]!=null&&TAXUA[i][2]>peak)peak=TAXUA[i][2];}
+const km=(dist/1000).toFixed(1);
+['tx-km','dx-km','mx-km'].forEach(id=>document.getElementById(id).textContent=km);
+['tx-gain','dx-gain','mx-gain'].forEach(id=>document.getElementById(id).textContent=Math.round(gain));
+['dx-peak','mx-peak'].forEach(id=>document.getElementById(id).textContent=peak);
+
+// ===== Thời tiết THẬT (Open-Meteo, không key) =====
+const WMO={0:['☀️','Trời quang'],1:['🌤️','Nắng nhẹ'],2:['⛅','Mây rải rác'],3:['☁️','Nhiều mây'],
+ 45:['🌫️','Sương mù'],51:['🌦️','Mưa phùn nhẹ'],53:['🌦️','Mưa phùn'],55:['🌧️','Mưa phùn dày'],
+ 61:['🌧️','Mưa nhỏ'],63:['🌧️','Mưa vừa'],65:['🌧️','Mưa to'],80:['🌦️','Mưa rào nhẹ'],81:['🌧️','Mưa rào'],
+ 82:['⛈️','Mưa rào dữ dội'],95:['⛈️','Giông bão'],96:['⛈️','Giông mưa đá'],99:['⛈️','Giông nặng']};
+const wmo=c=>WMO[c]||['❓','Mã '+c];
+let wxLoaded=false;
+async function loadWeather(){
+  if(wxLoaded)return;
+  const el=document.getElementById('wx');
+  try{
+    const s=TAXUA[0];
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${s[1]}&longitude=${s[0]}&elevation=${s[2]??1200}`+
+      `&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_min,temperature_2m_max,`+
+      `precipitation_sum,precipitation_probability_max,weather_code&timezone=Asia%2FBangkok&forecast_days=5`;
+    const j=await(await fetch(u)).json();
+    const cw=wmo(j.current.weather_code);
+    const danger=j.daily.weather_code.slice(0,3).some(c=>c>=82||c===65)||j.daily.precipitation_sum.slice(0,3).some(p=>p>30);
+    const caution=!danger&&j.daily.precipitation_probability_max.slice(0,3).some(p=>p>70);
+    el.innerHTML=`
+      <div class="now"><span class="e">${cw[0]}</span><span class="t">${Math.round(j.current.temperature_2m)}°</span>
+        <span style="font-size:13px"><b>${cw[1]}</b><br/><span style="color:var(--text2)">gió ${Math.round(j.current.wind_speed_10m)} km/h · độ cao ~${Math.round(j.elevation)}m</span></span></div>
+      <div class="days">${j.daily.time.map((d,i)=>`<div class="d">${d.slice(8)}/${d.slice(5,7)}<br/>${wmo(j.daily.weather_code[i])[0]}<br/><b>${Math.round(j.daily.temperature_2m_min[i])}–${Math.round(j.daily.temperature_2m_max[i])}°</b><br/>💧${j.daily.precipitation_probability_max[i]??0}%</div>`).join('')}</div>
+      <div class="safety ${danger?'danger':caution?'warn':''}">${danger?'⛔ Mưa lớn/giông 3 ngày tới — KHÔNG nên đi cung':caution?'⚠️ Khả năng mưa cao — chuẩn bị áo mưa, cân nhắc lùi lịch':'✅ Thời tiết 3 ngày tới thuận lợi cho trekking'}</div>`;
+    wxLoaded=true;
+  }catch(e){el.innerHTML='<div class="now"><span style="font-size:13px;color:var(--text2);padding:4px">Không lấy được thời tiết (cần internet)</span></div>';}
+}
+
+// ===== Map THẬT (MapLibre + track nhúng) =====
+const BASES={
+ clean:'https://tiles.openfreemap.org/styles/positron',
+ topo:{version:8,sources:{b:{type:'raster',tiles:['https://a.tile.opentopomap.org/{z}/{x}/{y}.png','https://b.tile.opentopomap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:17,attribution:'© OpenTopoMap © OSM'}},layers:[{id:'b',type:'raster',source:'b'}]},
+ sat:{version:8,sources:{b:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,attribution:'© Esri'}},layers:[{id:'b',type:'raster',source:'b'}]}};
+let map=null;
+function addTrack(){
+  if(map.getSource('t'))return;
+  map.addSource('t',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:TAXUA.map(p=>[p[0],p[1]])}}});
+  map.addLayer({id:'t-c',type:'line',source:'t',paint:{'line-color':'#fff','line-width':8},layout:{'line-cap':'round','line-join':'round'}});
+  map.addLayer({id:'t-l',type:'line',source:'t',paint:{'line-color':'#2F5233','line-width':4.5},layout:{'line-cap':'round','line-join':'round'}});
+  map.addSource('e',{type:'geojson',data:{type:'FeatureCollection',features:[
+    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[0][0],TAXUA[0][1]]},properties:{c:'#2F5233'}},
+    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA.at(-1)[0],TAXUA.at(-1)[1]]},properties:{c:'#FF5233'}}]}});
+  map.addLayer({id:'e-c',type:'circle',source:'e',paint:{'circle-radius':7,'circle-color':['get','c'],'circle-stroke-width':2.5,'circle-stroke-color':'#fff'}});
+}
+function initMap(){
+  if(map)return;
+  map=new maplibregl.Map({container:'map',style:BASES.clean,center:[TAXUA[0][0],TAXUA[0][1]],zoom:12,attributionControl:{compact:true}});
+  map.on('load',()=>{addTrack();fitTrack();});
+  map.on('style.load',addTrack);
+}
+function setBase(el){
+  document.querySelectorAll('.mtool[data-b]').forEach(x=>x.classList.toggle('on',x===el));
+  if(map)map.setStyle(BASES[el.dataset.b]);
+}
+function fitTrack(){
+  if(!map)return;const b=new maplibregl.LngLatBounds();
+  TAXUA.forEach(p=>b.extend([p[0],p[1]]));map.fitBounds(b,{padding:50});
+}
+</script>
+</body>
+</html>
