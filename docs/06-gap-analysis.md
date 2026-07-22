@@ -62,9 +62,9 @@
 | Mức độ khó | ✅ | DifficultyChip + thang docs/04 |
 | Ảnh từng waypoint | 🟡 | Design có (điểm xuất phát BẮT BUỘC ảnh); upload GĐ3 |
 | Offline map | ❌ | GĐ5 — PMTiles |
-| Thời tiết | ❌ | GĐ3 — Open-Meteo (miễn phí, thật) |
-| SOS | ❌ | GĐ3 — share vị trí + số khẩn cấp (đề xuất docs/04) |
-| Chia sẻ vị trí | ❌ | GĐ3 |
+| Thời tiết | ✅ | Open-Meteo thật + đánh giá an toàn trekking (2026-07-22) |
+| SOS | ✅ | SMS + gọi 112/115/113, GPS thật, không qua server — đã chốt docs/05 §5 (2026-07-22) |
+| Chia sẻ vị trí | ✅ | Share sheet kèm toạ độ + link maps (trong SosSheet) |
 
 ## 6. Chat — ❌ toàn bộ realtime (GĐ3: Socket.IO — đã xem/online/typing/thu hồi/block/report)
 

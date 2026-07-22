@@ -16,6 +16,8 @@ export interface CurrentUser {
   level: UserLevel;
   reputation: number; // 0..1000
   stats: { routes: number; km: number; gain: number; days: number };
+  /** Liên hệ khẩn cấp cho SOS (docs/05 §5) — khai trong Hồ sơ. TODO(api): lưu server. */
+  emergencyContact?: { name: string; phone: string };
 }
 
 // TODO(api): GET /me — hồ sơ user thật + cấp + uy tín + cột mốc.
@@ -25,6 +27,7 @@ export const currentUser: CurrentUser = {
   level: 2,
   reputation: 780,
   stats: { routes: 14, km: 168, gain: 9400, days: 21 },
+  emergencyContact: { name: 'Minh (anh trai)', phone: '0912345678' },
 };
 
 // ---- Cung đường (Route Card đủ chỉ số — docs 02 Tab 2) ----

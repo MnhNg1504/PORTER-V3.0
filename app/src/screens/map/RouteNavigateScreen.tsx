@@ -27,6 +27,9 @@ import {
 import { generateTurns, nextTurn, meFeature, estimateEta, Turn } from '../../lib/nav';
 import { loadBundledTaXua } from '../../lib/gpxAsset';
 import { CLEAN_STYLE_URL } from '../../lib/mapStyles';
+import { SosSheet } from '../../components/SosSheet';
+import { currentUser, mockRoutes } from '../../lib/mockData';
+import { brandPalette } from '../../theme';
 
 MapLibreGL.setAccessToken(null);
 
@@ -47,7 +50,9 @@ export function RouteNavigateScreen({ route }: Props) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [progress, setProgress] = useState(0); // quãng đã đi (m)
   const [simRunning, setSimRunning] = useState(false);
+  const [sosOpen, setSosOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const routeMeta = mockRoutes.find((r) => r.id === route.params.routeId);
 
   useEffect(() => {
     // Hiện chỉ có GPX bundle của Tà Xùa. TODO(api): tải GPX theo route.params.routeId.
@@ -103,6 +108,11 @@ export function RouteNavigateScreen({ route }: Props) {
   const upcoming = stats ? nextTurn(turns, progress) : undefined;
   const remaining = stats ? stats.distance - progress : 0;
 
+  // SOS fallback: vị trí hiện tại trên tuyến (khi GPS máy lỗi) — sheet luôn ưu tiên GPS THẬT.
+  const sosFallback = me
+    ? { lat: me.lngLat[1], lon: me.lngLat[0], ele: me.ele }
+    : null;
+
   return (
     <View style={styles.container}>
       <MapView style={styles.map} mapStyle={CLEAN_STYLE_URL} logoEnabled={false}>
@@ -154,12 +164,29 @@ export function RouteNavigateScreen({ route }: Props) {
         </View>
       </View>
 
+      {/* Nút SOS — luôn hiện, nổi bật Ember (docs/05 §5) */}
+      <Pressable
+        style={[styles.sosBtn, { bottom: insets.bottom + space[8] + 56 }]}
+        onPress={() => setSosOpen(true)}
+        accessibilityLabel="Mở khẩn cấp SOS"
+      >
+        <Text style={styles.sosText}>SOS</Text>
+      </Pressable>
+
       {/* Nút mô phỏng + nhắn hướng dẫn */}
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + space[3] }]}>
         <Pressable style={styles.simBtn} onPress={toggleSim}>
           <Text style={styles.simText}>{simRunning ? '⏸ Dừng mô phỏng' : '▶ Mô phỏng dẫn đường'}</Text>
         </Pressable>
       </View>
+
+      <SosSheet
+        visible={sosOpen}
+        onClose={() => setSosOpen(false)}
+        routeName={routeMeta?.name}
+        fallbackPos={sosFallback}
+        emergencyContact={currentUser.emergencyContact ?? null}
+      />
 
       {!points && (
         <View style={styles.center}>
@@ -173,6 +200,20 @@ export function RouteNavigateScreen({ route }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
+  sosBtn: {
+    position: 'absolute',
+    right: space[3],
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: brandPalette.ember,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    ...shadow.fab,
+  },
+  sosText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15, letterSpacing: 1 },
   navCard: {
     position: 'absolute',
     left: space[3],

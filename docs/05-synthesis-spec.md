@@ -72,6 +72,14 @@ Thang uy tín 0–1000; ma trận phân quyền; enforce trong-app + waiver là 
 3. **Mô hình giá:** hướng Premium thuê bao + hoa hồng marketplace — mức giá & % ra sao?
 4. **Bước kế tiếp:** sau khi chốt, khởi động **agent Code** (dựng khung dự án thật) + **agent Kiểm-tra-chéo**?
 
+### ✅ QUYẾT ĐỊNH ĐÃ CHỐT (2026-07-22 — bổ sung GĐ3)
+5. **SOS:** cơ chế **SMS + gọi số khẩn cấp (112/115), KHÔNG qua server** — chạy được khi
+   chỉ có sóng thoại; app không hứa hẹn cứu hộ → giảm rủi ro trách nhiệm (docs/04).
+   Nâng cấp server-tracked để ngỏ khi có hạ tầng vận hành thật.
+6. **OAuth Google/Apple + Push:** code flow + stub rõ ràng TRƯỚC; user tạo tài khoản
+   (Google Cloud/Firebase miễn phí, Apple Developer $99/năm khi lên App Store) và điền
+   key vào `.env` SAU.
+
 ### ✅ QUYẾT ĐỊNH ĐÃ CHỐT (2026-07-22)
 1. **Tech stack mobile:** **React Native** (theo khuyến nghị R&D — `@maplibre/maplibre-react-native`). Agent Code toàn quyền chọn công cụ đi kèm (Expo/bare, state mgmt…) và giải thích khi bàn giao.
 2. **Phạm vi MVP:** **MVP rộng** — dựng khung đủ **cả 5 tab** ngay từ đầu (gồm Cộng đồng + Nhắn tin), không hoãn sang GĐ2.

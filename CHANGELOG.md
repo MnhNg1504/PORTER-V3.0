@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added — 2026-07-22 (GĐ3 — Thời tiết + SOS)
+- **Thời tiết thật** (`lib/weather.ts` + WeatherCard): Open-Meteo không cần key,
+  contract test theo response thật; 7 ngày + đánh giá an toàn trekking
+  (giông/mưa>30mm/gió>60kmh → khuyến cáo KHÔNG đi cung). Gắn mọi cung (RouteDetail).
+- **SOS + chia sẻ vị trí** (`lib/sos.ts` + SosSheet, quyết định docs/05 §5 — SMS/gọi
+  112·115·113, KHÔNG qua server): GPS THẬT khi mở sheet (fallback vị trí tuyến),
+  toạ độ đọc-qua-điện-thoại, SMS người thân (iOS `&body` vs Android `?body`),
+  Share vị trí thường; nút SOS Ember luôn hiện ở màn điều hướng.
+- Hồ sơ: thêm `emergencyContact` (TODO(api) lưu server).
+- Test: 10 sos + 17 weather — tổng 55/55 pass.
+
 ### Added — 2026-07-22 (GĐ1 — Hoàn thiện app)
 - **ContourCard "Route covered"** (`src/components/ContourCard.tsx`): thẻ núi bình độ
   isometric trong app RN (react-native-svg) — port thuật toán marching squares +
