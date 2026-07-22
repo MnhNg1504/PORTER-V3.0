@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>POTTER 3.0 — Smart Navigation (vector thật)</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  :root{ --blue:#2f6bff; --blue2:#1e50d6; --ink:#0f1f3d; --panel:rgba(255,255,255,.96); }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+  #app{position:relative;height:100%;width:100%}
+  #map{position:absolute;inset:0;background:#eaf0fb}
+  .panel{position:absolute;background:var(--panel);backdrop-filter:blur(10px);border-radius:18px;
+    box-shadow:0 10px 30px rgba(20,40,90,.16)}
+  /* ---- Turn card (giống ảnh Smart Navigation) ---- */
+  #nav{top:14px;left:14px;right:14px;max-width:380px;padding:16px 18px}
+  #nav .route{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#5b6b86;margin-bottom:12px}
+  #nav .dot{width:12px;height:12px;border-radius:50%;background:var(--blue)}
+  #nav .ring{width:12px;height:12px;border-radius:50%;border:3px solid var(--blue);background:#fff}
+  #nav .line{flex:1;height:2px;background:linear-gradient(90deg,var(--blue),#cfe0ff)}
+  #nav .main{display:flex;align-items:center;gap:14px}
+  #nav .arrow{width:52px;height:52px;border-radius:16px;background:var(--blue);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 16px rgba(47,107,255,.4)}
+  #nav .instr .d{font-size:22px;font-weight:800;letter-spacing:-.3px}
+  #nav .instr .s{font-size:13px;color:#6b7b96;margin-top:2px}
+  #nav .foot{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid #eef2f8;font-size:12.5px;color:#5b6b86}
+  #nav .foot b{color:var(--ink);font-size:15px}
+  /* ---- Controls ---- */
+  #ctl{bottom:16px;left:14px;padding:12px 14px;width:240px}
+  #ctl h3{margin:0 0 8px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#7688a6}
+  #ctl select{width:100%;padding:8px;border-radius:10px;border:1px solid #e3e9f3;font-size:13px;margin-bottom:8px}
+  .seg{display:flex;gap:6px;margin-bottom:8px}
+  .seg button{flex:1;border:1px solid #e3e9f3;background:#fff;border-radius:9px;padding:6px 0;font-size:11.5px;cursor:pointer}
+  .seg button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+  .row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#5b6b86;margin-top:6px}
+  #play{margin-top:10px;width:100%;border:none;border-radius:11px;background:var(--blue);color:#fff;
+    padding:11px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(47,107,255,.35)}
+  #tools{top:14px;right:14px;display:flex;flex-direction:column;gap:8px}
+  #tools button{width:44px;height:44px;border:none;border-radius:13px;background:var(--panel);
+    box-shadow:0 6px 16px rgba(20,40,90,.16);font-size:18px;cursor:pointer}
+  .maplibregl-ctrl-attrib{font-size:10px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+
+  <div id="nav" class="panel">
+    <div class="route"><span class="dot"></span><span class="line"></span><span class="ring"></span>
+      <span id="destName" style="margin-left:4px;font-weight:700;color:var(--ink)">—</span></div>
+    <div class="main">
+      <div class="arrow" id="navArrow">➜</div>
+      <div class="instr"><div class="d" id="navDist">—</div><div class="s" id="navText">Chọn một đỉnh để bắt đầu</div></div>
+    </div>
+    <div class="foot">
+      <span>Còn lại <b id="remain">—</b></span>
+      <span>Độ cao <b id="curEle">—</b></span>
+      <span>Đỉnh <b id="peakEle">—</b></span>
+    </div>
+  </div>
+
+  <div id="ctl" class="panel">
+    <h3>Cung / Đỉnh (GPX thật)</h3>
+    <select id="peak"></select>
+    <div class="seg" id="baseSeg">
+      <button data-b="clean" class="on">Sạch</button>
+      <button data-b="topo">Bình độ</button>
+      <button data-b="sat">Vệ tinh</button>
+    </div>
+    <div class="row"><span>Địa hình 3D</span><input id="tg3D" type="checkbox" checked></div>
+    <div class="row"><span>Phóng đại địa hình</span><input id="exag" type="range" min="1" max="3" step="0.1" value="1.6"></div>
+    <button id="play">▶ Mô phỏng dẫn đường</button>
+  </div>
+
+  <div id="tools">
+    <button id="fit" title="Vừa khung">🎯</button>
+    <button id="tiltBtn" title="Nghiêng">⛰️</button>
+  </div>
+</div>
+
+<script>
+const PEAKS=["Fansipang","Putaleng","Tà Xùa","Tà Chì Nhù","Bạch Mộc (Kỳ Quan San)","Lảo Thẩn","Nhìu Cồ San","Ngũ Chỉ Sơn","Tả Liên Sơn","Lùng Cúng","Pu Si Lung","Chu Va 12","Kang Su Văn","Nam Kang","Pờ Ma Lung"];
+const FILES={"Fansipang":"Fansipang.gpx","Putaleng":"Putaleng.gpx","Tà Xùa":"Tà Xùa.gpx","Tà Chì Nhù":"Tà Chì Nhù.gpx","Bạch Mộc (Kỳ Quan San)":"KỲ QUAN SAN.gpx","Lảo Thẩn":"Lảo Thẩn.gpx","Nhìu Cồ San":"Nhìu Cồ San.gpx","Ngũ Chỉ Sơn":"Ngũ Chỉ Sơn.gpx","Tả Liên Sơn":"Tả Liên Sơn.gpx","Lùng Cúng":"Lùng Cúng.gpx","Pu Si Lung":"Pu Si Lung.gpx","Chu Va 12":"Chu Va 12.gpx","Kang Su Văn":"Kang Su Văn.gpx","Nam Kang":"NamKang.gpx","Pờ Ma Lung":"Pờ Ma Lung , Chung Nhíu Vũ.gpx"};
+
+const DEM={type:'raster-dem',tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],encoding:'terrarium',tileSize:256,maxzoom:14};
+function rasterStyle(tiles,attr,mz){return{version:8,sources:{base:{type:'raster',tiles,tileSize:256,maxzoom:mz,attribution:attr},terrain:DEM},
+  layers:[{id:'base',type:'raster',source:'base'},{id:'hills',type:'hillshade',source:'terrain',paint:{'hillshade-exaggeration':.45}}]};}
+const STYLES={
+  clean:'https://tiles.openfreemap.org/styles/positron',
+  topo: rasterStyle(['https://a.tile.opentopomap.org/{z}/{x}/{y}.png','https://b.tile.opentopomap.org/{z}/{x}/{y}.png','https://c.tile.opentopomap.org/{z}/{x}/{y}.png'],'© OpenTopoMap, © OSM',17),
+  sat:  rasterStyle(['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],'Imagery © Esri, Maxar',19)
+};
+
+const map=new maplibregl.Map({container:'map',style:STYLES.clean,center:[103.838,22.333],zoom:12.5,pitch:55,maxPitch:80});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'bottom-right');
+map.addControl(new maplibregl.ScaleControl({unit:'metric'}));
+
+let base='clean',is3D=true,track=null,simTimer=null;
+
+// tô lại positron thành tông xanh sạch giống ảnh
+function recolorClean(){ if(base!=='clean')return; const layers=map.getStyle().layers||[];
+  for(const L of layers){ try{
+    const id=L.id.toLowerCase();
+    if(L.type==='background') map.setPaintProperty(L.id,'background-color','#eef3fb');
+    else if(id.includes('water')) map.setPaintProperty(L.id, L.type==='fill'?'fill-color':'line-color','#cfe0ff');
+    else if(id.includes('building')) { if(L.type==='fill'){map.setPaintProperty(L.id,'fill-color','#e4ebf6');map.setPaintProperty(L.id,'fill-opacity',.7);} }
+    else if(id.includes('landcover')||id.includes('park')||id.includes('wood')||id.includes('forest')) { if(L.type==='fill')map.setPaintProperty(L.id,'fill-color','#e8f0e6'); }
+    else if(id.includes('road')||id.includes('street')||id.includes('transport')){ if(L.type==='line')map.setPaintProperty(L.id,'line-color','#ffffff'); }
+  }catch(e){} } }
+
+function ensureDEM(){ if(!map.getSource('terrain')) map.addSource('terrain',DEM); }
+function addRouteLayers(){
+  if(!map.getSource('track')){
+    map.addSource('track',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'rt-cas',type:'line',source:'track',paint:{'line-color':'#ffffff','line-width':11,'line-opacity':.95},layout:{'line-join':'round','line-cap':'round'}});
+    map.addLayer({id:'rt-line',type:'line',source:'track',paint:{'line-color':'#2f6bff','line-width':7},layout:{'line-join':'round','line-cap':'round'}});
+    map.addLayer({id:'rt-arrow',type:'symbol',source:'track',layout:{'symbol-placement':'line','symbol-spacing':70,'text-field':'▶','text-size':13,'text-keep-upright':false,'text-rotation-alignment':'map','text-allow-overlap':true},paint:{'text-color':'#ffffff'}});
+  }
+  if(!map.getSource('ends')){
+    map.addSource('ends',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'ends-ring',type:'circle',source:'ends',paint:{'circle-radius':9,'circle-color':'#fff','circle-stroke-width':4,'circle-stroke-color':['get','c']}});
+  }
+  if(!map.getSource('me')){
+    map.addSource('me',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'me-hal',type:'circle',source:'me',paint:{'circle-radius':16,'circle-color':'#2f6bff','circle-opacity':.18}});
+    map.addLayer({id:'me-dot',type:'circle',source:'me',paint:{'circle-radius':8,'circle-color':'#2f6bff','circle-stroke-width':3,'circle-stroke-color':'#fff'}});
+  }
+}
+function reapply(){ ensureDEM(); addRouteLayers(); recolorClean();
+  if(track){ map.getSource('track').setData(track.line); map.getSource('ends').setData(track.ends); }
+  if(is3D){ try{map.setTerrain({source:'terrain',exaggeration:+exag.value});}catch(e){} }
+  try{ map.setSky({'sky-color':'#8fb6f0','horizon-color':'#e8f1fe','fog-color':'#ffffff','sky-horizon-blend':.6}); }catch(e){}
+}
+map.on('load',reapply); map.on('style.load',reapply);
+
+// ==== geo helpers ====
+function hav(a,b){const R=6371000,r=Math.PI/180,dLat=(b.lat-a.lat)*r,dLon=(b.lon-a.lon)*r,
+  s=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+function bearing(a,b){const r=Math.PI/180,y=Math.sin((b.lon-a.lon)*r)*Math.cos(b.lat*r),
+  x=Math.cos(a.lat*r)*Math.sin(b.lat*r)-Math.sin(a.lat*r)*Math.cos(b.lat*r)*Math.cos((b.lon-a.lon)*r);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;}
+function parseGPX(t){const xml=new DOMParser().parseFromString(t,'application/xml');
+  let p=[...xml.querySelectorAll('trkpt')];if(!p.length)p=[...xml.querySelectorAll('rtept')];
+  return p.map(x=>({lon:+x.getAttribute('lon'),lat:+x.getAttribute('lat'),ele:x.querySelector('ele')?+x.querySelector('ele').textContent:null})).filter(p=>isFinite(p.lat));}
+
+// gộp điểm quá dày cho mượt & sinh khúc rẽ từ hình học thật
+function turns(pts,cum){const out=[];let last=0;
+  for(let i=5;i<pts.length-5;i++){const b1=bearing(pts[i-5],pts[i]),b2=bearing(pts[i],pts[i+5]);
+    let d=((b2-b1+540)%360)-180; if(Math.abs(d)>32 && cum[i]-last>150){out.push({at:cum[i],dir:d>0?'right':'left',ang:Math.abs(d)});last=cum[i];}}
+  return out;}
+
+function loadTrack(pts,name){
+  const coords=pts.map(p=>[p.lon,p.lat]);const cum=[0];let dist=0,mx=-1e9;
+  for(let i=1;i<pts.length;i++){dist+=hav(pts[i-1],pts[i]);cum.push(dist);}
+  pts.forEach(p=>{if(p.ele!=null&&p.ele>mx)mx=p.ele;});
+  track={pts,coords,cum,total:dist,turns:turns(pts,cum),peak:mx,
+    line:{type:'Feature',geometry:{type:'LineString',coordinates:coords}},
+    ends:{type:'FeatureCollection',features:[
+      {type:'Feature',geometry:{type:'Point',coordinates:coords[0]},properties:{c:'#16a34a'}},
+      {type:'Feature',geometry:{type:'Point',coordinates:coords.at(-1)},properties:{c:'#e11d48'}}]}};
+  addRouteLayers();map.getSource('track').setData(track.line);map.getSource('ends').setData(track.ends);
+  destName.textContent=name; peakEle.textContent=Math.round(mx)+' m';
+  fitTrack(); updateCard(0);
+}
+function fitTrack(){const b=new maplibregl.LngLatBounds();track.coords.forEach(c=>b.extend(c));
+  map.fitBounds(b,{padding:{top:180,bottom:170,left:60,right:60},pitch:is3D?55:0});}
+
+function posAt(d){ // vị trí + độ cao tại quãng d (m) dọc route
+  const {cum,pts,coords}=track; let i=1; while(i<cum.length&&cum[i]<d)i++;
+  if(i>=cum.length)return{lngLat:coords.at(-1),ele:pts.at(-1).ele,idx:cum.length-1};
+  const t=(d-cum[i-1])/((cum[i]-cum[i-1])||1);
+  return{lngLat:[coords[i-1][0]+(coords[i][0]-coords[i-1][0])*t,coords[i-1][1]+(coords[i][1]-coords[i-1][1])*t],
+    ele:(pts[i-1].ele!=null&&pts[i].ele!=null)?pts[i-1].ele+(pts[i].ele-pts[i-1].ele)*t:pts[i].ele,idx:i};}
+
+function fmt(m){return m>=1000?(m/1000).toFixed(1)+' km':Math.round(m/10)*10+' m';}
+function updateCard(d){ if(!track)return;
+  const p=posAt(d); map.getSource('me').setData({type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'Point',coordinates:p.lngLat}}]});
+  const nx=track.turns.find(t=>t.at>d+8);
+  if(nx){ navArrow.textContent=nx.dir==='right'?'➤':'⬅'; navArrow.style.transform=nx.dir==='right'?'rotate(0deg)':'none';
+    navText.textContent=nx.dir==='right'?'Rẽ phải':'Rẽ trái'; navDist.textContent='sau '+fmt(nx.at-d);
+  } else { navArrow.textContent='◎'; navText.textContent='Tới đỉnh'; navDist.textContent=fmt(track.total-d); }
+  remain.textContent=fmt(track.total-d);
+  curEle.textContent=p.ele!=null?Math.round(p.ele)+' m':'—';
+}
+
+// ==== simulation ====
+function stopSim(){if(simTimer){clearInterval(simTimer);simTimer=null;play.textContent='▶ Mô phỏng dẫn đường';}}
+play.onclick=()=>{ if(!track)return; if(simTimer){stopSim();return;}
+  play.textContent='⏸ Dừng'; let d=0; const step=Math.max(track.total/600,8);
+  simTimer=setInterval(()=>{ d+=step; if(d>=track.total){updateCard(track.total);stopSim();return;}
+    updateCard(d); const p=posAt(d); map.easeTo({center:p.lngLat,duration:180,pitch:is3D?60:0}); },120); };
+
+// ==== controls ====
+document.querySelectorAll('#baseSeg button').forEach(b=>b.onclick=()=>{stopSim();base=b.dataset.b;
+  map.setStyle(typeof STYLES[base]==='string'?STYLES[base]:STYLES[base]);
+  document.querySelectorAll('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));});
+tg3D.onchange=()=>{is3D=tg3D.checked; if(is3D){map.easeTo({pitch:55});try{map.setTerrain({source:'terrain',exaggeration:+exag.value});}catch(e){}}else{try{map.setTerrain(null);}catch(e){}map.easeTo({pitch:0});}};
+exag.oninput=()=>{if(is3D){try{map.setTerrain({source:'terrain',exaggeration:+exag.value});}catch(e){}}};
+fit.onclick=()=>track&&fitTrack(); tiltBtn.onclick=()=>map.easeTo({pitch:map.getPitch()>10?0:55});
+
+const sel=document.getElementById('peak');
+PEAKS.forEach(p=>{const o=document.createElement('option');o.textContent=p;sel.appendChild(o);});
+sel.onchange=()=>loadPeak(sel.value);
+function loadPeak(n){stopSim();navText.textContent='đang tải…';
+  fetch('gpx/'+encodeURIComponent(FILES[n])).then(r=>r.text()).then(t=>{const p=parseGPX(t);if(p.length>1)loadTrack(p,n);}).catch(e=>alert('Lỗi: '+e.message));}
+map.on('load',()=>setTimeout(()=>loadPeak(PEAKS[0]),400));
+</script>
+</body>
+</html>

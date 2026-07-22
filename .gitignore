@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Env & secrets — KHÔNG commit key thật (dùng .env.example)
+.env
+.env.local
+*.pem
+
+# Build outputs
+dist/
+build/
+.expo/
+web-build/
+
+# Native folders sinh bởi `expo prebuild` (tái tạo được)
+app/android/
+app/ios/
+
+# Logs & temp
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# File nén / dữ liệu trùng lặp (nguồn gốc: "16 Đỉnh Tây Bắc/")
+*.zip
+prototype/gpx/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude local
+.claude/

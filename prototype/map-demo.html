@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>POTTER 3.0 — Map thật (MapLibre + địa hình 3D)</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  :root{ --green:#16a34a; --ink:#0f172a; --panel:rgba(255,255,255,.94); }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink)}
+  #app{position:relative;height:100%;width:100%}
+  #map{position:absolute;inset:0}
+  .panel{position:absolute;background:var(--panel);backdrop-filter:blur(8px);border-radius:14px;
+    box-shadow:0 6px 24px rgba(0,0,0,.18);padding:12px 14px}
+  #layers{top:12px;left:12px;width:250px}
+  #layers h3{margin:0 0 8px;font-size:12px;letter-spacing:.3px;text-transform:uppercase;color:#475569}
+  .seg{display:flex;gap:6px;margin-bottom:10px}
+  .seg button{flex:1;border:1px solid #e2e8f0;background:#fff;border-radius:9px;padding:7px 0;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+  .row{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#475569;margin-top:7px}
+  input[type=range]{width:110px}
+  select{width:100%;padding:8px;border-radius:9px;border:1px solid #e2e8f0;font-size:13px;margin-bottom:8px}
+  #stats{bottom:150px;left:12px;min-width:180px;font-size:13px;display:none}
+  #stats .big{font-size:20px;font-weight:700;color:var(--green)}
+  #stats .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-top:8px}
+  #stats .k{font-size:11px;color:#64748b}
+  #stats .v{font-size:15px;font-weight:600}
+  #elev{position:absolute;left:12px;right:12px;bottom:12px;height:120px;padding:8px 10px 4px;display:none}
+  #elev canvas{width:100%;height:86px;display:block}
+  #elev .lbl{font-size:11px;color:#64748b;margin-bottom:2px}
+  #tools{top:12px;right:12px;display:flex;flex-direction:column;gap:8px}
+  #tools button{width:44px;height:44px;border:none;border-radius:12px;background:var(--panel);
+    box-shadow:0 4px 14px rgba(0,0,0,.16);font-size:18px;cursor:pointer}
+  #tools button.on{background:var(--green);color:#fff}
+  #drop{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(15,23,42,.55);color:#fff;font-size:18px;z-index:20;pointer-events:none;opacity:0;transition:.15s}
+  #drop.show{opacity:1}
+  .badge{font-size:11px;color:#64748b}
+  .maplibregl-ctrl-attrib{font-size:10px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+
+  <div id="layers" class="panel">
+    <h3>Chọn đỉnh Tây Bắc (GPX thật)</h3>
+    <select id="peak"></select>
+    <h3>Lớp bản đồ (tile thật)</h3>
+    <div class="seg" id="baseSeg">
+      <button data-b="topo" class="on">Bình độ</button>
+      <button data-b="street">Đường bộ</button>
+      <button data-b="sat">Vệ tinh</button>
+    </div>
+    <div class="row"><span>Đổ bóng núi (hillshade)</span><input id="tgHill" type="checkbox" checked></div>
+    <div class="row"><span>Địa hình 3D (isometric)</span><input id="tg3D" type="checkbox"></div>
+    <div class="row"><span>Độ phóng đại địa hình</span><input id="exag" type="range" min="1" max="3" step="0.1" value="1.5"></div>
+    <div class="row"><span>Độ mờ lớp nền</span><input id="opacity" type="range" min="20" max="100" value="100"></div>
+    <div class="row"><label class="badge" style="cursor:pointer">📂 Nạp GPX khác<input id="gpx" type="file" accept=".gpx" style="display:none"></label><span class="badge" id="fname"></span></div>
+  </div>
+
+  <div id="tools">
+    <button id="locate" title="Định vị GPS thật">📍</button>
+    <button id="fit" title="Vừa khung track">🎯</button>
+    <button id="tiltBtn" title="Nghiêng góc nhìn">⛰️</button>
+  </div>
+
+  <div id="stats" class="panel">
+    <div><span class="big" id="sDist">0.0</span> km</div>
+    <div class="grid">
+      <div><div class="k">Tổng leo</div><div class="v" id="sUp">0 m</div></div>
+      <div><div class="k">Tổng xuống</div><div class="v" id="sDown">0 m</div></div>
+      <div><div class="k">Đỉnh cao</div><div class="v" id="sMax">0 m</div></div>
+      <div><div class="k">Xuất phát</div><div class="v" id="sMin">0 m</div></div>
+    </div>
+  </div>
+
+  <div id="elev" class="panel">
+    <div class="lbl">Biểu đồ độ cao (từ &lt;ele&gt; trong GPX — dốc = đỏ, phẳng = xanh)</div>
+    <canvas id="elevCanvas"></canvas>
+  </div>
+
+  <div id="drop">Thả file GPX để nạp cung đường</div>
+</div>
+
+<script>
+// ===== Danh sách 15 đỉnh (GPX thật trong /gpx) =====
+const PEAKS = ["Fansipang","Putaleng","Tà Xùa","Tà Chì Nhù","Bạch Mộc (Kỳ Quan San)","Lảo Thẩn",
+  "Nhìu Cồ San","Ngũ Chỉ Sơn","Tả Liên Sơn","Lùng Cúng","Pu Si Lung","Chu Va 12",
+  "Kang Su Văn","Nam Kang","Pờ Ma Lung"];
+const FILES = {"Fansipang":"Fansipang.gpx","Putaleng":"Putaleng.gpx","Tà Xùa":"Tà Xùa.gpx",
+  "Tà Chì Nhù":"Tà Chì Nhù.gpx","Bạch Mộc (Kỳ Quan San)":"KỲ QUAN SAN.gpx","Lảo Thẩn":"Lảo Thẩn.gpx",
+  "Nhìu Cồ San":"Nhìu Cồ San.gpx","Ngũ Chỉ Sơn":"Ngũ Chỉ Sơn.gpx","Tả Liên Sơn":"Tả Liên Sơn.gpx",
+  "Lùng Cúng":"Lùng Cúng.gpx","Pu Si Lung":"Pu Si Lung.gpx","Chu Va 12":"Chu Va 12.gpx",
+  "Kang Su Văn":"Kang Su Văn.gpx","Nam Kang":"NamKang.gpx","Pờ Ma Lung":"Pờ Ma Lung , Chung Nhíu Vũ.gpx"};
+
+// ===== Base styles: tile thật =====
+const DEM = { type:'raster-dem', tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+  encoding:'terrarium', tileSize:256, maxzoom:14, attribution:'Elevation: Terrarium (Mapzen/AWS)' };
+const RASTER = (tiles, attr, maxzoom=19) => (Array.isArray(tiles)?tiles:[tiles]);
+const BASES = {
+  topo:   {tiles:['https://a.tile.opentopomap.org/{z}/{x}/{y}.png','https://b.tile.opentopomap.org/{z}/{x}/{y}.png','https://c.tile.opentopomap.org/{z}/{x}/{y}.png'], attr:'© OpenTopoMap (CC-BY-SA), © OpenStreetMap contributors', maxzoom:17},
+  street: {tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], attr:'© OpenStreetMap contributors', maxzoom:19},
+  sat:    {tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], attr:'Imagery © Esri, Maxar', maxzoom:19}
+};
+function buildStyle(b){
+  const base=BASES[b];
+  return { version:8, sources:{
+      base:{ type:'raster', tiles:base.tiles, tileSize:256, maxzoom:base.maxzoom, attribution:base.attr },
+      terrain: DEM
+    }, layers:[
+      { id:'base', type:'raster', source:'base' },
+      { id:'hills', type:'hillshade', source:'terrain', paint:{'hillshade-exaggeration':0.5,'hillshade-shadow-color':'#3a2f26'} }
+    ] };
+}
+
+const map = new maplibregl.Map({
+  container:'map', style:buildStyle('topo'),
+  center:[103.838,22.333], zoom:12, pitch:0, maxPitch:80, hash:false
+});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'bottom-right');
+map.addControl(new maplibregl.ScaleControl({unit:'metric'}));
+
+let currentBase='topo', trackGeo=null, is3D=false;
+
+function addTrackLayers(){
+  if(!map.getSource('track')){
+    map.addSource('track',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'track-casing',type:'line',source:'track',
+      paint:{'line-color':'#ffffff','line-width':7,'line-opacity':.9},layout:{'line-join':'round','line-cap':'round'}});
+    map.addLayer({id:'track-line',type:'line',source:'track',
+      paint:{'line-color':'#2563eb','line-width':4},layout:{'line-join':'round','line-cap':'round'}});
+  }
+  if(!map.getSource('pts')){
+    map.addSource('pts',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'pts',type:'circle',source:'pts',
+      paint:{'circle-radius':7,'circle-color':['get','c'],'circle-stroke-width':2,'circle-stroke-color':'#fff'}});
+  }
+}
+function reapply(){
+  addTrackLayers();
+  if(trackGeo){ map.getSource('track').setData(trackGeo.line); map.getSource('pts').setData(trackGeo.ptsFC); }
+  applyOpacity(); applyHill();
+  if(is3D){ try{ map.setTerrain({source:'terrain',exaggeration:+exag.value}); }catch(e){} }
+  try{ map.setSky({'sky-color':'#87b5e8','horizon-color':'#dfeefc','fog-color':'#ffffff','sky-horizon-blend':0.6,'horizon-fog-blend':0.5}); }catch(e){}
+}
+map.on('load',reapply);
+map.on('style.load',reapply);
+
+// base switch
+function setBase(b){ currentBase=b; map.setStyle(buildStyle(b));
+  document.querySelectorAll('#baseSeg button').forEach(x=>x.classList.toggle('on',x.dataset.b===b)); }
+document.querySelectorAll('#baseSeg button').forEach(btn=>btn.onclick=()=>setBase(btn.dataset.b));
+
+function applyOpacity(){ const o=+opacity.value/100; if(map.getLayer('base')) map.setPaintProperty('base','raster-opacity',o); }
+function applyHill(){ if(map.getLayer('hills')) map.setLayoutProperty('hills','visibility',tgHill.checked?'visible':'none'); }
+opacity.oninput=applyOpacity; tgHill.onchange=applyHill;
+tg3D.onchange=()=>{ is3D=tg3D.checked;
+  if(is3D){ map.easeTo({pitch:62}); try{map.setTerrain({source:'terrain',exaggeration:+exag.value});}catch(e){} }
+  else { try{map.setTerrain(null);}catch(e){} map.easeTo({pitch:0}); } };
+exag.oninput=()=>{ if(is3D){ try{map.setTerrain({source:'terrain',exaggeration:+exag.value});}catch(e){} } };
+
+// tools
+locate.onclick=()=>{ if(!navigator.geolocation)return alert('Không hỗ trợ GPS');
+  navigator.geolocation.getCurrentPosition(p=>{const c=[p.coords.longitude,p.coords.latitude];
+    new maplibregl.Marker({color:'#16a34a'}).setLngLat(c).addTo(map); map.flyTo({center:c,zoom:14});},
+    ()=>alert('Cần cho phép quyền GPS'),{enableHighAccuracy:true}); };
+fit.onclick=()=>trackGeo&&fitTrack(trackGeo);
+tiltBtn.onclick=()=>map.easeTo({pitch: map.getPitch()>10?0:60});
+
+// ===== GPX =====
+function parseGPX(text){ const xml=new DOMParser().parseFromString(text,'application/xml');
+  let pts=[...xml.querySelectorAll('trkpt')]; if(!pts.length) pts=[...xml.querySelectorAll('rtept')];
+  return pts.map(p=>({lon:+p.getAttribute('lon'),lat:+p.getAttribute('lat'),
+    ele:p.querySelector('ele')?+p.querySelector('ele').textContent:null})).filter(p=>isFinite(p.lat)&&isFinite(p.lon)); }
+function hav(a,b){const R=6371000,r=Math.PI/180,dLat=(b.lat-a.lat)*r,dLon=(b.lon-a.lon)*r,
+  s=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+function stats(pts){let dist=0,up=0,down=0,e=[],cum=[0];
+  for(let i=1;i<pts.length;i++){dist+=hav(pts[i-1],pts[i]);cum.push(dist);}
+  pts.forEach(p=>p.ele!=null&&e.push(p.ele));
+  for(let i=1;i<pts.length;i++){if(pts[i].ele!=null&&pts[i-1].ele!=null){const d=pts[i].ele-pts[i-1].ele;if(d>0)up+=d;else down-=d;}}
+  return{dist,up,down,max:e.length?Math.max(...e):0,min:e.length?Math.min(...e):0,cum};}
+function fitTrack(g){const b=new maplibregl.LngLatBounds();g.line.geometry.coordinates.forEach(c=>b.extend(c));
+  map.fitBounds(b,{padding:{top:120,bottom:170,left:70,right:70},pitch:is3D?62:0});}
+function loadPoints(pts,name){ const coords=pts.map(p=>[p.lon,p.lat]); const st=stats(pts);
+  trackGeo={line:{type:'Feature',geometry:{type:'LineString',coordinates:coords}},
+    ptsFC:{type:'FeatureCollection',features:[
+      {type:'Feature',geometry:{type:'Point',coordinates:coords[0]},properties:{c:'#16a34a'}},
+      {type:'Feature',geometry:{type:'Point',coordinates:coords.at(-1)},properties:{c:'#e11d48'}}]}};
+  addTrackLayers(); map.getSource('track').setData(trackGeo.line); map.getSource('pts').setData(trackGeo.ptsFC);
+  fitTrack(trackGeo);
+  sDist.textContent=(st.dist/1000).toFixed(1); sUp.textContent=Math.round(st.up)+' m';
+  sDown.textContent=Math.round(st.down)+' m'; sMax.textContent=Math.round(st.max)+' m'; sMin.textContent=Math.round(st.min)+' m';
+  stats_el.style.display='block'; drawElev(pts,st); fname.textContent=name; }
+const stats_el=document.getElementById('stats');
+function drawElev(pts,st){const wrap=document.getElementById('elev');wrap.style.display='block';
+  const cv=document.getElementById('elevCanvas');const dpr=devicePixelRatio||1;const W=cv.clientWidth,H=cv.clientHeight;
+  cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  if(!pts.some(p=>p.ele!=null)){ctx.fillStyle='#94a3b8';ctx.fillText('GPX không có độ cao',10,40);return;}
+  const eMin=st.min,eMax=st.max||eMin+1,total=st.dist||1;
+  const x=d=>d/total*W,y=e=>H-6-((e-eMin)/(eMax-eMin))*(H-14);
+  for(let i=1;i<pts.length;i++){if(pts[i].ele==null||pts[i-1].ele==null)continue;
+    const seg=hav(pts[i-1],pts[i])||1,grade=(pts[i].ele-pts[i-1].ele)/seg,g=Math.min(Math.abs(grade)/0.25,1);
+    ctx.strokeStyle=`rgb(${34+g*200|0},${160-g*150|0},${70-g*40|0})`;ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(x(st.cum[i-1]),y(pts[i-1].ele));ctx.lineTo(x(st.cum[i]),y(pts[i].ele));ctx.stroke();}}
+
+function loadPeak(name){ fname.textContent='đang tải…';
+  fetch('gpx/'+encodeURIComponent(FILES[name])).then(r=>r.text()).then(t=>{
+    const pts=parseGPX(t); if(pts.length<2)return alert('GPX rỗng: '+name); loadPoints(pts,name);
+  }).catch(e=>alert('Lỗi tải '+name+': '+e.message)); }
+
+// dropdown
+const sel=document.getElementById('peak');
+PEAKS.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o);});
+sel.onchange=()=>loadPeak(sel.value);
+
+// custom file
+document.getElementById('gpx').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{const pts=parseGPX(r.result);if(pts.length<2)return alert('GPX rỗng');loadPoints(pts,f.name);};r.readAsText(f);};
+const drop=document.getElementById('drop');
+addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('show');});
+addEventListener('dragleave',e=>{if(e.clientX===0)drop.classList.remove('show');});
+addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('show');
+  const f=[...e.dataTransfer.files].find(f=>f.name.toLowerCase().endsWith('.gpx'));
+  if(f){const r=new FileReader();r.onload=()=>{const pts=parseGPX(r.result);if(pts.length>1)loadPoints(pts,f.name);};r.readAsText(f);}});
+
+// auto-load first peak once map ready
+map.on('load',()=>setTimeout(()=>loadPeak(PEAKS[0]),300));
+</script>
+</body>
+</html>

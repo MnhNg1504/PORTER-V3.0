@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>POTTER 3.0 — Contour Isometric (DEM thật)</title>
+<style>
+  :root{--bg:#0a0f16;--card:#10151f;--cyan:#39e0e6;--muted:#7d8aa0}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#05070b;color:#e6edf7;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  #wrap{max-width:520px;margin:0 auto;padding:14px}
+  .card{background:linear-gradient(180deg,#0e1420,#0a0f18);border:1px solid #1c2534;border-radius:22px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+  .head{display:flex;align-items:center;gap:10px;padding:14px 16px}
+  .head .ico{width:34px;height:34px;border-radius:11px;background:#1a2233;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .head h1{font-size:15px;margin:0;font-weight:700}
+  .head .sub{color:var(--muted);font-size:13px;font-weight:500}
+  .head .sp{flex:1}
+  .head .dots{color:var(--muted);font-size:16px;letter-spacing:2px}
+  #cv{display:block;width:100%;height:360px;background:radial-gradient(120% 90% at 50% 30%,#0d1622 0%,#080b12 60%,#05070b 100%)}
+  .ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-top:1px solid #161d29}
+  select,input[type=range]{accent-color:var(--cyan)}
+  select{background:#131b28;color:#e6edf7;border:1px solid #223049;border-radius:9px;padding:7px 10px;font-size:13px}
+  .lab{font-size:12px;color:var(--muted)}
+  .legend{display:flex;gap:14px;padding:6px 16px 16px;font-size:12px;color:var(--muted)}
+  .legend b{color:#e6edf7}
+  .pill{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:10px;height:10px;border-radius:50%}
+  #status{padding:0 16px 12px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="card">
+    <div class="head">
+      <div class="ico">⛰️</div>
+      <div><h1>Route covered <span class="sub">· <span id="peakName">—</span></span></h1></div>
+      <div class="sp"></div>
+      <div class="dots">◫ ◵ ⧉ ⋯</div>
+    </div>
+    <canvas id="cv"></canvas>
+    <div class="ctrls">
+      <span class="lab">Đỉnh</span>
+      <select id="peak"></select>
+      <span class="lab">Bình độ mỗi</span>
+      <select id="interval">
+        <option value="40">40 m</option><option value="60" selected>60 m</option>
+        <option value="80">80 m</option><option value="100">100 m</option>
+      </select>
+      <span class="lab">Xoay</span>
+      <input id="rot" type="range" min="0" max="360" value="35" style="flex:1;min-width:90px">
+    </div>
+    <div class="legend">
+      <span class="pill"><span class="swatch" style="background:#39e0e6"></span>Đường bình độ (DEM thật)</span>
+      <span class="pill"><span class="swatch" style="background:#fff"></span>Route GPX</span>
+      <span class="pill"><span class="swatch" style="background:#ff5a5f"></span>Waypoint</span>
+    </div>
+    <div id="status">Đang tải dữ liệu độ cao…</div>
+  </div>
+</div>
+
+<script>
+const PEAKS=["Fansipang","Putaleng","Tà Xùa","Tà Chì Nhù","Bạch Mộc (Kỳ Quan San)","Lảo Thẩn","Nhìu Cồ San","Ngũ Chỉ Sơn","Tả Liên Sơn","Lùng Cúng","Pu Si Lung","Chu Va 12","Kang Su Văn","Nam Kang","Pờ Ma Lung"];
+const FILES={"Fansipang":"Fansipang.gpx","Putaleng":"Putaleng.gpx","Tà Xùa":"Tà Xùa.gpx","Tà Chì Nhù":"Tà Chì Nhù.gpx","Bạch Mộc (Kỳ Quan San)":"KỲ QUAN SAN.gpx","Lảo Thẩn":"Lảo Thẩn.gpx","Nhìu Cồ San":"Nhìu Cồ San.gpx","Ngũ Chỉ Sơn":"Ngũ Chỉ Sơn.gpx","Tả Liên Sơn":"Tả Liên Sơn.gpx","Lùng Cúng":"Lùng Cúng.gpx","Pu Si Lung":"Pu Si Lung.gpx","Chu Va 12":"Chu Va 12.gpx","Kang Su Văn":"Kang Su Văn.gpx","Nam Kang":"NamKang.gpx","Pờ Ma Lung":"Pờ Ma Lung , Chung Nhíu Vũ.gpx"};
+
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const status=document.getElementById('status');
+let DPR=Math.min(devicePixelRatio||1,2);
+function resize(){cv.width=cv.clientWidth*DPR;cv.height=cv.clientHeight*DPR;}
+resize();addEventListener('resize',()=>{resize();if(STATE)render();});
+
+// ---------- DEM tiles ----------
+const N=150;               // độ phân giải lưới
+const tileCache=new Map();
+function lon2xf(lon,z){return (lon+180)/360*Math.pow(2,z);}
+function lat2yf(lat,z){const r=lat*Math.PI/180;return (1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*Math.pow(2,z);}
+function loadTile(z,x,y){const k=z+'/'+x+'/'+y;if(tileCache.has(k))return tileCache.get(k);
+  const p=new Promise(res=>{const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+      g.drawImage(img,0,0);res(g.getImageData(0,0,256,256).data);};
+    img.onerror=()=>res(null);
+    img.src='https://s3.amazonaws.com/elevation-tiles-prod/terrarium/'+z+'/'+x+'/'+y+'.png';});
+  tileCache.set(k,p);return p;}
+
+async function buildGrid(bbox){
+  // chọn zoom sao cho vùng trải ~ vài tile
+  let z=13; while(z>9){const nx=Math.floor(lon2xf(bbox.maxLon,z))-Math.floor(lon2xf(bbox.minLon,z))+1;
+    const ny=Math.floor(lat2yf(bbox.minLat,z))-Math.floor(lat2yf(bbox.maxLat,z))+1; if(nx*ny<=20)break; z--;}
+  const need=new Set();
+  const px=[],py=[];
+  for(let j=0;j<=N;j++){for(let i=0;i<=N;i++){
+    const lon=bbox.minLon+(bbox.maxLon-bbox.minLon)*i/N;
+    const lat=bbox.maxLat-(bbox.maxLat-bbox.minLat)*j/N;
+    const xf=lon2xf(lon,z),yf=lat2yf(lat,z);
+    need.add(Math.floor(xf)+'/'+Math.floor(yf));
+  }}
+  // tải tile
+  const tiles={};
+  await Promise.all([...need].map(async k=>{const[x,y]=k.split('/').map(Number);tiles[k]=await loadTile(z,x,y);}));
+  // dựng lưới độ cao
+  const elev=new Float32Array((N+1)*(N+1));let mn=1e9,mx=-1e9;
+  for(let j=0;j<=N;j++){for(let i=0;i<=N;i++){
+    const lon=bbox.minLon+(bbox.maxLon-bbox.minLon)*i/N;
+    const lat=bbox.maxLat-(bbox.maxLat-bbox.minLat)*j/N;
+    const xf=lon2xf(lon,z),yf=lat2yf(lat,z);
+    const tx=Math.floor(xf),ty=Math.floor(yf),d=tiles[tx+'/'+ty];
+    let e=NaN;if(d){const ix=Math.min(255,Math.floor((xf-tx)*256)),iy=Math.min(255,Math.floor((yf-ty)*256));
+      const o=(iy*256+ix)*4;e=(d[o]*256+d[o+1]+d[o+2]/256)-32768;}
+    elev[j*(N+1)+i]=e;if(isFinite(e)){if(e<mn)mn=e;if(e>mx)mx=e;}
+  }}
+  // lấp lỗ tile lỗi bằng đáy thung lũng để không tạo bình độ giả ở mức 0
+  for(let k=0;k<elev.length;k++) if(!isFinite(elev[k])) elev[k]=mn;
+  return {elev,mn,mx,z};
+}
+
+// ---------- Marching squares ----------
+function contourSegments(elev,level){
+  const segs=[];const W=N+1;
+  const P=(a,b,t)=>t; // placeholder
+  for(let j=0;j<N;j++){for(let i=0;i<N;i++){
+    const tl=elev[j*W+i],tr=elev[j*W+i+1],br=elev[(j+1)*W+i+1],bl=elev[(j+1)*W+i];
+    let c=(tl>=level?8:0)|(tr>=level?4:0)|(br>=level?2:0)|(bl>=level?1:0);
+    if(c===0||c===15)continue;
+    const it=(a,b)=>(level-a)/((b-a)||1e-9);
+    const top=[i+it(tl,tr),j], right=[i+1,j+it(tr,br)], bot=[i+it(bl,br),j+1], left=[i,j+it(tl,bl)];
+    const push=(A,B)=>segs.push([A[0],A[1],B[0],B[1]]);
+    switch(c){
+      case 1:push(left,bot);break; case 2:push(bot,right);break; case 3:push(left,right);break;
+      case 4:push(top,right);break; case 5:push(left,top);push(bot,right);break; case 6:push(top,bot);break;
+      case 7:push(left,top);break; case 8:push(top,left);break; case 9:push(top,bot);break;
+      case 10:push(top,right);push(left,bot);break; case 11:push(top,right);break;
+      case 12:push(right,left);break; case 13:push(bot,right);break; case 14:push(left,bot);break;
+    }
+  }}
+  return segs;
+}
+
+// ---------- Projection isometric ----------
+let STATE=null,AZ=35*Math.PI/180;
+function proj(pi,pj,e,S){ // pi,pj in [0,N]; e elevation
+  const u=pi/N-0.5,v=pj/N-0.5;
+  const rx=u*Math.cos(AZ)-v*Math.sin(AZ), ry=u*Math.sin(AZ)+v*Math.cos(AZ);
+  const hN=(e-S.mn)/((S.mx-S.mn)||1);
+  const W=cv.width,H=cv.height,R=Math.min(W,H)*0.46,TILT=0.52,HP=H*0.42;
+  return [W/2+rx*R, H*0.60+ry*R*TILT - hN*HP, ry];
+}
+
+function render(){
+  const S=STATE;if(!S)return;const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(5,7,11,0)';ctx.fillRect(0,0,W,H);
+  // vòng la bàn
+  drawCompass(S);
+  // đường bình độ theo mức
+  const interval=+document.getElementById('interval').value;
+  const start=Math.ceil(S.mn/interval)*interval;
+  const draw=[];
+  for(let L=start;L<=S.mx;L+=interval){
+    const hN=(L-S.mn)/((S.mx-S.mn)||1);
+    const segs=contourSegments(S.elev,L);
+    for(const s of segs){const A=proj(s[0],s[1],L,S),B=proj(s[2],s[3],L,S);
+      draw.push({a:A,b:B,depth:(A[2]+B[2])/2,hN});}
+  }
+  draw.sort((p,q)=>p.depth-q.depth); // sau ra trước
+  ctx.lineWidth=1.1*DPR;ctx.lineCap='round';
+  for(const d of draw){
+    const al=0.22+d.hN*0.72;
+    ctx.strokeStyle=`rgba(${Math.round(40+d.hN*40)},${Math.round(190+d.hN*40)},${Math.round(210+d.hN*30)},${al})`;
+    ctx.shadowColor='rgba(57,224,230,'+(0.35*d.hN+0.1)+')';ctx.shadowBlur=6*DPR;
+    ctx.beginPath();ctx.moveTo(d.a[0],d.a[1]);ctx.lineTo(d.b[0],d.b[1]);ctx.stroke();
+  }
+  ctx.shadowBlur=0;
+  drawRoute(S);
+  drawPins(S);
+}
+
+function drawCompass(S){
+  const steps=96,pts=[];
+  for(let k=0;k<=steps;k++){const a=k/steps*Math.PI*2;
+    const pi=(0.5+Math.cos(a)*0.48)*N, pj=(0.5+Math.sin(a)*0.48)*N;
+    pts.push(proj(pi,pj,S.mn,S));}
+  ctx.strokeStyle='rgba(120,150,190,.35)';ctx.lineWidth=1*DPR;ctx.beginPath();
+  pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+  // ticks
+  ctx.strokeStyle='rgba(120,150,190,.22)';
+  for(let k=0;k<72;k++){const a=k/72*Math.PI*2;
+    const p1=proj((0.5+Math.cos(a)*0.48)*N,(0.5+Math.sin(a)*0.48)*N,S.mn,S);
+    const p2=proj((0.5+Math.cos(a)*0.505)*N,(0.5+Math.sin(a)*0.505)*N,S.mn,S);
+    ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();}
+  // labels N/E/S/W (xoay theo AZ)
+  const L=[['N',-Math.PI/2],['E',0],['S',Math.PI/2],['W',Math.PI]];
+  ctx.fillStyle='rgba(200,215,235,.7)';ctx.font=(13*DPR)+'px -apple-system,Segoe UI';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const[t,a]of L){const p=proj((0.5+Math.cos(a)*0.55)*N,(0.5+Math.sin(a)*0.55)*N,S.mn,S);
+    ctx.fillText(t,p[0],p[1]);}
+}
+
+function drawRoute(S){
+  const b=S.bbox,tr=S.track;if(!tr)return;
+  ctx.setLineDash([5*DPR,5*DPR]);ctx.lineWidth=2.4*DPR;ctx.strokeStyle='#ffffff';
+  ctx.shadowColor='rgba(255,255,255,.6)';ctx.shadowBlur=6*DPR;ctx.beginPath();
+  tr.forEach((p,k)=>{const pi=(p.lon-b.minLon)/(b.maxLon-b.minLon)*N,pj=(b.maxLat-p.lat)/(b.maxLat-b.minLat)*N;
+    const P=proj(pi,pj,p.ele!=null?p.ele:S.mn,S);k?ctx.lineTo(P[0],P[1]):ctx.moveTo(P[0],P[1]);});
+  ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+}
+
+function pin(P,base,color,glyph){
+  // thân pin nối xuống chân
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1.2*DPR;
+  ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(base[0],base[1]);ctx.stroke();
+  // đầu pin
+  const r=11*DPR;ctx.beginPath();ctx.fillStyle=color;
+  ctx.shadowColor=color;ctx.shadowBlur=10*DPR;
+  ctx.arc(P[0],P[1]-r,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(P[0]-5*DPR,P[1]-r);ctx.lineTo(P[0]+5*DPR,P[1]-r);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#0a0f16';ctx.font='bold '+(11*DPR)+'px -apple-system';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(glyph,P[0],P[1]-r);
+}
+function drawPins(S){
+  const b=S.bbox,tr=S.track;if(!tr||!tr.length)return;
+  const at=(idx,color,glyph)=>{const p=tr[Math.max(0,Math.min(tr.length-1,idx))];
+    const pi=(p.lon-b.minLon)/(b.maxLon-b.minLon)*N,pj=(b.maxLat-p.lat)/(b.maxLat-b.minLat)*N;
+    const P=proj(pi,pj,p.ele!=null?p.ele:S.mn,S),base=proj(pi,pj,S.mn,S);pin(P,base,color,glyph);};
+  let sIdx=0,mx=-1e9;tr.forEach((p,i)=>{if(p.ele!=null&&p.ele>mx){mx=p.ele;sIdx=i;}});
+  at(0,'#31d0aa','S');                        // xuất phát
+  at(Math.floor(tr.length*0.33),'#4aa8ff','A'); // camp 1
+  at(Math.floor(tr.length*0.66),'#ff5a5f','B'); // camp 2
+  at(sIdx,'#ffd23f','▲');                       // đỉnh
+  at(tr.length-1,'#ff5a5f','⚑');                // kết thúc
+}
+
+// ---------- GPX ----------
+function parseGPX(t){const xml=new DOMParser().parseFromString(t,'application/xml');
+  let p=[...xml.querySelectorAll('trkpt')];if(!p.length)p=[...xml.querySelectorAll('rtept')];
+  return p.map(x=>({lon:+x.getAttribute('lon'),lat:+x.getAttribute('lat'),ele:x.querySelector('ele')?+x.querySelector('ele').textContent:null})).filter(p=>isFinite(p.lat));}
+
+async function loadPeak(name){
+  status.textContent='Đang tải GPX + độ cao (DEM thật)…';
+  document.getElementById('peakName').textContent=name;
+  const t=await (await fetch('gpx/'+encodeURIComponent(FILES[name]))).text();
+  const track=parseGPX(t);
+  let minLon=1e9,maxLon=-1e9,minLat=1e9,maxLat=-1e9;
+  track.forEach(p=>{minLon=Math.min(minLon,p.lon);maxLon=Math.max(maxLon,p.lon);minLat=Math.min(minLat,p.lat);maxLat=Math.max(maxLat,p.lat);});
+  // đệm + ép vuông
+  const padLon=(maxLon-minLon)*0.18||0.01,padLat=(maxLat-minLat)*0.18||0.01;
+  minLon-=padLon;maxLon+=padLon;minLat-=padLat;maxLat+=padLat;
+  const cLon=(minLon+maxLon)/2,cLat=(minLat+maxLat)/2;
+  const half=Math.max((maxLon-minLon)/2,(maxLat-minLat)/2/Math.cos(cLat*Math.PI/180));
+  const bbox={minLon:cLon-half,maxLon:cLon+half,minLat:cLat-half*Math.cos(cLat*Math.PI/180),maxLat:cLat+half*Math.cos(cLat*Math.PI/180)};
+  const grid=await buildGrid(bbox);
+  STATE={...grid,bbox,track};
+  status.textContent=`DEM thật · vùng ~${((bbox.maxLat-bbox.minLat)*111).toFixed(1)}km · độ cao ${Math.round(grid.mn)}–${Math.round(grid.mx)}m · ${track.length} điểm GPX · zoom DEM z${grid.z}`;
+  render();
+}
+
+// controls
+const sel=document.getElementById('peak');
+PEAKS.forEach(p=>{const o=document.createElement('option');o.textContent=p;sel.appendChild(o);});
+sel.onchange=()=>loadPeak(sel.value);
+document.getElementById('interval').onchange=()=>STATE&&render();
+document.getElementById('rot').oninput=e=>{AZ=e.target.value*Math.PI/180;STATE&&render();};
+// kéo xoay
+let drag=false,lx=0;
+cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;});
+addEventListener('pointerup',()=>drag=false);
+addEventListener('pointermove',e=>{if(!drag||!STATE)return;AZ+=(e.clientX-lx)*0.008;lx=e.clientX;
+  document.getElementById('rot').value=((AZ*180/Math.PI)%360+360)%360;render();});
+
+loadPeak(PEAKS[0]);
+</script>
+</body>
+</html>

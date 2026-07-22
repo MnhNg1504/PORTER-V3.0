@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "POTTER",
+    "slug": "potter-app",
+    "version": "3.0.0",
+    "orientation": "portrait",
+    "scheme": "potter",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "assetBundlePatterns": ["assets/**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.potter.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "POTTER cần vị trí GPS để định vị bạn trên bản đồ và dẫn đường theo cung.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "POTTER ghi track khi bạn đút túi điện thoại cần quyền vị trí nền.",
+        "UIBackgroundModes": ["location"]
+      }
+    },
+    "android": {
+      "package": "vn.potter.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE"
+      ]
+    },
+    "plugins": [
+      [
+        "@maplibre/maplibre-react-native",
+        {
+          "android": { "nativeVersion": "6.9.0" }
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "POTTER cần vị trí để ghi track & dẫn đường."
+        }
+      ]
+    ],
+    "extra": {
+      "note": "Map dùng MapLibre native — CẦN development build (không chạy Expo Go). Xem README."
+    }
+  }
+}
