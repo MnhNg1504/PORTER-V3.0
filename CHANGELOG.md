@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+### Added — 2026-07-22 (GĐ2 — Backend scaffold)
+- **Backend `server/`** (NestJS + TypeORM + PostgreSQL/PostGIS, typecheck 0 lỗi):
+  - Auth: email + JWT access/refresh (hash trong DB), bcrypt, khoá 15' sau 5 lần
+    sai, throttle login; guards `@Roles` + `@MinTier` enforce hệ 3 cấp docs/04.
+  - Routes (PostGIS LineStringZ thật; track GeoJSON chỉ trả khi miễn phí/đã mua,
+    cờ `requiresGuide` cho Cấp 1 × cung khó), GPX submit + kiểm duyệt,
+    Purchases (chặn Cấp 1 mua cung Khó), Moderation (report/block), Admin API,
+    Chat gateway Socket.IO (join/message/typing/presence).
+  - Migration schema đầy đủ (index GIST) + seed 15 cung từ GPX thật
+    (parser verify: Fansipan 9.541 điểm/24km/+3264m — khớp prototype).
+  - docker-compose (PostGIS 16) + Dockerfile + Swagger `/docs` + `.env.example`.
+
 ### Added — 2026-07-22
 - **Tài liệu thiết kế** (`docs/00` → `05`): brief gốc, R&D thị trường + tech stack,
   UX/UI 5 tab, luồng bản đồ (snap/offline/mua cung), hệ 3 cấp user + thang điểm,
