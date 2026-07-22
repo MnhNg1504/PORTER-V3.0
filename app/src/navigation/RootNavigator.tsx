@@ -20,7 +20,7 @@ export function RootNavigator() {
         screenOptions={{
           headerStyle: { backgroundColor: colors.bg.base },
           headerTintColor: colors.brand.primary,
-          headerTitleStyle: { color: colors.text.primary },
+          headerTitleStyle: { color: colors.text.primary, fontFamily: 'YoungDisplay' },
         }}
       >
         <Stack.Screen name="Tabs" component={BottomTabs} options={{ headerShown: false }} />

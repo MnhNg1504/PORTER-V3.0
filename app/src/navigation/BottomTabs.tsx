@@ -96,7 +96,8 @@ const styles = StyleSheet.create({
     width: sizing.fabDiameter,
     height: sizing.fabDiameter,
     borderRadius: sizing.fabDiameter / 2,
-    backgroundColor: colors.brand.primary,
+    // CTA thương hiệu: Lime Signal trên nền, chữ/icon Pine (Porter Brand Guidelines)
+    backgroundColor: colors.brand.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -22, // nổi cao hơn thanh nav
@@ -104,6 +105,6 @@ const styles = StyleSheet.create({
     borderColor: colors.bg.base,
     ...shadow.fab,
   },
-  fabIcon: { color: '#fff', fontSize: 26 },
+  fabIcon: { color: colors.text.onLime, fontSize: 26 },
   fabLabel: { ...type.caption, color: colors.brand.primary, fontWeight: '700', marginTop: 2 },
 });

@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MapLibreGL, {
   MapView,
   Camera,
+  type CameraRef,
   ShapeSource,
   LineLayer,
   CircleLayer,
@@ -39,7 +40,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'RouteNavigate'>;
  */
 export function RouteNavigateScreen({ route }: Props) {
   const insets = useSafeAreaInsets();
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<CameraRef>(null);
 
   const [points, setPoints] = useState<GpxPoint[] | null>(null);
   const [stats, setStats] = useState<TrackStats | null>(null);

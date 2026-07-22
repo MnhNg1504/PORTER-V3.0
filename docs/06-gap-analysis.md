@@ -74,7 +74,7 @@
 
 ## 8. DevOps — 🟡 GĐ2: docker-compose (PostGIS) · ❌ GĐ5: CI/CD, test tự động, crash reporting, monitoring
 
-## 9. Thiết kế — ✅ tokens (`app/src/theme/`) · ❌ dark mode (GĐ1) · ✅ component thống nhất · 🟡 icon (emoji tạm)
+## 9. Thiết kế — ✅ tokens theo **bộ nhận diện PORTER** (Pine/Lime/Cream/Mist/Ember + font Young) · 🟡 dark mode (palette `darkColors` đã định nghĩa, chưa wire toggle) · ✅ component thống nhất · 🟡 icon (emoji tạm)
 
 ## 10. Pháp lý — 🟡 docs/04 có khung waiver + NĐ13/2023; ❌ GĐ6: Điều khoản/Privacy/Quy định nội dung (cần luật sư rà)
 

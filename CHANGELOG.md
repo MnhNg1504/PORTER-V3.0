@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added — 2026-07-22 (Brand PORTER vào app)
+- **Design tokens theo bộ nhận diện PORTER** (`app/src/theme/tokens.ts`):
+  Pine `#16281A` · Lime Signal `#C9E265` · Cream `#EAF1E4` · Mist `#A9CDD8`
+  · Ember `#FF5233`; kèm `darkColors` (checklist §9 dark mode) và `brandPalette`.
+- **Font thương hiệu Young** (Young + Young-Bold-Display) nạp qua expo-font,
+  áp vào tiêu đề (ScreenHeader, stack header); logo 6 biến thể vào `assets/brand/`.
+- FAB "Xuất phát" đổi sang Lime Signal (CTA thương hiệu), chữ Pine.
+- Prototype `contour-iso.html` đồng bộ brand: nền Pine, contour glow Lime,
+  pin Ember/Mist/Gold, tiêu đề Young Display (verify canvas: 1510 px lime, 0 cyan).
+
+### Fixed — 2026-07-22
+- App typecheck sạch với dependency thật (1.198 gói): bỏ `Terrain`/`RasterDemSource`
+  (không tồn tại trong @maplibre/maplibre-react-native v10 — 3D chuyển sang camera
+  pitch + TODO(native)), `useRef<CameraRef>`, export `Difficulty` từ mockData.
+
 ### Added — 2026-07-22 (GĐ2 — Backend scaffold)
 - **Backend `server/`** (NestJS + TypeORM + PostgreSQL/PostGIS, typecheck 0 lỗi):
   - Auth: email + JWT access/refresh (hash trong DB), bcrypt, khoá 15' sau 5 lần

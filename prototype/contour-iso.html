@@ -5,25 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>POTTER 3.0 — Contour Isometric (DEM thật)</title>
 <style>
-  :root{--bg:#0a0f16;--card:#10151f;--cyan:#39e0e6;--muted:#7d8aa0}
+  @font-face{font-family:'YoungDisplay';src:url('../BỘ NHẬN DIỆN THƯƠNG HIỆU PORTER/assets/Young-Bold-Display.otf') format('opentype');font-display:swap}
+  :root{--bg:#0e1712;--card:#12201a;--cyan:#C9E265;--muted:#8FA07F}
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:#05070b;color:#e6edf7;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  html,body{margin:0;height:100%;background:#0a0f0c;color:#EAF1E4;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
   #wrap{max-width:520px;margin:0 auto;padding:14px}
-  .card{background:linear-gradient(180deg,#0e1420,#0a0f18);border:1px solid #1c2534;border-radius:22px;
+  .card{background:linear-gradient(180deg,#16281A,#0e1712);border:1px solid #24331F;border-radius:22px;
     box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
   .head{display:flex;align-items:center;gap:10px;padding:14px 16px}
-  .head .ico{width:34px;height:34px;border-radius:11px;background:#1a2233;display:flex;align-items:center;justify-content:center;font-size:15px}
-  .head h1{font-size:15px;margin:0;font-weight:700}
+  .head .ico{width:34px;height:34px;border-radius:11px;background:#24331F;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .head h1{font-family:'YoungDisplay',serif;font-size:16px;margin:0;font-weight:700;letter-spacing:.3px}
   .head .sub{color:var(--muted);font-size:13px;font-weight:500}
   .head .sp{flex:1}
   .head .dots{color:var(--muted);font-size:16px;letter-spacing:2px}
-  #cv{display:block;width:100%;height:360px;background:radial-gradient(120% 90% at 50% 30%,#0d1622 0%,#080b12 60%,#05070b 100%)}
-  .ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-top:1px solid #161d29}
+  #cv{display:block;width:100%;height:360px;background:radial-gradient(120% 90% at 50% 30%,#1a2c20 0%,#101a13 60%,#0a0f0c 100%)}
+  .ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;border-top:1px solid #24331F}
   select,input[type=range]{accent-color:var(--cyan)}
-  select{background:#131b28;color:#e6edf7;border:1px solid #223049;border-radius:9px;padding:7px 10px;font-size:13px}
+  select{background:#16281A;color:#EAF1E4;border:1px solid #2F5233;border-radius:9px;padding:7px 10px;font-size:13px}
   .lab{font-size:12px;color:var(--muted)}
   .legend{display:flex;gap:14px;padding:6px 16px 16px;font-size:12px;color:var(--muted)}
-  .legend b{color:#e6edf7}
+  .legend b{color:#EAF1E4}
   .pill{display:inline-flex;align-items:center;gap:6px}
   .swatch{width:10px;height:10px;border-radius:50%}
   #status{padding:0 16px 12px;font-size:12px;color:var(--muted)}
@@ -51,9 +52,9 @@
       <input id="rot" type="range" min="0" max="360" value="35" style="flex:1;min-width:90px">
     </div>
     <div class="legend">
-      <span class="pill"><span class="swatch" style="background:#39e0e6"></span>Đường bình độ (DEM thật)</span>
+      <span class="pill"><span class="swatch" style="background:#C9E265"></span>Đường bình độ (DEM thật)</span>
       <span class="pill"><span class="swatch" style="background:#fff"></span>Route GPX</span>
-      <span class="pill"><span class="swatch" style="background:#ff5a5f"></span>Waypoint</span>
+      <span class="pill"><span class="swatch" style="background:#FF5233"></span>Waypoint</span>
     </div>
     <div id="status">Đang tải dữ liệu độ cao…</div>
   </div>
@@ -165,8 +166,8 @@ function render(){
   ctx.lineWidth=1.1*DPR;ctx.lineCap='round';
   for(const d of draw){
     const al=0.22+d.hN*0.72;
-    ctx.strokeStyle=`rgba(${Math.round(40+d.hN*40)},${Math.round(190+d.hN*40)},${Math.round(210+d.hN*30)},${al})`;
-    ctx.shadowColor='rgba(57,224,230,'+(0.35*d.hN+0.1)+')';ctx.shadowBlur=6*DPR;
+    ctx.strokeStyle=`rgba(${Math.round(100+d.hN*101)},${Math.round(140+d.hN*86)},${Math.round(60+d.hN*41)},${al})`;
+    ctx.shadowColor='rgba(201,226,101,'+(0.35*d.hN+0.1)+')';ctx.shadowBlur=6*DPR;
     ctx.beginPath();ctx.moveTo(d.a[0],d.a[1]);ctx.lineTo(d.b[0],d.b[1]);ctx.stroke();
   }
   ctx.shadowBlur=0;
@@ -179,17 +180,17 @@ function drawCompass(S){
   for(let k=0;k<=steps;k++){const a=k/steps*Math.PI*2;
     const pi=(0.5+Math.cos(a)*0.48)*N, pj=(0.5+Math.sin(a)*0.48)*N;
     pts.push(proj(pi,pj,S.mn,S));}
-  ctx.strokeStyle='rgba(120,150,190,.35)';ctx.lineWidth=1*DPR;ctx.beginPath();
+  ctx.strokeStyle='rgba(143,160,127,.4)';ctx.lineWidth=1*DPR;ctx.beginPath();
   pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
   // ticks
-  ctx.strokeStyle='rgba(120,150,190,.22)';
+  ctx.strokeStyle='rgba(143,160,127,.25)';
   for(let k=0;k<72;k++){const a=k/72*Math.PI*2;
     const p1=proj((0.5+Math.cos(a)*0.48)*N,(0.5+Math.sin(a)*0.48)*N,S.mn,S);
     const p2=proj((0.5+Math.cos(a)*0.505)*N,(0.5+Math.sin(a)*0.505)*N,S.mn,S);
     ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();}
   // labels N/E/S/W (xoay theo AZ)
   const L=[['N',-Math.PI/2],['E',0],['S',Math.PI/2],['W',Math.PI]];
-  ctx.fillStyle='rgba(200,215,235,.7)';ctx.font=(13*DPR)+'px -apple-system,Segoe UI';
+  ctx.fillStyle='rgba(234,241,228,.75)';ctx.font=(13*DPR)+'px -apple-system,Segoe UI';
   ctx.textAlign='center';ctx.textBaseline='middle';
   for(const[t,a]of L){const p=proj((0.5+Math.cos(a)*0.55)*N,(0.5+Math.sin(a)*0.55)*N,S.mn,S);
     ctx.fillText(t,p[0],p[1]);}
@@ -213,7 +214,7 @@ function pin(P,base,color,glyph){
   ctx.shadowColor=color;ctx.shadowBlur=10*DPR;
   ctx.arc(P[0],P[1]-r,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
   ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(P[0]-5*DPR,P[1]-r);ctx.lineTo(P[0]+5*DPR,P[1]-r);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#0a0f16';ctx.font='bold '+(11*DPR)+'px -apple-system';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='#16281A';ctx.font='bold '+(11*DPR)+'px -apple-system';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText(glyph,P[0],P[1]-r);
 }
 function drawPins(S){
@@ -222,11 +223,11 @@ function drawPins(S){
     const pi=(p.lon-b.minLon)/(b.maxLon-b.minLon)*N,pj=(b.maxLat-p.lat)/(b.maxLat-b.minLat)*N;
     const P=proj(pi,pj,p.ele!=null?p.ele:S.mn,S),base=proj(pi,pj,S.mn,S);pin(P,base,color,glyph);};
   let sIdx=0,mx=-1e9;tr.forEach((p,i)=>{if(p.ele!=null&&p.ele>mx){mx=p.ele;sIdx=i;}});
-  at(0,'#31d0aa','S');                        // xuất phát
-  at(Math.floor(tr.length*0.33),'#4aa8ff','A'); // camp 1
-  at(Math.floor(tr.length*0.66),'#ff5a5f','B'); // camp 2
-  at(sIdx,'#ffd23f','▲');                       // đỉnh
-  at(tr.length-1,'#ff5a5f','⚑');                // kết thúc
+  at(0,'#7FB069','S');                        // xuất phát
+  at(Math.floor(tr.length*0.33),'#A9CDD8','A'); // camp 1
+  at(Math.floor(tr.length*0.66),'#FF5233','B'); // camp 2
+  at(sIdx,'#E8C877','▲');                       // đỉnh
+  at(tr.length-1,'#FF5233','⚑');                // kết thúc
 }
 
 // ---------- GPX ----------

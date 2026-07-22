@@ -1,48 +1,104 @@
 /**
- * POTTER 3.0 — Design tokens
- * Nguồn: docs/02-ux-ui-5tabs.md §0.2. Tông "thiên nhiên / outdoor" + style điều hướng xanh-sạch.
- * KHÔNG dùng màu neon. Ưu tiên tương phản cao (đọc ngoài trời nắng).
+ * POTTER 3.0 — Design tokens theo BỘ NHẬN DIỆN THƯƠNG HIỆU PORTER.
+ * Nguồn: "BỘ NHẬN DIỆN THƯƠNG HIỆU PORTER/Porter Brand Guidelines.dc.html".
+ * Bảng màu chính thức: Pine Green #16281A · Lime Signal #C9E265 · Cream #EAF1E4
+ *                      · Mist #A9CDD8 · Ember #FF5233.
+ * Typography: Young Display (tiêu đề, serif) · Space Mono (số liệu) · sans hệ thống (body).
+ * Ưu tiên tương phản cao (đọc ngoài trời nắng).
  */
 
-// ---- MÀU (Color) ----
+// ---- BẢNG MÀU THƯƠNG HIỆU (nguồn sự thật duy nhất) ----
+export const brandPalette = {
+  pine: '#16281A', // Pine Green — màu chủ đạo (nền tối, chữ trên nền sáng)
+  pineMid: '#1F3A22', // Pine biến thể (pressed, gradient)
+  forest: '#2F5233', // Xanh rừng trung gian (link, icon active trên nền sáng)
+  lime: '#C9E265', // Lime Signal — accent CTA (nút Xuất phát, highlight)
+  cream: '#EAF1E4', // Cream — nền sáng chính
+  sand: '#E3DFD2', // Viền/nền phụ ấm
+  mist: '#A9CDD8', // Mist — accent phụ (nước, sương, thông tin)
+  ember: '#FF5233', // Ember — SOS, lệch tuyến, cung Khó
+  gold: '#E8C877', // Vàng hổ phách — cảnh báo mềm, cung Chuẩn
+  sage: '#8FA07F', // Chữ phụ trên nền sáng
+  night: '#0E120E', // Gần đen — nền dark sâu nhất
+} as const;
+
+// ---- MÀU NGỮ NGHĨA (giữ nguyên key cũ — mọi màn hình không phải sửa) ----
 export const colors = {
   brand: {
-    primary: '#2E7D32', // Xanh rừng — nút chính, nút Xuất phát, active tab
-    primaryDark: '#1B5E20', // Pressed, header gradient
-    primaryLight: '#A5D6A7', // Nền nhấn nhẹ, chip active
+    primary: brandPalette.pine, // Nút chính, active tab, header
+    primaryDark: brandPalette.night, // Pressed
+    primaryLight: brandPalette.lime, // Nền nhấn / chip active (Lime Signal)
   },
   accent: {
-    summit: '#F57C00', // Cam đỉnh núi — CTA phụ, "độ hot", track đang ghi
+    summit: brandPalette.ember, // "Độ hot", track đang ghi, CTA phụ
   },
-  earth: '#795548', // Nâu đất — icon địa hình, nhãn mùa
-  rock: '#607D8B', // Xám đá — text phụ, đường phân cách
+  earth: brandPalette.forest, // Icon địa hình, nhãn mùa
+  rock: brandPalette.sage, // Text phụ, phân cách
 
-  danger: '#D32F2F', // Dốc đứng, cảnh báo lệch hướng, cung Khó
-  warning: '#FBC02D', // Cung Chuẩn, cần chú ý
-  success: '#43A047', // Cung Dễ, hoàn thành
+  danger: brandPalette.ember, // Dốc đứng, lệch hướng, cung Khó, SOS
+  warning: brandPalette.gold, // Cung Chuẩn, cần chú ý
+  success: brandPalette.forest, // Cung Dễ, hoàn thành
 
   bg: {
-    base: '#FFFFFF',
-    baseDark: '#121712',
-    surface: '#F5F7F4',
-    surfaceDark: '#1D241C',
+    base: brandPalette.cream, // Nền sáng chính (Cream)
+    baseDark: brandPalette.pine, // Nền dark chính (Pine)
+    surface: '#F2F6ED', // Card trên nền cream
+    surfaceDark: brandPalette.pineMid,
   },
   text: {
-    primary: '#1B241E',
-    secondary: '#5B6B60',
-    onBrand: '#FFFFFF',
+    primary: brandPalette.pine,
+    secondary: '#5A6552', // Xám rêu (từ guidelines)
+    onBrand: brandPalette.cream, // Chữ trên nền pine
+    onLime: brandPalette.pine, // Chữ trên nút Lime (tương phản cao)
   },
-  // Màu track/route trên map — dùng chung với prototype đã verify
+  // Màu track/route trên map — nền map sáng nên cần line đậm tương phản
   map: {
-    trackPlanned: '#2962FF', // Track dự kiến
-    trackRecording: '#F57C00', // Track đang ghi
-    trackSample: '#2E7D32', // Track cung mẫu (đã mua)
-    start: '#16A34A', // Điểm đầu
-    end: '#E11D48', // Điểm cuối
-    me: '#2F6BFF', // Vị trí người dùng (mũi tên GPS)
-    casing: '#FFFFFF', // Viền trắng bọc line
+    trackPlanned: '#2F6BFF', // Track dự kiến (xanh điều hướng — giữ để dễ đọc)
+    trackRecording: brandPalette.ember, // Track đang ghi
+    trackSample: brandPalette.forest, // Track cung mẫu (đã mua)
+    start: brandPalette.forest, // Điểm đầu
+    end: brandPalette.ember, // Điểm cuối
+    me: '#2F6BFF', // Vị trí người dùng
+    casing: '#FFFFFF', // Viền bọc line
   },
-  border: '#E2E8F0',
+  border: brandPalette.sand,
+} as const;
+
+/** Nới literal type của bảng màu `as const` thành string để theme dark gán giá trị khác */
+type DeepWiden<T> = { [K in keyof T]: T[K] extends string ? string : DeepWiden<T[K]> };
+
+/** Dark mode (checklist §9) — cùng key với `colors`, nền Pine/Night, accent Lime */
+export const darkColors: DeepWiden<typeof colors> = {
+  ...colors,
+  brand: {
+    primary: brandPalette.lime, // Trên nền tối, Lime là màu hành động chính
+    primaryDark: '#B5CE55',
+    primaryLight: brandPalette.pineMid,
+  },
+  bg: {
+    base: brandPalette.pine,
+    baseDark: brandPalette.night,
+    surface: brandPalette.pineMid,
+    surfaceDark: '#24331F',
+  },
+  text: {
+    primary: brandPalette.cream,
+    secondary: brandPalette.sage,
+    onBrand: brandPalette.pine,
+    onLime: brandPalette.pine,
+  },
+  border: '#24331F',
+} as const;
+
+// ---- FONT THƯƠNG HIỆU ----
+// Load trong App.tsx qua expo-font; fallback an toàn khi font chưa sẵn sàng.
+export const fonts = {
+  /** Young Display Bold — tiêu đề lớn, tên cung, số liệu hero */
+  display: 'YoungDisplay',
+  /** Young regular — heading phụ */
+  displayRegular: 'Young',
+  /** Số liệu kiểu Space Mono — fallback monospace hệ thống (font không kèm trong kit) */
+  mono: 'monospace',
 } as const;
 
 // ---- TYPOGRAPHY ----
@@ -53,7 +109,7 @@ export const type = {
   body: { fontSize: 15, lineHeight: 22, fontWeight: '400' as const },
   meta: { fontSize: 13, lineHeight: 18, fontWeight: '500' as const },
   caption: { fontSize: 11, lineHeight: 14, fontWeight: '500' as const },
-  stat: { fontSize: 20, lineHeight: 24, fontWeight: '700' as const }, // tabular figures
+  stat: { fontSize: 20, lineHeight: 24, fontWeight: '700' as const },
 } as const;
 
 // ---- SPACING (grid 4pt) ----
@@ -65,40 +121,40 @@ export const space = {
   5: 20,
   6: 24,
   8: 32,
-  screen: 16, // padding lề màn
-  cardGap: 12, // khoảng cách giữa card
+  screen: 16,
+  cardGap: 12,
 } as const;
 
 // ---- BO GÓC ----
 export const radius = {
-  sm: 8, // chip
-  md: 12, // card
-  lg: 16, // sheet, ảnh hero
+  sm: 8,
+  md: 12,
+  lg: 16,
   pill: 999,
 } as const;
 
 // ---- KÍCH THƯỚC / TOUCH TARGET ----
 export const sizing = {
-  touchMin: 44, // 44x44pt tối thiểu
-  buttonHeight: 52, // nút chính
+  touchMin: 44,
+  buttonHeight: 52,
   tabIcon: 26,
-  fabDiameter: 64, // nút Xuất phát giữa
+  fabDiameter: 64,
   bottomNav: 56,
 } as const;
 
-// ---- BÓNG (elevation) ----
+// ---- BÓNG ----
 export const shadow = {
   card: {
-    shadowColor: '#000',
+    shadowColor: brandPalette.pine,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 2,
   },
   fab: {
-    shadowColor: '#000',
+    shadowColor: brandPalette.pine,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.24,
+    shadowOpacity: 0.28,
     shadowRadius: 12,
     elevation: 6,
   },

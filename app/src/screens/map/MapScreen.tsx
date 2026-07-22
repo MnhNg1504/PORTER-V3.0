@@ -4,11 +4,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MapLibreGL, {
   MapView,
   Camera,
+  type CameraRef,
   ShapeSource,
   LineLayer,
   CircleLayer,
-  RasterDemSource,
-  Terrain,
   UserLocation,
 } from '@maplibre/maplibre-react-native';
 import * as Location from 'expo-location';
@@ -43,7 +42,7 @@ MapLibreGL.setAccessToken(null);
 export function MapScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<CameraRef>(null);
 
   const [base, setBase] = useState<BaseLayerId>('topo');
   const [is3D, setIs3D] = useState(false);
@@ -87,6 +86,7 @@ export function MapScreen() {
         [120, 60, 200, 60],
         800
       );
+      cameraRef.current.setCamera({ pitch: is3D ? 60 : 0, animationDuration: 600 });
     }
   }, [bounds, is3D]);
 
@@ -126,17 +126,9 @@ export function MapScreen() {
         {/* Vị trí người dùng = GPS THẬT (mũi tên hướng + vòng độ chính xác) */}
         <UserLocation visible showsUserHeadingIndicator renderMode="native" />
 
-        {/* DEM + Terrain 3D THẬT (chỉ bật khi 3D để tiết kiệm pin) */}
-        {is3D && (
-          <RasterDemSource
-            id="dem"
-            tileUrlTemplates={DEM_SOURCE.tiles}
-            maxZoomLevel={DEM_SOURCE.maxzoom}
-            tileSize={DEM_SOURCE.tileSize}
-          >
-            <Terrain style={{ exaggeration: 1.5 }} />
-          </RasterDemSource>
-        )}
+        {/* 3D: nghiêng camera (pitch). TODO(native): terrain raster-dem chưa có
+            trong @maplibre/maplibre-react-native v10 — cần theo dõi upstream
+            hoặc viết native module; KHÔNG giả lập bằng ảnh tĩnh (map thật). */}
 
         {/* Track cung mẫu THẬT: casing trắng + line xanh */}
         {lineFC && (

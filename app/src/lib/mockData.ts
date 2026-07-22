@@ -5,6 +5,7 @@
  */
 
 import { Difficulty } from '../theme';
+export type { Difficulty };
 
 // ---- Cấp người dùng (docs 04/05) — điều khiển bật/khoá tính năng theo cấp ----
 export type UserLevel = 1 | 2 | 3;

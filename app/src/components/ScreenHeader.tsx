@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, space, type } from '../theme';
+import { colors, fonts, space, type } from '../theme';
 
 // Header đơn giản dùng chung cho các tab (tránh trùng lặp layout).
 export function ScreenHeader({ title, right }: { title: string; right?: React.ReactNode }) {
@@ -25,5 +25,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
   },
-  title: { ...type.h1, color: colors.text.primary },
+  title: { ...type.h1, fontFamily: fonts.display, color: colors.text.primary },
 });
