@@ -12,7 +12,7 @@
 | Đăng bài, ảnh, video | 🟡 | 3 | Feed UI mock; upload media cần backend + storage |
 | Bình luận, cảm xúc | ❌ | 3 | Contract có; chưa build |
 | Chat 1-1 & nhóm | 🟡 | 3 | UI mock; Socket.IO gateway GĐ3 |
-| Thông báo đẩy | ❌ | 3 | Expo Notifications + FCM/APNs (cần tài khoản Firebase/Apple) |
+| Thông báo đẩy | 🟡 | 3✓ | Server XONG (Expo Push API, token registry, tự dọn token chết); app đăng ký token khi build có FCM |
 | Bản đồ | ✅ | — | MapLibre + OSM/OpenFreeMap + DEM THẬT, đã verify |
 | GPS tracking | 🟡 | 1 | expo-location foreground có; background tracking chưa |
 | Offline cache | ❌ | 5 | PMTiles theo Area (đã đặc tả docs/03) |
@@ -42,7 +42,7 @@
 | JWT/OAuth + Refresh | 🟡 | JWT + refresh GĐ2; OAuth Google/Apple GĐ3 |
 | Rate limit | 🟡 | @nestjs/throttler |
 | Log lỗi | 🟡 | Nest Logger; production: pino GĐ5 |
-| Backup DB | ❌ | Script pg_dump GĐ5 |
+| Backup DB | 🟡 | Script pg_dump+gzip giữ 14 bản (npm run db:backup); tự động hoá cron khi deploy |
 | Phân quyền Admin/User | 🟡 | RolesGuard + TierGuard |
 | Upload ảnh/video | ❌ | GĐ3 (multer + object storage) |
 | Queue tác vụ nặng | ❌ | GĐ5 (BullMQ — xử lý GPX lớn, thumbnail) |

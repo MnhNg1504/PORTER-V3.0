@@ -8,29 +8,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import dataSource from '../config/data-source';
 import { parseGpx, trackStats } from '../gpx/gpx.service';
-
-/** Bỏ dấu tiếng Việt → slug */
-function slugify(s: string): string {
-  return s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[đĐ]/g, 'd')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-/** Ước tính thời gian theo Naismith: 4km/h + 1h mỗi 600m leo */
-function estimateMinutes(distanceM: number, ascentM: number): number {
-  return Math.round((distanceM / 4000) * 60 + (ascentM / 600) * 60);
-}
-
-/** Phân loại độ khó sơ bộ theo tổng leo — admin hiệu chỉnh sau (TODO(api)) */
-function classify(ascentM: number, distanceM: number): 'easy' | 'standard' | 'hard' {
-  if (ascentM > 1800 || distanceM > 20000) return 'hard';
-  if (ascentM > 800 || distanceM > 10000) return 'standard';
-  return 'easy';
-}
+import { slugify, estimateMinutes, classifyDifficulty } from '../common/route-utils';
 
 async function main() {
   const gpxDir = path.resolve(__dirname, '../../', process.env.GPX_DIR ?? '../16 Đỉnh Tây Bắc');
@@ -63,14 +41,14 @@ async function main() {
        VALUES ($1,$2,$3, ST_GeomFromText($4,4326), ST_SetSRID(ST_MakePoint($5,$6),4326),
                $7,$8,$9,$10,$11,$12,$13,'published')`,
       [
-        name, slug, classify(stats.ascentM, stats.distanceM), wkt,
+        name, slug, classifyDifficulty(stats.ascentM, stats.distanceM), wkt,
         start.lon, start.lat,
         stats.distanceM, stats.ascentM, stats.descentM, stats.maxEleM, stats.minEleM,
         estimateMinutes(stats.distanceM, stats.ascentM), '10-4',
       ],
     );
     console.log(
-      `+ ${name}: ${pts.length} điểm, ${(stats.distanceM / 1000).toFixed(1)}km, +${stats.ascentM}m → ${classify(stats.ascentM, stats.distanceM)}`,
+      `+ ${name}: ${pts.length} điểm, ${(stats.distanceM / 1000).toFixed(1)}km, +${stats.ascentM}m → ${classifyDifficulty(stats.ascentM, stats.distanceM)}`,
     );
   }
   await ds.destroy();

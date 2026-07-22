@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IsIn, IsInt, IsOptional, IsString, MaxLength, Max, Min } from 'class-validator';
 import { Roles, RolesGuard } from '../common/auth.decorators';
+import { AdminService } from './admin.service';
 import { GpxSubmission, SubmissionStatus } from '../gpx/gpx-submission.entity';
 import { Report, ReportStatus } from '../moderation/report.entity';
 import { User } from '../users/user.entity';
@@ -52,6 +53,7 @@ export class AdminController {
     @InjectRepository(GpxSubmission) private subs: Repository<GpxSubmission>,
     @InjectRepository(Report) private reports: Repository<Report>,
     @InjectRepository(User) private users: Repository<User>,
+    private adminService: AdminService,
   ) {}
 
   /** Hàng đợi kiểm duyệt GPX (docs/04 — gate mở cung của Cấp 2) */
@@ -60,11 +62,10 @@ export class AdminController {
     return this.subs.find({ where: { status }, relations: { user: true }, order: { createdAt: 'ASC' } });
   }
 
+  /** Duyệt GPX — approved sẽ TỰ TẠO cung (seller = người nộp) + push báo kết quả */
   @Patch('gpx/:id')
-  async reviewGpx(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ReviewGpxDto) {
-    await this.subs.update(id, { status: dto.status, reviewNote: dto.reviewNote });
-    // TODO(api): khi approved → tạo TrekRoute từ rawGpx (dùng GpxService.parse + PostGIS insert)
-    return this.subs.findOne({ where: { id } });
+  reviewGpx(@Param('id', ParseUUIDPipe) id: string, @Body() dto: ReviewGpxDto) {
+    return this.adminService.reviewGpx(id, dto.status, dto.reviewNote);
   }
 
   @Get('reports')

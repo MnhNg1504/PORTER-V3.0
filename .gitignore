@@ -32,3 +32,4 @@ prototype/gpx/
 
 # Claude local
 .claude/
+backups/
