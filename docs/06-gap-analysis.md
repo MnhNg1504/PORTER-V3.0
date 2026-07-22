@@ -7,7 +7,7 @@
 | Hạng mục | Trạng thái | GĐ | Ghi chú |
 |---|---|---|---|
 | Android + iOS | 🟡 | 1 | RN Expo build được 2 nền tảng; cần dev build test thật |
-| Đăng nhập Google/Apple/Email | ❌ | 2-3 | Backend auth GĐ2 (email+JWT); OAuth stub → hoàn thiện GĐ3 |
+| Đăng nhập Google/Apple/Email | 🟡 | 3✓ | Email+JWT ✅; Google ✅ code (chờ GOOGLE_CLIENT_ID); Apple stub 501 (chờ Apple Dev) |
 | Hồ sơ người dùng | 🟡 | 2 | Màn Profile có UI, chờ nối API |
 | Đăng bài, ảnh, video | 🟡 | 3 | Feed UI mock; upload media cần backend + storage |
 | Bình luận, cảm xúc | ❌ | 3 | Contract có; chưa build |
@@ -66,13 +66,13 @@
 | SOS | ✅ | SMS + gọi 112/115/113, GPS thật, không qua server — đã chốt docs/05 §5 (2026-07-22) |
 | Chia sẻ vị trí | ✅ | Share sheet kèm toạ độ + link maps (trong SosSheet) |
 
-## 6. Chat — ❌ toàn bộ realtime (GĐ3: Socket.IO — đã xem/online/typing/thu hồi/block/report)
+## 6. Chat — ✅ server realtime + REST đầy đủ (đã xem/online/typing/thu hồi 30'/block-aware/report, 2026-07-22) · 🟡 client app còn mock (nối GĐ3 tiếp) · ❌ gửi ảnh/video (chờ storage)
 
 ## 7. Bảo mật
 🟡 GĐ2: bcrypt hash, JWT an toàn, validation (chống injection/XSS), throttle đăng nhập sai ·
-❌ GĐ3: xác thực email · ❌ GĐ5: HTTPS (deploy), CSRF cho admin web
+🟡 xác thực email (flow token 24h xong, chờ nối SMTP thật — TODO mailer) · ❌ GĐ5: HTTPS (deploy), CSRF cho admin web
 
-## 8. DevOps — 🟡 GĐ2: docker-compose (PostGIS) · ✅ test tự động lib app (Jest 28/28, 2026-07-22) · ❌ GĐ5: CI/CD, crash reporting, monitoring
+## 8. DevOps — 🟡 GĐ2: docker-compose (PostGIS) · ✅ test tự động lib app (Jest) · ✅ CI GitHub Actions (typecheck+test mỗi push, 2026-07-22) · ❌ GĐ5: crash reporting, monitoring
 
 ## 9. Thiết kế — ✅ tokens theo **bộ nhận diện PORTER** (Pine/Lime/Cream/Mist/Ember + font Young) · 🟡 dark mode (palette `darkColors` đã định nghĩa, chưa wire toggle) · ✅ component thống nhất · 🟡 icon (emoji tạm)
 
