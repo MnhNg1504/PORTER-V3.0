@@ -6,6 +6,7 @@ export type RootStackParamList = {
   StartPoint: { routeId: string }; // Màn "Dẫn tới điểm xuất phát"
   RouteNavigate: { routeId: string }; // BƯỚC 2 — điều hướng cung
   Chat: { conversationId: string };
+  Search: undefined; // Tìm kiếm cung (checklist §1)
 };
 
 export type TabParamList = {

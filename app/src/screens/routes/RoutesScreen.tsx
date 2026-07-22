@@ -25,7 +25,14 @@ export function RoutesScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Cung đường" right={<Text style={styles.filterIcon}>⚙ Bộ lọc</Text>} />
+      <ScreenHeader
+        title="Cung đường"
+        right={
+          <Pressable hitSlop={8} onPress={() => nav.navigate('Search')}>
+            <Text style={styles.filterIcon}>🔍 Tìm kiếm</Text>
+          </Pressable>
+        }
+      />
 
       {/* Filter chips */}
       <View style={styles.chips}>

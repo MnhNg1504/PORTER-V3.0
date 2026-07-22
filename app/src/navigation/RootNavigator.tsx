@@ -9,6 +9,7 @@ import { RouteDetailScreen } from '../screens/routes/RouteDetailScreen';
 import { StartPointScreen } from '../screens/routes/StartPointScreen';
 import { RouteNavigateScreen } from '../screens/map/RouteNavigateScreen';
 import { ChatScreen } from '../screens/messages/ChatScreen';
+import { SearchScreen } from '../screens/routes/SearchScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -28,6 +29,7 @@ export function RootNavigator() {
         <Stack.Screen name="StartPoint" component={StartPointScreen} options={{ title: 'Tới điểm xuất phát' }} />
         <Stack.Screen name="RouteNavigate" component={RouteNavigateScreen} options={{ title: 'Điều hướng cung' }} />
         <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Nhắn tin' }} />
+        <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

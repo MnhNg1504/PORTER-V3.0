@@ -16,7 +16,7 @@
 | Bản đồ | ✅ | — | MapLibre + OSM/OpenFreeMap + DEM THẬT, đã verify |
 | GPS tracking | 🟡 | 1 | expo-location foreground có; background tracking chưa |
 | Offline cache | ❌ | 5 | PMTiles theo Area (đã đặc tả docs/03) |
-| Tìm kiếm | ❌ | 1 | Màn search skeleton GĐ1; backend query GĐ2 |
+| Tìm kiếm | 🟡 | 1✓ | Màn Search + lọc không dấu XONG (client); nối server query sau |
 | Báo cáo nội dung xấu | ❌ | 2 | Module moderation GĐ2 |
 | Chặn người dùng | ❌ | 2 | Module moderation GĐ2 |
 | Trang quản trị | ❌ | 4 | Web admin (duyệt GPX, xử lý report, quản lý tier) |
@@ -55,7 +55,7 @@
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | GPX import | ✅ | `app/src/lib/gpx.ts` — đã verify với 15 GPX thật |
-| GPX export | ❌ | GĐ1 |
+| GPX export | ✅ | `toGpxXml()` + test roundtrip (2026-07-22) |
 | Lưu hành trình / độ cao / khoảng cách / thời gian | 🟡 | Lib tính đủ; lưu server GĐ2 |
 | Tốc độ | ❌ | GĐ1 (từ timestamp GPX / GPS) |
 | Check-in, cắm trại, nguồn nước | ❌ | GĐ2 — waypoint types (đã đặc tả docs/03 §6) |
@@ -72,7 +72,7 @@
 🟡 GĐ2: bcrypt hash, JWT an toàn, validation (chống injection/XSS), throttle đăng nhập sai ·
 ❌ GĐ3: xác thực email · ❌ GĐ5: HTTPS (deploy), CSRF cho admin web
 
-## 8. DevOps — 🟡 GĐ2: docker-compose (PostGIS) · ❌ GĐ5: CI/CD, test tự động, crash reporting, monitoring
+## 8. DevOps — 🟡 GĐ2: docker-compose (PostGIS) · ✅ test tự động lib app (Jest 28/28, 2026-07-22) · ❌ GĐ5: CI/CD, crash reporting, monitoring
 
 ## 9. Thiết kế — ✅ tokens theo **bộ nhận diện PORTER** (Pine/Lime/Cream/Mist/Ember + font Young) · 🟡 dark mode (palette `darkColors` đã định nghĩa, chưa wire toggle) · ✅ component thống nhất · 🟡 icon (emoji tạm)
 

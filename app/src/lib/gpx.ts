@@ -178,3 +178,29 @@ export function boundsOf(pts: GpxPoint[]): [number, number, number, number] {
 export function formatDistance(m: number): string {
   return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m / 10) * 10} m`;
 }
+
+// ---- Xuất GPX (checklist §5 — GPX import/export) ----
+/**
+ * Serialize danh sách điểm -> file GPX 1.1 hợp lệ (trk/trkseg/trkpt + ele).
+ * Dùng khi user xuất track đã ghi / chia sẻ cung (docs/03 §7).
+ */
+export function toGpxXml(points: GpxPoint[], name: string): string {
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const pts = points
+    .map((p) => {
+      const ele = p.ele != null ? `<ele>${p.ele}</ele>` : '';
+      return `      <trkpt lat="${p.lat}" lon="${p.lon}">${ele}</trkpt>`;
+    })
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="POTTER 3.0">
+  <metadata><name>${esc(name)}</name></metadata>
+  <trk><name>${esc(name)}</name>
+    <trkseg>
+${pts}
+    </trkseg>
+  </trk>
+</gpx>
+`;
+}

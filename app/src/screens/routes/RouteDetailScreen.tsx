@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, radius, space, shadow, type } from '../../theme';
 import { DifficultyChip } from '../../components/DifficultyChip';
 import { StatCell } from '../../components/StatCell';
+import { ContourCard } from '../../components/ContourCard';
 import { mockRoutes, currentUser } from '../../lib/mockData';
+import { loadBundledTaXua } from '../../lib/gpxAsset';
+import type { GpxPoint } from '../../lib/gpx';
+import type { DemGrid } from '../../lib/contour';
 import { RootStackParamList } from '../../navigation/types';
+
+// Lưới DEM THẬT (terrarium) sinh offline bằng scripts/gen-dem-grid.mjs — bundle theo app.
+// TODO(api): các cung khác tải grid từ backend (GET /routes/:slug/dem-grid).
+const TA_XUA_GRID = require('../../../assets/dem/ta-xua-grid.json') as DemGrid;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RouteDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -16,6 +24,17 @@ export function RouteDetailScreen({ route }: Props) {
   const nav = useNavigation<Nav>();
   const data = mockRoutes.find((r) => r.id === route.params.routeId) ?? mockRoutes[0];
   const needGuide = currentUser.level === 1 && data.difficulty !== 'easy';
+
+  // Cung Tà Xùa có GPX bundle thật -> hiện thẻ "Route covered" (contour isometric).
+  const [taXuaPts, setTaXuaPts] = useState<GpxPoint[] | null>(null);
+  useEffect(() => {
+    if (data.id !== 'r_taxua') return;
+    let alive = true;
+    loadBundledTaXua()
+      .then((pts) => alive && setTaXuaPts(pts))
+      .catch(() => alive && setTaXuaPts(null));
+    return () => { alive = false; };
+  }, [data.id]);
 
   return (
     <View style={styles.container}>
@@ -41,13 +60,19 @@ export function RouteDetailScreen({ route }: Props) {
             <StatCell value={`★${data.rating}`} label={`${data.reviewCount} review`} />
           </View>
 
-          {/* TODO(api): mini map THẬT (MapLibre lite) + elevation profile từ GPX của cung.
-              Với cung có GPX bundle (Tà Xùa) đã render đầy đủ ở Tab 3 / màn điều hướng. */}
-          <View style={styles.mapPlaceholder}>
-            <Text style={styles.mapPlaceholderText}>
-              Mini map + track mẫu (MapLibre thật){'\n'}Xem đầy đủ ở màn Điều hướng
-            </Text>
-          </View>
+          {/* "Route covered" — contour isometric từ DEM + GPX THẬT (cung Tà Xùa).
+              TODO(api): cung khác nạp GPX + DEM grid từ backend rồi render y hệt. */}
+          {data.id === 'r_taxua' && taXuaPts ? (
+            <View style={{ marginBottom: space[4] }}>
+              <ContourCard grid={TA_XUA_GRID} points={taXuaPts} title={data.name} />
+            </View>
+          ) : (
+            <View style={styles.mapPlaceholder}>
+              <Text style={styles.mapPlaceholderText}>
+                Mini map + track mẫu (MapLibre thật){'\n'}Xem đầy đủ ở màn Điều hướng
+              </Text>
+            </View>
+          )}
 
           <Text style={styles.section}>Mô tả</Text>
           <Text style={styles.paragraph}>

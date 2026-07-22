@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+### Added — 2026-07-22 (GĐ1 — Hoàn thiện app)
+- **ContourCard "Route covered"** (`src/components/ContourCard.tsx`): thẻ núi bình độ
+  isometric trong app RN (react-native-svg) — port thuật toán marching squares +
+  chiếu isometric từ prototype sang `src/lib/contour.ts` (thuần hàm, có test).
+  Gắn vào RouteDetailScreen cung Tà Xùa với **DEM thật** + **GPX thật**, xoay được.
+- **Lưới DEM offline** (`assets/dem/ta-xua-grid.json`, 96×96, 818–2871m, 0 lỗ tile)
+  sinh bởi `scripts/gen-dem-grid.mjs` từ terrarium tiles thật (chạy được cho cung khác).
+- **GPX export** `toGpxXml()` (checklist §5) — test roundtrip parse lại đúng.
+- **Màn Tìm kiếm** (checklist §1): lọc không dấu ("ta xua" khớp "Tà Xùa"),
+  vào từ header tab Cung đường; `TODO(api)` nối GET /routes?q=.
+- **Jest** (checklist §8 — test tự động): 28 test cho `lib/gpx` (parse trkpt/rtept,
+  stats, roundtrip export), `lib/nav` (khúc rẽ chữ L, off-route + hysteresis, ETA),
+  `lib/contour` (marching squares kim tự tháp, chiếu iso, màu Lime). 28/28 pass.
+
 ### Added — 2026-07-22 (Brand PORTER vào app)
 - **Design tokens theo bộ nhận diện PORTER** (`app/src/theme/tokens.ts`):
   Pine `#16281A` · Lime Signal `#C9E265` · Cream `#EAF1E4` · Mist `#A9CDD8`
