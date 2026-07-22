@@ -209,6 +209,27 @@
   .mile b{color:var(--ink)}
   .premium{margin:14px 16px 96px;background:var(--go);color:var(--go-ink);border-radius:16px;padding:15px;text-align:center;
     font-weight:700;font-size:13px;cursor:pointer}
+  /* ===== Replay hành trình kiểu COROS (map nghiêng 3D + stats bay theo track) ===== */
+  #repbar{position:absolute;left:0;right:0;top:0;z-index:7;display:none;
+    padding:14px 10px 26px;background:linear-gradient(180deg,rgba(38,68,110,.78),rgba(120,150,190,.28) 70%,transparent);
+    color:#fff;text-align:center}
+  #repbar.on{display:block}
+  #repbar .logo{font-size:9px;letter-spacing:3px;font-weight:700;opacity:.9;margin-bottom:8px}
+  #repbar .row{display:flex}
+  #repbar .c{flex:1}
+  #repbar .ic{font-size:11px;opacity:.85}
+  #repbar .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;text-shadow:0 1px 6px rgba(0,0,0,.35);line-height:1.15}
+  #repbar .u{font-size:10px;opacity:.85}
+  #repx{position:absolute;top:10px;right:12px;z-index:8;width:30px;height:30px;border-radius:50%;
+    background:rgba(18,19,21,.55);color:#fff;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+  #repx.on{display:flex}
+  #repphoto{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.85);z-index:7;
+    width:230px;border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5);
+    opacity:0;pointer-events:none;transition:.3s}
+  #repphoto.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #repphoto img{width:100%;display:block}
+  .rep-thumb{width:34px;height:34px;border-radius:8px;border:2px solid #fff;object-fit:cover;
+    box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
   /* ===== Núi 3D Core Map (contour isometric brand, mesh xoay 360°) ===== */
   #mount3d{position:absolute;inset:0;background:#0e1712;display:none;z-index:12;flex-direction:column}
   #mount3d.on{display:flex}
@@ -491,12 +512,24 @@
     <section class="screen" id="s-map">
       <div id="mapscreen" style="position:absolute;inset:0">
         <div id="map"></div>
+        <div id="repbar">
+          <div class="logo">◆ POTTER · XEM LẠI HÀNH TRÌNH</div>
+          <div class="row">
+            <div class="c"><div class="ic">🥾</div><div class="n" id="rp-km">0.00</div><div class="u">km</div></div>
+            <div class="c"><div class="ic">⛰</div><div class="n" id="rp-ele">—</div><div class="u">m</div></div>
+            <div class="c"><div class="ic">📈</div><div class="n" id="rp-gain">0</div><div class="u">m leo</div></div>
+            <div class="c"><div class="ic">🕐</div><div class="n" id="rp-eta">0:00</div><div class="u">giờ đi (ước)</div></div>
+          </div>
+        </div>
+        <span id="repx" onclick="stopReplay()">✕</span>
+        <div id="repphoto"><img id="repphoto-img" src="photos/yt-a.jpg" alt=""/></div>
         <div class="maptools">
           <span class="mtool on" data-b="clean" onclick="setBase(this)">🗺</span>
           <span class="mtool" data-b="topo" onclick="setBase(this)">⛰</span>
           <span class="mtool" data-b="sat" onclick="setBase(this)">🛰</span>
           <span class="mtool" onclick="fitTrack()">🎯</span>
           <span class="mtool" onclick="open3D()">🗻</span>
+          <span class="mtool" onclick="startReplay()">▶</span>
         </div>
         <span class="sos" onclick="openSos()">SOS</span>
         <div id="navcard">
@@ -725,6 +758,100 @@ function closeSos(){
 // ===== Chat view =====
 function openChat(){document.getElementById('chatview').classList.add('on');}
 function closeChat(){document.getElementById('chatview').classList.remove('on');}
+
+// ===== REPLAY HÀNH TRÌNH kiểu COROS — map nghiêng 3D thật, camera bay theo track =====
+// Số liệu THẬT từ GPX: km luỹ kế (CUM), độ cao (ele), tổng leo, giờ đi ước tính Naismith.
+// (Không hiện nhịp tim/pace vì GPX không có dữ liệu thật — nguyên tắc không bịa số.)
+const REP={active:false,idx:0,timer:null,gain:[0]};
+for(let i=1;i<TAXUA.length;i++){
+  const d=(TAXUA[i][2]??0)-(TAXUA[i-1][2]??0);
+  REP.gain.push(REP.gain[i-1]+(d>0?d:0));
+}
+// Ảnh thật ghim dọc track (vị trí minh hoạ preview — app thật lấy toạ độ EXIF/waypoint)
+const REP_PHOTOS=[[40,'photos/yt-a.jpg'],[90,'photos/yt-b.jpg'],[135,'photos/yty-2.jpg'],
+  [180,'photos/bacha-pano.jpg'],[225,'photos/caobang-2.jpg'],[265,'photos/cb-d.jpg']];
+let repMarkers=[],repShownPhoto=-1;
+
+function enableTerrain(){
+  if(!map.getSource('dem')){
+    map.addSource('dem',{type:'raster-dem',tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+      encoding:'terrarium',tileSize:256,maxzoom:14});
+  }
+  try{map.setTerrain({source:'dem',exaggeration:1.35});}catch(e){}
+  try{map.setSky({'sky-color':'#7FA8D8','horizon-color':'#DCE8F5','fog-color':'#ffffff',
+    'sky-horizon-blend':.7,'horizon-fog-blend':.55});}catch(e){}
+}
+function ensureProgress(){
+  if(map.getSource('prog'))return;
+  map.addSource('prog',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:[]}}});
+  map.addLayer({id:'prog-cas',type:'line',source:'prog',paint:{'line-color':'#fff','line-width':9},layout:{'line-cap':'round','line-join':'round'}});
+  map.addLayer({id:'prog-line',type:'line',source:'prog',paint:{'line-color':'#C9E265','line-width':5.5},layout:{'line-cap':'round','line-join':'round'}});
+}
+function repBearing(i){
+  const a=TAXUA[Math.max(0,i-4)],b=TAXUA[Math.min(TAXUA.length-1,i+4)];
+  const r=Math.PI/180,y=Math.sin((b[0]-a[0])*r)*Math.cos(b[1]*r),
+   x=Math.cos(a[1]*r)*Math.sin(b[1]*r)-Math.sin(a[1]*r)*Math.cos(b[1]*r)*Math.cos((b[0]-a[0])*r);
+  return (Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+function startReplay(){
+  if(REP.active)return;
+  if(!map){initMap();setTimeout(startReplay,700);return;}
+  REP.active=true;REP.idx=0;repShownPhoto=-1;
+  // Nền topo như COROS (vân địa hình + bình độ) — style đổi xong sẽ tự re-add qua addTrack
+  const topoBtn=document.querySelector('.mtool[data-b="topo"]');
+  if(topoBtn&&!topoBtn.classList.contains('on'))setBase(topoBtn);
+  document.getElementById('repbar').classList.add('on');
+  document.getElementById('repx').classList.add('on');
+  stopNav();closeGo();closeBuy();
+  enableTerrain();ensureProgress();
+  // Ghim ảnh thật lên map
+  REP_PHOTOS.forEach(([idx,src])=>{
+    const el=document.createElement('img');el.src=src;el.className='rep-thumb';
+    repMarkers.push(new maplibregl.Marker({element:el,anchor:'bottom'})
+      .setLngLat([TAXUA[idx][0],TAXUA[idx][1]]).addTo(map));
+  });
+  map.easeTo({center:[TAXUA[0][0],TAXUA[0][1]],zoom:13.6,pitch:66,bearing:repBearing(0),duration:1200});
+  REP.timer=setInterval(repTick,240);
+}
+function repTick(){
+  const i=REP.idx;
+  if(i>=TAXUA.length-1){stopReplay(true);return;}
+  // Vẽ dần track + di chuyển chấm đỏ (dùng source 'me' sẵn có)
+  map.getSource('prog').setData({type:'Feature',geometry:{type:'LineString',
+    coordinates:TAXUA.slice(0,i+1).map(p=>[p[0],p[1]])}});
+  if(map.getSource('me'))map.getSource('me').setData({type:'FeatureCollection',
+    features:[{type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[i][0],TAXUA[i][1]]}}]});
+  // Camera bay theo
+  map.easeTo({center:[TAXUA[i][0],TAXUA[i][1]],bearing:repBearing(i),pitch:66,duration:260,easing:t=>t});
+  // Stats THẬT
+  document.getElementById('rp-km').textContent=(CUM[i]/1000).toFixed(2);
+  document.getElementById('rp-ele').textContent=TAXUA[i][2]!=null?Math.round(TAXUA[i][2]):'—';
+  document.getElementById('rp-gain').textContent=Math.round(REP.gain[i]);
+  const mins=(CUM[i]/4000)*60+(REP.gain[i]/600)*60;
+  document.getElementById('rp-eta').textContent=Math.floor(mins/60)+':'+String(Math.round(mins%60)).padStart(2,'0');
+  // Ảnh phóng to khi đi qua điểm chụp
+  REP_PHOTOS.forEach(([pi,src],k)=>{
+    if(Math.abs(i-pi)<=2&&repShownPhoto!==k){
+      repShownPhoto=k;
+      const ph=document.getElementById('repphoto');
+      document.getElementById('repphoto-img').src=src;
+      ph.classList.add('on');
+      setTimeout(()=>ph.classList.remove('on'),1600);
+    }
+  });
+  REP.idx=i+2;
+}
+function stopReplay(finished){
+  if(REP.timer)clearInterval(REP.timer);REP.timer=null;REP.active=false;
+  document.getElementById('repbar').classList.remove('on');
+  document.getElementById('repx').classList.remove('on');
+  document.getElementById('repphoto').classList.remove('on');
+  repMarkers.forEach(m=>m.remove());repMarkers=[];
+  if(map){
+    if(finished){map.easeTo({pitch:40,duration:900});setTimeout(fitTrack,1000);}
+    else{try{map.setTerrain(null);}catch(e){}map.easeTo({pitch:0,duration:600});fitTrack();}
+  }
+}
 
 // ===== NÚI 3D CORE MAP — mesh DEM THẬT + bình độ brand, xoay 360° (three.js) =====
 const M3={inited:false,az:.65,pol:1.02,dist:2.7,drag:false,lx:0,ly:0,raf:null};
