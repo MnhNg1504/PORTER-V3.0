@@ -8,233 +8,323 @@
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="taxua-track.js"></script>
 <style>
-  /* ===== BRAND PORTER (Porter Brand Guidelines) ===== */
+  /* ============================================================
+     POTTER 3.0 — preview UI theo NGÔN NGỮ THIẾT KẾ GỐC Porter
+     (porter-route-tracker): nền sáng F2F3F1 · chữ 121315 ·
+     Lime C9E265 cho CTA/FAB · màu phụ đất-trầm gán theo ngữ nghĩa
+     terracotta B0765A = Khó/cảnh báo · gold A98F5E = Chuẩn
+     sage 6FA08A = Dễ/thành công · blue-gray 7E93AC = thông tin/nước
+     Nhãn .k (10px UPPERCASE giãn chữ) / số .v (to, tabular) như bản gốc.
+     ============================================================ */
   @font-face{font-family:'YoungDisplay';src:url('brand/Young-Bold-Display.otf') format('opentype')}
   @font-face{font-family:'Young';src:url('brand/Young.otf') format('opentype')}
   :root{
-    --pine:#16281A; --pine-mid:#1F3A22; --forest:#2F5233; --lime:#C9E265;
-    --cream:#EAF1E4; --sand:#E3DFD2; --mist:#A9CDD8; --ember:#FF5233;
-    --gold:#E8C877; --sage:#8FA07F; --night:#0E120E; --surface:#F2F6ED;
-    --text2:#5A6552;
+    --ground:#F2F3F1; --card:#FFFFFF; --panel:#ECEEE8; --badge:#E6E8E2;
+    --line:#E1E3DC; --hairline:#E9EBE5;
+    --ink:#121315; --mute:#70766F; --soft:#4A4F4B;
+    --go:#C9E265; --go-ink:#182200;
+    --terra:#B0765A; --terra-deep:#8E5136; --terra-bg:#F4E8E1;
+    --gold:#A98F5E; --gold-deep:#776132; --gold-bg:#F2ECDD;
+    --sage:#6FA08A; --sage-deep:#3E6B57; --sage-bg:#E4EEE8;
+    --bluegray:#7E93AC; --bluegray-deep:#4E637C; --bluegray-bg:#E7ECF1;
+    --viola:#8B7BA6;
+    --radius:26px;
   }
   *{box-sizing:border-box;margin:0}
-  body{background:#d8ded2;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
-    display:flex;justify-content:center;padding:22px;color:var(--pine)}
-  .hint{position:fixed;left:14px;top:14px;max-width:210px;font-size:12px;color:#5a6552;line-height:1.5}
-  .hint b{color:var(--pine)}
-  /* ===== Khung điện thoại ===== */
-  #phone{width:390px;height:800px;background:var(--cream);border-radius:38px;overflow:hidden;
-    box-shadow:0 30px 80px rgba(20,35,20,.45), 0 0 0 10px var(--night);position:relative;display:flex;flex-direction:column}
-  .statusbar{height:34px;display:flex;justify-content:space-between;align-items:center;
-    padding:0 22px;font-size:12px;font-weight:700;flex-shrink:0}
+  body{background:#DDDFD9;font-family:"Segoe UI","SF Pro Text",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+    display:flex;justify-content:center;padding:22px;color:var(--ink);-webkit-font-smoothing:antialiased}
+  .hint{position:fixed;left:14px;top:14px;max-width:210px;font-size:12px;color:#565C55;line-height:1.55}
+  .hint b{color:var(--ink)}
+  /* ===== Khung điện thoại 390px (bezel đen kiểu bản gốc) ===== */
+  #phone{width:390px;height:800px;background:var(--ground);border-radius:42px;overflow:hidden;
+    box-shadow:0 0 0 11px #0A0B0C, 0 0 0 13px #2A2D31, 0 30px 80px rgba(18,19,21,.4);
+    position:relative;display:flex;flex-direction:column}
+  .statusbar{height:38px;display:flex;justify-content:space-between;align-items:center;
+    padding:0 24px;font-size:12.5px;font-weight:600;flex-shrink:0;color:var(--ink);font-variant-numeric:tabular-nums}
+  .statusbar .sb-mid{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
   main{flex:1;overflow:hidden;position:relative}
-  .screen{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--cream)}
+  .screen{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--ground);scrollbar-width:none}
+  .screen::-webkit-scrollbar{display:none}
   .screen.on{display:block}
-  /* ===== Header ===== */
-  .hd{display:flex;align-items:flex-end;justify-content:space-between;padding:10px 16px 12px;
-    border-bottom:1px solid var(--sand);position:sticky;top:0;background:var(--cream);z-index:5}
-  .hd h1{font-family:'YoungDisplay',serif;font-size:22px}
-  .hd .act{font-size:13px;font-weight:600;color:var(--forest);cursor:pointer}
+  @media (prefers-reduced-motion:no-preference){.screen.on{animation:fade .28s ease}}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}}
+  /* ===== Header (pattern .home-intro của bản gốc) ===== */
+  .hd{display:flex;align-items:flex-end;justify-content:space-between;padding:12px 16px 12px;
+    position:sticky;top:0;background:var(--ground);z-index:5}
+  .hd h1{font-family:'YoungDisplay',serif;font-size:25px;font-weight:700;letter-spacing:.2px}
+  .hd .sub{font-size:11.5px;color:var(--mute);margin-top:2px}
+  .hd .act{font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;background:var(--card);
+    border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
   /* ===== Bottom nav ===== */
-  nav{height:74px;background:var(--cream);border-top:1px solid var(--sand);display:flex;
-    align-items:stretch;flex-shrink:0;position:relative}
+  nav{height:74px;background:var(--ground);border-top:1px solid var(--hairline);display:flex;
+    align-items:stretch;flex-shrink:0;position:relative;z-index:8}
   nav .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:2px;font-size:10.5px;color:var(--text2);cursor:pointer;user-select:none}
-  nav .tab .ic{font-size:22px}
-  nav .tab.on{color:var(--pine);font-weight:700}
+    gap:3px;font-size:9.5px;font-weight:600;letter-spacing:.2px;color:#899086;cursor:pointer;user-select:none;position:relative}
+  nav .tab .ic{font-size:21px;filter:grayscale(1) contrast(.7)}
+  nav .tab.on{color:var(--ink);font-weight:700}
+  nav .tab.on .ic{filter:none}
+  nav .tab.on::before{content:'';position:absolute;top:6px;width:18px;height:3px;border-radius:2px;background:var(--go)}
   nav .fabwrap{flex:1.15;display:flex;justify-content:center}
-  nav .fab{width:62px;height:62px;border-radius:50%;background:var(--lime);margin-top:-24px;
+  nav .fab{width:62px;height:62px;border-radius:50%;background:var(--go);margin-top:-24px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
-    border:4px solid var(--cream);box-shadow:0 8px 20px rgba(22,40,26,.35);font-weight:800}
-  nav .fab .ic{font-size:22px}
-  nav .fab .lb{font-size:9px;letter-spacing:.3px}
-  /* ===== Cards chung ===== */
-  .card{background:#fff;border:1px solid var(--sand);border-radius:14px;overflow:hidden}
-  .px{padding:0 16px}
-  .chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
-  .chip.easy{background:#E4EFDD;color:var(--forest)} .chip.std{background:#F6ECCF;color:#8a6d1c}
-  .chip.hard{background:#FBDDD5;color:var(--ember)}
+    border:4px solid var(--ground);box-shadow:0 6px 18px -4px rgba(120,144,59,.6);color:var(--go-ink);font-weight:800}
+  nav .fab .ic{font-size:21px}
+  nav .fab .lb{font-size:8.5px;letter-spacing:.5px}
+  /* ===== Cards & nhãn chung ===== */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+  .k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+  .v{font-size:16px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .v .u{font-size:11px;color:var(--mute);font-weight:400}
+  .chip{display:inline-block;padding:4px 11px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.3px}
+  .chip.easy{background:var(--sage-bg);color:var(--sage-deep)}
+  .chip.std{background:var(--gold-bg);color:var(--gold-deep)}
+  .chip.hard{background:var(--terra-bg);color:var(--terra-deep)}
   /* ===== Tab Cung đường ===== */
-  .search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--sand);
-    border-radius:12px;padding:10px 12px;margin:12px 16px;color:var(--text2);font-size:14px;cursor:pointer}
-  .filters{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto}
-  .fchip{padding:6px 14px;border-radius:999px;border:1px solid var(--sand);background:#fff;
-    font-size:12.5px;white-space:nowrap;cursor:pointer}
-  .fchip.on{background:var(--pine);color:var(--cream);border-color:var(--pine);font-weight:600}
-  .rlist{display:flex;flex-direction:column;gap:12px;padding:0 16px 90px}
-  .rcard .ph{height:120px;background:linear-gradient(120deg,var(--pine-mid),var(--forest) 55%,#557a4b);
-    position:relative;display:flex;align-items:flex-end;padding:10px}
-  .rcard .ph .nm{font-family:'YoungDisplay',serif;color:var(--cream);font-size:17px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
-  .rcard .ph .chip{position:absolute;top:10px;right:10px}
-  .rcard .meta{display:flex;gap:14px;padding:10px 12px 4px;font-size:12.5px;color:var(--text2)}
-  .rcard .meta b{color:var(--pine);font-size:14px}
-  .rcard .foot{display:flex;justify-content:space-between;align-items:center;padding:6px 12px 12px;font-size:12px;color:var(--sage)}
-  .rcard .price{font-weight:800;color:var(--forest);font-size:14px}
-  .warnguide{background:#FBDDD5;color:#9c2e14;font-size:11.5px;padding:6px 12px}
+  .search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:11px 14px;margin:2px 16px 12px;color:var(--mute);font-size:13.5px;cursor:pointer}
+  .filters{display:flex;gap:7px;padding:0 16px 14px;overflow-x:auto;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent);
+    mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent)}
+  .filters::-webkit-scrollbar{display:none}
+  .fchip{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+    font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--soft)}
+  .fchip.on{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+  .rlist{display:flex;flex-direction:column;gap:12px;padding:0 16px 96px}
+  .rcard{cursor:pointer}
+  .rcard .ph{height:132px;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+  .rcard .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .rcard .ph::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,19,21,0) 40%,rgba(18,19,21,.62))}
+  .rcard .ph .nm{font-family:'YoungDisplay',serif;color:#F2F3F1;font-size:17.5px;position:relative;z-index:2;
+    text-shadow:0 1px 8px rgba(0,0,0,.45);line-height:1.25}
+  .rcard .ph .chip{position:absolute;top:10px;right:10px;z-index:2}
+  .rcard .meta{display:flex;gap:14px;padding:11px 14px 4px;font-size:11px;color:var(--mute);flex-wrap:wrap;font-variant-numeric:tabular-nums}
+  .rcard .meta b{color:var(--ink);font-size:12.5px;font-weight:600}
+  .rcard .foot{display:flex;justify-content:space-between;align-items:center;padding:7px 14px 13px;font-size:11.5px;color:var(--mute)}
+  .rcard .price{font-weight:700;color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums}
+  .rcard .price.free{color:var(--sage-deep)}
+  .warnguide{background:var(--terra-bg);color:var(--terra-deep);font-size:11.5px;font-weight:600;
+    padding:7px 14px;border-top:1px solid #EBD9CE;border-bottom:1px solid #EBD9CE}
   /* ===== Chi tiết cung (overlay) ===== */
-  #detail{position:absolute;inset:0;background:var(--cream);display:none;overflow-y:auto;z-index:9}
+  #detail{position:absolute;inset:0;background:var(--ground);display:none;overflow-y:auto;z-index:9;scrollbar-width:none}
+  #detail::-webkit-scrollbar{display:none}
   #detail.on{display:block}
-  .dhero{height:190px;background:linear-gradient(160deg,var(--pine),var(--forest));display:flex;
-    align-items:flex-end;padding:14px;position:relative}
-  .dhero .back{position:absolute;top:12px;left:12px;width:34px;height:34px;border-radius:50%;
-    background:rgba(234,241,228,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
-  .dhero h2{font-family:'YoungDisplay',serif;color:var(--cream);font-size:24px}
-  .stats{display:flex;border-bottom:1px solid var(--sand);margin:0 16px;padding:14px 0}
-  .stats>div{flex:1;text-align:center}
-  .stats .v{font-size:17px;font-weight:800} .stats .k{font-size:10.5px;color:var(--text2);margin-top:2px}
-  .sec{font-family:'YoungDisplay',serif;font-size:16px;margin:16px 16px 8px}
+  .dhero{height:210px;position:relative;display:flex;align-items:flex-end;padding:16px;overflow:hidden}
+  .dhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .dhero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,19,21,.06) 35%,rgba(18,19,21,.68))}
+  .dhero .back{position:absolute;top:12px;left:12px;z-index:3}
+  .dhero h2{font-family:'YoungDisplay',serif;color:#F2F3F1;font-size:24px;position:relative;z-index:2;
+    line-height:1.2;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+  .dhero .dsub{position:relative;z-index:2;color:rgba(242,243,241,.82);font-size:11px;letter-spacing:1.2px;
+    text-transform:uppercase;margin-top:4px}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:14px 16px;background:var(--card);
+    border:1px solid var(--line);border-radius:20px;padding:15px 16px}
+  .stats .v{font-size:15.5px}
+  .sec{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);margin:18px 16px 8px}
   /* weather */
-  .wx{margin:0 16px;background:var(--surface)}
-  .wx .now{display:flex;align-items:center;gap:12px;padding:14px}
-  .wx .t{font-size:30px;font-weight:800} .wx .e{font-size:30px}
-  .wx .days{display:flex;gap:8px;padding:0 12px 12px;overflow-x:auto}
-  .wx .d{background:var(--cream);border-radius:10px;padding:8px 10px;text-align:center;font-size:11px;min-width:56px}
-  .wx .safety{padding:10px 14px;font-size:12.5px;background:#E4EFDD}
-  .wx .safety.warn{background:#F4EAD1} .wx .safety.danger{background:#F9DAD3}
-  .contour-note{margin:10px 16px 0;font-size:12px;color:var(--text2)}
-  .cta{position:sticky;bottom:0;background:var(--cream);padding:12px 16px;border-top:1px solid var(--sand)}
-  .buybtn{display:block;width:100%;background:var(--lime);border:none;border-radius:13px;padding:15px;
-    font-weight:800;font-size:14.5px;color:var(--pine);cursor:pointer}
+  .wx{margin:0 16px;background:var(--card)}
+  .wx .now{display:flex;align-items:center;gap:12px;padding:14px 16px}
+  .wx .t{font-size:31px;font-weight:700;font-variant-numeric:tabular-nums} .wx .e{font-size:29px}
+  .wx .days{display:flex;gap:8px;padding:0 14px 13px;overflow-x:auto;scrollbar-width:none;
+    -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent);
+    mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 24px),transparent)}
+  .wx .days::-webkit-scrollbar{display:none}
+  .wx .d{background:var(--panel);border-radius:12px;padding:8px 10px;text-align:center;font-size:11px;min-width:58px;
+    font-variant-numeric:tabular-nums;line-height:1.5}
+  .wx .safety{padding:11px 16px;font-size:12.5px;font-weight:600;background:var(--sage-bg);color:var(--sage-deep);
+    border-top:1px solid var(--hairline)}
+  .wx .safety.warn{background:var(--gold-bg);color:var(--gold-deep)}
+  .wx .safety.danger{background:var(--terra-bg);color:var(--terra-deep)}
+  .contour-note{margin:10px 16px 0;font-size:11.5px;color:var(--mute);line-height:1.5}
+  .startcard{margin:0 16px}
+  .startcard .sph{height:118px;position:relative;overflow:hidden}
+  .startcard .sph img{width:100%;height:100%;object-fit:cover;display:block}
+  .startcard .scap{padding:11px 14px;font-size:12.5px;color:var(--mute);line-height:1.5}
+  .startcard .scap b{color:var(--ink);font-weight:600}
+  .cta{position:sticky;bottom:0;background:var(--ground);padding:12px 16px 14px;border-top:1px solid var(--hairline)}
+  .buybtn{display:block;width:100%;background:var(--go);border:none;border-radius:15px;padding:15px;
+    font-family:inherit;font-weight:700;font-size:14.5px;color:var(--go-ink);cursor:pointer;letter-spacing:.2px}
   /* ===== Tab Map ===== */
   #mapscreen{display:flex;flex-direction:column}
   #map{flex:1}
-  .maptools{position:absolute;right:12px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}
-  .mtool{width:42px;height:42px;border-radius:12px;background:rgba(234,241,228,.95);border:1px solid var(--sand);
-    display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
-  .mtool.on{background:var(--lime)}
-  .mapstats{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;background:rgba(234,241,228,.96);
-    border:1px solid var(--sand);border-radius:14px;display:flex;padding:10px 6px}
-  .mapstats>div{flex:1;text-align:center}
-  .mapstats .v{font-weight:800;font-size:15px} .mapstats .k{font-size:10px;color:var(--text2)}
-  .sos{position:absolute;right:12px;bottom:86px;z-index:6;width:52px;height:52px;border-radius:50%;
-    background:var(--ember);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;
-    justify-content:center;border:3px solid #fff;box-shadow:0 6px 16px rgba(255,82,51,.4);cursor:pointer}
+  .maptools{position:absolute;right:12px;top:56px;display:flex;flex-direction:column;gap:7px;z-index:6}
+  .mtool{width:40px;height:40px;border-radius:12px;background:rgba(242,243,241,.95);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(18,19,21,.1)}
+  .mtool.on{background:var(--go);border-color:var(--go)}
+  .mapstats{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;background:rgba(242,243,241,.96);
+    border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+    padding:11px 6px;backdrop-filter:blur(4px)}
+  .mapstats>div{text-align:center}
+  .mapstats .v{font-size:15px;font-weight:700;margin-top:0}
+  .mapstats .k{display:block;margin-top:2px;font-size:9px}
+  .sos{position:absolute;right:12px;bottom:92px;z-index:6;width:52px;height:52px;border-radius:50%;
+    background:var(--terra);color:#fff;font-weight:800;font-size:12.5px;letter-spacing:.5px;display:flex;align-items:center;
+    justify-content:center;border:3px solid #fff;box-shadow:0 6px 16px rgba(176,118,90,.45);cursor:pointer}
   /* ===== Tab Cộng đồng ===== */
-  .feed{display:flex;flex-direction:column;gap:12px;padding:12px 16px 90px}
-  .post .u{display:flex;align-items:center;gap:10px;padding:12px}
-  .ava{width:36px;height:36px;border-radius:50%;background:var(--lime);display:flex;align-items:center;
-    justify-content:center;font-weight:800;font-size:14px}
-  .post .nm{font-weight:700;font-size:13.5px} .post .lv{font-size:11px;color:var(--forest)}
-  .post .img{height:150px;background:linear-gradient(115deg,#2F5233,#557a4b 50%,#8FA07F);display:flex;
-    align-items:flex-end;padding:10px;color:var(--cream);font-size:12px}
-  .post .txt{padding:10px 12px;font-size:13.5px;line-height:1.45}
-  .post .acts{display:flex;gap:18px;padding:0 12px 12px;font-size:12.5px;color:var(--text2)}
+  .feed{display:flex;flex-direction:column;gap:12px;padding:2px 16px 96px}
+  .post .u{display:flex;align-items:center;gap:10px;padding:12px 14px}
+  .ava{width:37px;height:37px;border-radius:50%;background:var(--go);color:var(--go-ink);display:flex;align-items:center;
+    justify-content:center;font-weight:800;font-size:13px;letter-spacing:.3px;flex-shrink:0}
+  .ava.c-terra{background:var(--terra);color:#F6F4EF}
+  .ava.c-gold{background:var(--gold);color:#F6F4EF}
+  .ava.c-sage{background:var(--sage);color:#F6F4EF}
+  .ava.c-blue{background:var(--bluegray);color:#F6F4EF}
+  .ava.c-viola{background:var(--viola);color:#F6F4EF}
+  .post .nm{font-weight:700;font-size:13.5px} .post .lv{font-size:11px;color:var(--mute);margin-top:1px}
+  .post .img{height:178px;position:relative;display:flex;align-items:flex-end;padding:10px;overflow:hidden}
+  .post .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .post .img .tag{position:relative;z-index:2;color:#F2F3F1;font-size:11px;font-weight:600;
+    background:rgba(18,19,21,.55);border-radius:999px;padding:5px 11px;backdrop-filter:blur(2px)}
+  .post .txt{padding:11px 14px;font-size:13.5px;line-height:1.5;color:var(--soft)}
+  .post .acts{display:flex;gap:18px;padding:0 14px 12px;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
   /* ===== Tab Tin nhắn ===== */
-  .convs{padding:6px 0 90px}
-  .conv{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--surface);cursor:pointer}
+  .convs{padding:2px 0 96px}
+  .conv{display:flex;gap:12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--hairline);cursor:pointer;background:var(--ground)}
   .conv .p{flex:1;min-width:0}
-  .conv .nm{font-weight:700;font-size:14px}
-  .conv .last{font-size:12.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .conv .meta{text-align:right;font-size:11px;color:var(--sage)}
-  .badge{background:var(--ember);color:#fff;border-radius:999px;font-size:10.5px;font-weight:800;
+  .conv .nm{font-weight:700;font-size:13.5px}
+  .conv .last{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .conv .meta{text-align:right;font-size:10.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+  .badge{background:var(--terra);color:#fff;border-radius:999px;font-size:10px;font-weight:800;
     padding:2px 7px;display:inline-block;margin-top:3px}
-  .online{width:9px;height:9px;border-radius:50%;background:#4caf50;position:absolute;right:0;bottom:0;border:2px solid #fff}
-  .avwrap{position:relative}
+  .online{width:9px;height:9px;border-radius:50%;background:var(--sage);position:absolute;right:0;bottom:0;border:2px solid var(--ground)}
+  .avwrap{position:relative;flex-shrink:0}
   /* ===== Tab Hồ sơ ===== */
-  .cover{background:var(--pine);padding:22px 16px 18px;text-align:center;color:var(--cream)}
-  .cover .ava{width:64px;height:64px;margin:0 auto 8px;font-size:22px}
-  .cover h2{font-family:'YoungDisplay',serif;font-size:20px}
-  .cover .lv{color:var(--lime);font-size:12.5px;margin-top:3px}
-  .rep{margin:10px auto 0;max-width:250px}
-  .rep .bar{height:6px;background:var(--pine-mid);border-radius:3px;overflow:hidden}
-  .rep .fill{height:100%;width:78%;background:var(--lime)}
-  .rep .t{font-size:10.5px;color:var(--sage);margin-top:4px}
-  .pstats{display:flex;margin:14px 16px;gap:10px}
-  .pstats .card{flex:1;text-align:center;padding:12px 4px}
-  .pstats .v{font-family:'YoungDisplay',serif;font-size:18px} .pstats .k{font-size:10.5px;color:var(--text2)}
-  .mile{display:flex;gap:10px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--surface);font-size:13px}
-  .mile .ic{font-size:18px}
-  .premium{margin:14px 16px 90px;background:var(--lime);border-radius:14px;padding:14px;text-align:center;
+  .cover{background:var(--ink);padding:24px 16px 20px;text-align:center;color:var(--ground);
+    border-radius:0 0 var(--radius) var(--radius)}
+  .cover .ava{width:64px;height:64px;margin:0 auto 9px;font-size:21px;border:2px solid var(--go)}
+  .cover h2{font-family:'YoungDisplay',serif;font-size:21px;letter-spacing:.3px}
+  .cover .lv{color:var(--go);font-size:12px;margin-top:4px}
+  .rep{margin:12px auto 0;max-width:250px}
+  .rep .bar{height:6px;background:#2C2E31;border-radius:3px;overflow:hidden}
+  .rep .fill{height:100%;width:78%;background:var(--go)}
+  .rep .t{font-size:10.5px;color:#9BA19B;margin-top:5px;font-variant-numeric:tabular-nums}
+  .pstats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:14px 16px;background:var(--card);
+    border:1px solid var(--line);border-radius:20px;padding:15px 14px;text-align:center}
+  .pstats .v{font-family:'YoungDisplay',serif;font-size:18px;font-weight:700;margin-top:0}
+  .pstats .k{display:block;margin-top:3px}
+  .mile{display:flex;gap:11px;align-items:center;margin:0 16px 8px;padding:12px 14px;font-size:12.5px;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;color:var(--soft)}
+  .mile .ic{font-size:17px}
+  .mile b{color:var(--ink)}
+  .premium{margin:14px 16px 96px;background:var(--go);color:var(--go-ink);border-radius:16px;padding:15px;text-align:center;
     font-weight:700;font-size:13px;cursor:pointer}
   /* ===== Overlay chung (StartPoint, Chat) ===== */
-  .ovl{position:absolute;inset:0;background:var(--cream);display:none;flex-direction:column;z-index:11;overflow-y:auto}
+  .ovl{position:absolute;inset:0;background:var(--ground);display:none;flex-direction:column;z-index:11;overflow-y:auto;scrollbar-width:none}
+  .ovl::-webkit-scrollbar{display:none}
   .ovl.on{display:flex}
-  .back{width:34px;height:34px;border-radius:50%;background:rgba(234,241,228,.94);display:flex;
-    align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid var(--sand)}
-  /* Bước 1 — điểm xuất phát */
-  .sphoto{height:38%;min-height:230px;background:linear-gradient(150deg,#3b5a3e,#557a4b 60%,#8FA07F);
-    position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-  .sphoto .back{position:absolute;top:12px;left:12px}
-  .sphoto-inner{text-align:center;color:var(--cream);font-size:13px;line-height:1.6}
-  .spdist{display:flex;justify-content:space-between;align-items:center;background:var(--lime);
-    border-radius:12px;padding:11px 14px;font-size:13px;margin:10px 0}
+  .back{width:34px;height:34px;border-radius:50%;background:rgba(242,243,241,.94);display:flex;
+    align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid var(--line);color:var(--ink)}
+  /* Bước 1 — điểm xuất phát (ảnh thật) */
+  .sphoto{height:40%;min-height:250px;position:relative;flex-shrink:0;overflow:hidden}
+  .sphoto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .sphoto::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,19,21,0) 55%,rgba(18,19,21,.6))}
+  .sphoto .back{position:absolute;top:12px;left:12px;z-index:3}
+  .sphoto-cap{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;color:#F2F3F1;font-size:12px;line-height:1.5}
+  .sphoto-cap .k{color:rgba(242,243,241,.75)}
+  .sphoto-cap b{font-size:14px;font-weight:700;display:block;margin-top:3px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .stitle{font-family:'YoungDisplay',serif;font-size:21px;margin-bottom:2px}
+  .spdist{display:flex;justify-content:space-between;align-items:center;background:var(--go);color:var(--go-ink);
+    border-radius:14px;padding:12px 14px;font-size:13px;margin:12px 0;font-weight:600;font-variant-numeric:tabular-nums}
+  .spdist b{font-weight:800}
+  .spnote{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;
+    font-size:13px;line-height:1.6;color:var(--soft)}
+  .spnote b{color:var(--ink)}
   /* Nav mode (Bước 2) */
   #navcard{position:absolute;left:12px;right:12px;top:46px;z-index:7;background:rgba(255,255,255,.97);
-    border-radius:16px;padding:13px;box-shadow:0 10px 26px rgba(22,40,26,.28);display:none}
+    border:1px solid var(--line);border-radius:18px;padding:13px 14px;box-shadow:0 10px 26px rgba(18,19,21,.18);display:none}
   #navcard.on{display:block}
   #navcard .row{display:flex;gap:12px;align-items:center}
-  #navcard .arr{width:46px;height:46px;border-radius:13px;background:var(--forest);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:22px}
+  #navcard .arr{width:46px;height:46px;border-radius:14px;background:var(--go);color:var(--go-ink);
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
   #navcard .big{font-size:17px;font-weight:800}
-  #navcard .sm{font-size:12px;color:var(--text2)}
-  #navcard .ft{display:flex;justify-content:space-between;margin-top:9px;padding-top:8px;
-    border-top:1px solid var(--surface);font-size:11.5px;color:var(--text2)}
-  #navcard .ft b{color:var(--pine)}
-  #navx{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;background:var(--pine);
-    color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+  #navcard .sm{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+  #navcard .ft{display:flex;justify-content:space-between;margin-top:10px;padding-top:9px;
+    border-top:1px solid var(--hairline);font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
+  #navcard .ft b{color:var(--ink);font-weight:700}
+  #navx{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;background:var(--ink);
+    color:var(--ground);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
   /* Chat view */
-  .chd{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--sand);
-    background:var(--cream);flex-shrink:0}
+  .chd{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--hairline);
+    background:var(--ground);flex-shrink:0}
   .cbody{flex:1;padding:14px;display:flex;flex-direction:column;gap:7px;overflow-y:auto}
   .bub{max-width:75%;padding:9px 13px;border-radius:16px;font-size:13.5px;line-height:1.45}
-  .bub.them{background:#fff;border:1px solid var(--sand);align-self:flex-start;border-bottom-left-radius:5px}
-  .bub.me{background:var(--pine);color:var(--cream);align-self:flex-end;border-bottom-right-radius:5px}
-  .bub.recalled{background:var(--surface);color:var(--sage);font-style:italic;border:1px dashed var(--sand)}
-  .sub{font-size:10px;color:var(--sage)} .me-sub{align-self:flex-end}
+  .bub.them{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px}
+  .bub.me{background:var(--ink);color:var(--ground);align-self:flex-end;border-bottom-right-radius:5px}
+  .bub.recalled{background:var(--panel);color:var(--mute);font-style:italic;border:1px dashed var(--line)}
+  .sub{font-size:10px;color:var(--mute)} .me-sub{align-self:flex-end}
   .bub.typing{display:flex;gap:4px;padding:12px 14px}
-  .bub.typing span{width:7px;height:7px;border-radius:50%;background:var(--sage);animation:tp 1s infinite}
+  .bub.typing span{width:7px;height:7px;border-radius:50%;background:var(--mute);animation:tp 1s infinite}
   .bub.typing span:nth-child(2){animation-delay:.2s} .bub.typing span:nth-child(3){animation-delay:.4s}
   @keyframes tp{0%,100%{opacity:.3}50%{opacity:1}}
-  .cinput{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--sand);
-    background:var(--cream);flex-shrink:0}
-  .cfield{flex:1;background:var(--surface);border:1px solid var(--sand);border-radius:999px;
-    padding:10px 14px;font-size:13px;color:var(--text2)}
-  .csend{width:38px;height:38px;border-radius:50%;background:var(--lime);display:flex;
-    align-items:center;justify-content:center;font-weight:800;cursor:pointer}
-  /* SOS sheet */
-  #sos-back{position:absolute;inset:0;background:rgba(14,18,14,.55);z-index:14;display:none}
-  #sos-sheet{position:absolute;left:0;right:0;bottom:-100%;background:var(--cream);z-index:15;
-    border-radius:22px 22px 0 0;padding:18px 16px 26px;transition:bottom .28s;display:flex;
-    flex-direction:column;gap:8px}
-  #sos-sheet.on{bottom:0} #sos-back.on{display:block}
-  .sos-pos{background:var(--surface);border:1px solid var(--sand);border-radius:12px;padding:10px 12px}
-  .sos-call{background:var(--ember);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
-  .sos-sms{background:var(--pine);color:var(--cream);border-radius:12px;padding:12px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
-  .sos-share{background:#fff;border:1px solid var(--sand);border-radius:12px;padding:12px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .cinput{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--hairline);
+    background:var(--ground);flex-shrink:0}
+  .cfield{flex:1;background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:10px 14px;font-size:13px;color:var(--mute)}
+  .csend{width:38px;height:38px;border-radius:50%;background:var(--go);color:var(--go-ink);display:flex;
+    align-items:center;justify-content:center;font-weight:800;cursor:pointer;flex-shrink:0}
+  /* SOS sheet (kiểu .ov-card bản gốc) */
+  #sos-back,#buy-back,#go-back{position:absolute;inset:0;background:rgba(18,19,21,.55);z-index:14;display:none}
+  #sos-sheet,#buy-sheet,#go-sheet{position:absolute;left:0;right:0;bottom:-100%;background:var(--ground);z-index:15;
+    border-radius:26px 26px 0 0;border-top:1px solid var(--line);padding:18px 16px 26px;transition:bottom .28s cubic-bezier(.22,.9,.3,1);
+    display:flex;flex-direction:column;gap:9px}
+  #sos-sheet.on,#buy-sheet.on,#go-sheet.on{bottom:0}
+  #sos-back.on,#buy-back.on,#go-back.on{display:block}
+  #buy-sheet h3,#go-sheet h3{font-family:'YoungDisplay',serif;font-size:20px}
+  .buyrow{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px solid var(--hairline)}
+  .buyrow b{font-variant-numeric:tabular-nums}
+  .waiver{display:flex;gap:10px;align-items:flex-start;background:var(--terra-bg);border:1px solid #EBD9CE;
+    border-radius:14px;padding:11px 12px;font-size:12px;color:var(--terra-deep);line-height:1.5;cursor:pointer;margin-top:4px}
+  .waiver input{margin-top:2px;accent-color:var(--terra)}
+  .confirmbtn{display:block;width:100%;background:var(--go);border:none;border-radius:15px;padding:14px;
+    font-weight:800;font-size:14px;color:var(--go-ink);cursor:pointer;margin-top:8px}
+  .confirmbtn:disabled{opacity:.4;cursor:not-allowed}
+  #sos-sheet h3{font-family:'YoungDisplay',serif;color:var(--terra-deep);font-size:20px}
+  .sos-pos{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px}
+  .sos-pos .v{font-size:16px;font-weight:800}
+  .sos-call{background:var(--terra);color:#fff;border-radius:14px;padding:13px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+  .sos-sms{background:var(--ink);color:var(--ground);border-radius:14px;padding:13px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .sos-share{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .sos-note{font-size:10.5px;color:var(--mute);margin-top:6px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="hint">
-  <b>POTTER — Preview UI</b><br/>Mô phỏng giao diện app RN để duyệt thiết kế.<br/><br/>
+  <b>POTTER — Preview UI</b><br/>Mô phỏng giao diện app RN để duyệt thiết kế (ngôn ngữ Porter: nền sáng + Lime).<br/><br/>
   • Bấm 5 tab dưới cùng<br/>• Tab Cung đường → bấm thẻ <b>Tà Xùa</b> xem chi tiết + thời tiết THẬT<br/>
   • Tab Bản đồ: map + track THẬT<br/><br/>Bản chạy thật = APK đang build.
 </div>
 
 <div id="phone">
-  <div class="statusbar"><span>12:31</span><span>POTTER · preview</span><span>▮▮▮ 🔋</span></div>
+  <div class="statusbar"><span>12:31</span><span class="sb-mid">Potter · preview</span><span>▮▮▮ 🔋</span></div>
   <main>
 
     <!-- ============ TAB 1: CỘNG ĐỒNG ============ -->
     <section class="screen on" id="s-community">
-      <div class="hd"><h1>Cộng đồng</h1><span class="act">＋ Đăng bài</span></div>
+      <div class="hd"><div><h1>Cộng đồng</h1><div class="sub">Chia sẻ hành trình &amp; khoảnh khắc trên núi</div></div><span class="act">＋ Đăng bài</span></div>
       <div class="feed">
         <div class="card post">
           <div class="u"><div class="ava">AC</div><div><div class="nm">A Của</div><div class="lv">Cấp 2 · Hướng dẫn viên ★4.9</div></div></div>
-          <div class="img">📍 Sống lưng khủng long — Tà Xùa</div>
+          <div class="img"><img src="photos/bacha-pano.jpg" alt="Hoàng hôn trên sống lưng khủng long Tà Xùa"/><span class="tag">📍 Sống lưng khủng long — Tà Xùa</span></div>
           <div class="txt">Săn mây cuối tuần trên sống lưng khủng long. Đoàn 6 người an toàn xuống núi 🎉</div>
           <div class="acts"><span>❤️ 128</span><span>💬 24</span><span>↗ Chia sẻ</span></div>
         </div>
         <div class="card post">
-          <div class="u"><div class="ava" style="background:var(--mist)">NC</div><div><div class="nm">Nao Chi</div><div class="lv">Cấp 2 · 168km</div></div></div>
-          <div class="txt">Check-in cột mốc: hoàn thành cung thứ 14! Putaleng mùa đỗ quyên đẹp không lời nào tả nổi 🌸</div>
+          <div class="u"><div class="ava c-blue">NC</div><div><div class="nm">Nao Chi</div><div class="lv">Cấp 2 · 168km</div></div></div>
+          <div class="img"><img src="photos/caobang-2.jpg" alt="Check-in cột mốc Phja Oắc 1.931 m"/><span class="tag">📍 Phja Oắc — 1.931 m</span></div>
+          <div class="txt">Check-in cột mốc: hoàn thành cung thứ 14! Phja Oắc mây kín trời, lạnh mà đã 🌫</div>
           <div class="acts"><span>❤️ 86</span><span>💬 12</span><span>↗ Chia sẻ</span></div>
+        </div>
+        <div class="card post">
+          <div class="u"><div class="ava c-viola">NL</div><div><div class="nm">Ngọc Lan</div><div class="lv">Cấp 1 · 42km</div></div></div>
+          <div class="img"><img src="photos/yty-4.jpg" alt="Giấc trưa ở bản Y Tý"/><span class="tag">📍 Bản Y Tý — Bát Xát, Lào Cai</span></div>
+          <div class="txt">Giấc trưa bình yên ở bản Y Tý trước khi vào cung. Cảm ơn homestay đã cho tá túc 💛</div>
+          <div class="acts"><span>❤️ 57</span><span>💬 9</span><span>↗ Chia sẻ</span></div>
         </div>
       </div>
     </section>
 
     <!-- ============ TAB 2: CUNG ĐƯỜNG ============ -->
     <section class="screen" id="s-routes">
-      <div class="hd"><h1>Cung đường</h1><span class="act">🔍 Tìm kiếm</span></div>
+      <div class="hd"><div><h1>Cung đường</h1><div class="sub">Track GPX thật · chợ cung có hướng dẫn</div></div><span class="act">🔍 Tìm kiếm</span></div>
       <div class="search">🔍 Tìm cung, đỉnh, khu vực…</div>
       <div class="filters">
         <span class="fchip on">Tất cả</span><span class="fchip">Dễ</span>
@@ -242,29 +332,26 @@
       </div>
       <div class="rlist">
         <div class="card rcard" onclick="openDetail()">
-          <div class="ph"><span class="nm">Tà Xùa – Sống lưng khủng long</span><span class="chip hard">Khó</span></div>
+          <div class="ph"><img src="photos/bacha-pano.jpg" alt="Tà Xùa"/><span class="nm">Tà Xùa – Sống lưng khủng long</span><span class="chip hard">Khó</span></div>
           <div class="meta"><span>🥾 <b id="tx-km">…</b> km</span><span>⛰ <b id="tx-gain">…</b>m leo</span><span>🕐 <b>~8h</b></span><span>🍂 <b>Thu</b></span></div>
           <div class="warnguide">⚠ Cấp 1 cần người hướng dẫn đi kèm</div>
           <div class="foot"><span>💾 1.204 lưu · 🔥 82</span><span class="price">350.000đ · GPX + guide</span></div>
         </div>
         <div class="card rcard">
-          <div class="ph" style="background:linear-gradient(120deg,#1F3A22,#3b5a3e 55%,#6b8a5f)">
-            <span class="nm">Bạch Mộc Lương Tử (Kỳ Quan San)</span><span class="chip hard">Khó</span></div>
+          <div class="ph"><img src="photos/cb-d.jpg" alt="Kỳ Quan San"/><span class="nm">Bạch Mộc Lương Tử (Kỳ Quan San)</span><span class="chip hard">Khó</span></div>
           <div class="meta"><span>🥾 <b>27.5</b> km</span><span>⛰ <b>2600</b>m leo</span><span>🕐 <b>2N1Đ</b></span><span>❄ <b>Đông</b></span></div>
           <div class="warnguide">⚠ Cấp 1 cần người hướng dẫn đi kèm</div>
           <div class="foot"><span>💾 980 lưu · 🔥 76</span><span class="price">550.000đ</span></div>
         </div>
         <div class="card rcard">
-          <div class="ph" style="background:linear-gradient(120deg,#2F5233,#6b8a5f)">
-            <span class="nm">Lảo Thẩn – Nóc nhà Y Tý</span><span class="chip std">Chuẩn</span></div>
+          <div class="ph"><img src="photos/yt-a.jpg" alt="Lảo Thẩn"/><span class="nm">Lảo Thẩn – Nóc nhà Y Tý</span><span class="chip std">Chuẩn</span></div>
           <div class="meta"><span>🥾 <b>16.2</b> km</span><span>⛰ <b>1100</b>m leo</span><span>🕐 <b>2N1Đ</b></span><span>🍂 <b>Thu</b></span></div>
           <div class="foot"><span>💾 720 lưu · 🔥 64</span><span class="price">400.000đ</span></div>
         </div>
         <div class="card rcard">
-          <div class="ph" style="background:linear-gradient(120deg,#557a4b,#8FA07F)">
-            <span class="nm">Núi Hàm Lợn (gần Hà Nội)</span><span class="chip easy">Dễ</span></div>
+          <div class="ph"><img src="photos/yt-b.jpg" alt="Hàm Lợn"/><span class="nm">Núi Hàm Lợn (gần Hà Nội)</span><span class="chip easy">Dễ</span></div>
           <div class="meta"><span>🥾 <b>7.5</b> km</span><span>⛰ <b>320</b>m leo</span><span>🕐 <b>~3h</b></span><span>☀ <b>Quanh năm</b></span></div>
-          <div class="foot"><span>💾 2.100 lưu · 🔥 71</span><span class="price" style="color:var(--sage)">Miễn phí</span></div>
+          <div class="foot"><span>💾 2.100 lưu · 🔥 71</span><span class="price free">Miễn phí</span></div>
         </div>
       </div>
     </section>
@@ -272,39 +359,40 @@
     <!-- ==== Chi tiết cung (overlay) ==== -->
     <section id="detail">
       <div class="dhero"><span class="back" onclick="closeDetail()">←</span>
-        <h2>Tà Xùa – Sống lưng khủng long</h2></div>
+        <div><h2>Tà Xùa – Sống lưng khủng long</h2><div class="dsub">Bắc Yên · Sơn La</div></div></div>
       <div class="stats">
-        <div><div class="v" id="dx-km">…</div><div class="k">KM</div></div>
-        <div><div class="v" id="dx-gain">…</div><div class="k">TỔNG LEO</div></div>
-        <div><div class="v" id="dx-peak">…</div><div class="k">ĐỈNH (M)</div></div>
-        <div><div class="v">★4.7</div><div class="k">88 REVIEW</div></div>
+        <div><div class="k">Quãng đường</div><div class="v"><span id="dx-km">…</span> <span class="u">km</span></div></div>
+        <div><div class="k">Tổng leo</div><div class="v"><span id="dx-gain">…</span> <span class="u">m</span></div></div>
+        <div><div class="k">Đỉnh</div><div class="v"><span id="dx-peak">…</span> <span class="u">m</span></div></div>
+        <div><div class="k">88 review</div><div class="v">★4.7</div></div>
       </div>
-      <div class="sec">Thời tiết · Bản Tà Xùa <span style="font-size:11px;color:var(--sage)">(Open-Meteo — THẬT)</span></div>
-      <div class="card wx" id="wx"><div class="now"><span class="e">⏳</span><span style="font-size:13px;color:var(--text2)">Đang lấy thời tiết thật…</span></div></div>
+      <div class="sec">Thời tiết · Bản Tà Xùa (Open-Meteo — thật)</div>
+      <div class="card wx" id="wx"><div class="now"><span class="e">⏳</span><span style="font-size:13px;color:var(--mute)">Đang lấy thời tiết thật…</span></div></div>
       <p class="contour-note">🗻 Thẻ "Route covered" (núi bình độ isometric) xem bản tương tác tại <b>contour-iso.html</b> — trong app RN đã tích hợp ở màn này.</p>
       <div class="sec">Điểm xuất phát (bắt buộc có ảnh)</div>
-      <div class="card" style="margin:0 16px">
-        <div style="height:110px;background:linear-gradient(115deg,#3b5a3e,#8FA07F);display:flex;align-items:center;justify-content:center;color:var(--cream);font-size:13px">📷 Ảnh thực địa: Cổng gỗ đầu bản Tà Xùa</div>
-        <div style="padding:10px 12px;font-size:12.5px;color:var(--text2)">Gửi xe nhà anh Sơn cuối đường bê tông · Guide: <b style="color:var(--pine)">A Của ★4.9</b></div>
+      <div class="card startcard">
+        <div class="sph"><img src="photos/yty-2.jpg" alt="Đường đất đầu bản Tà Xùa"/></div>
+        <div class="scap">📷 Ảnh thực địa: đường đất đầu bản · Gửi xe nhà anh Sơn cuối đường bê tông · Guide: <b>A Của ★4.9</b></div>
       </div>
-      <div class="cta"><button class="buybtn" onclick="openStart()">MUA CUNG HƯỚNG DẪN — 350.000đ</button></div>
+      <div class="cta"><button class="buybtn" onclick="openBuy()">MUA CUNG HƯỚNG DẪN — 350.000đ</button></div>
     </section>
 
     <!-- ==== BƯỚC 1: Dẫn tới ĐIỂM XUẤT PHÁT (docs/00 §4 — bắt buộc có ảnh) ==== -->
     <section id="startpoint" class="ovl">
       <div class="sphoto">
         <span class="back" onclick="closeStart()">←</span>
-        <div class="sphoto-inner">📷<br/>Ảnh thực địa THẬT<br/><b>Cổng gỗ đầu bản, biển "Tà Xùa"</b></div>
+        <img src="photos/yty-2.jpg" alt="Ảnh thực địa điểm xuất phát — đường đất đầu bản Tà Xùa"/>
+        <div class="sphoto-cap"><span class="k">📷 Ảnh thực địa thật</span><b>Cổng đầu bản, đường đất — biển "Tà Xùa"</b></div>
       </div>
       <div style="padding:14px 16px">
-        <h2 style="font-family:'YoungDisplay',serif;font-size:20px">Bước 1 — Tới điểm xuất phát</h2>
+        <h2 class="stitle">Bước 1 — Tới điểm xuất phát</h2>
         <div class="spdist"><span>📍 Cách bạn</span><b>3,2 km · ~9 phút xe máy</b></div>
-        <div class="card" style="padding:12px;font-size:13px;line-height:1.5">
+        <div class="spnote">
           🪧 <b>Mốc nhận diện:</b> Cổng gỗ đầu bản, có biển "Tà Xùa".<br/>
           🛵 Gửi xe tại nhà anh Sơn cuối đường bê tông.<br/>
           👤 Guide: <b>A Của ★4.9</b> — sẽ đợi tại điểm xuất phát.
         </div>
-        <div style="font-size:12px;color:var(--text2);margin-top:10px">Khi bạn tới gần 50m, app tự thông báo và chuyển Bước 2.</div>
+        <div style="font-size:12px;color:var(--mute);margin-top:10px">Khi bạn tới gần 50m, app tự thông báo và chuyển Bước 2.</div>
       </div>
       <div class="cta"><button class="buybtn" onclick="startTrek()">✅ ĐÃ TỚI NƠI — BẮT ĐẦU ĐI CUNG (Bước 2)</button></div>
     </section>
@@ -314,7 +402,7 @@
       <div class="chd"><span class="back" onclick="closeChat()">←</span>
         <div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
         <div><div style="font-weight:700;font-size:14px">A Của — Guide Tà Xùa</div>
-        <div style="font-size:11px;color:var(--forest)">● Đang hoạt động</div></div></div>
+        <div style="font-size:11px;color:var(--sage-deep)">● Đang hoạt động</div></div></div>
       <div class="cbody">
         <div class="bub them">Chào bạn, mình là A Của — guide cung Tà Xùa 👋</div>
         <div class="bub them">Đoàn mình 6h sáng xuất phát nhé, nhớ mang áo mưa ⛈</div>
@@ -331,16 +419,40 @@
     <!-- ==== SOS sheet (docs/05 §5 — SMS + gọi, không qua server) ==== -->
     <div id="sos-back" onclick="closeSos()"></div>
     <div id="sos-sheet">
-      <h3 style="color:var(--ember);font-family:'YoungDisplay',serif;font-size:19px">🆘 Khẩn cấp</h3>
+      <h3>🆘 Khẩn cấp</h3>
       <div class="sos-pos">
-        <div style="font-size:10.5px;color:var(--text2)">VỊ TRÍ GPS CỦA BẠN — đọc khi gọi cứu hộ</div>
-        <div id="sos-coords" style="font-size:16px;font-weight:800;margin:3px 0">…</div>
+        <div class="k">Vị trí GPS của bạn — đọc khi gọi cứu hộ</div>
+        <div id="sos-coords" class="v">…</div>
       </div>
       <div class="sos-call">📞 Gọi 112 — Cứu nạn cứu hộ quốc gia</div>
       <div class="sos-call">📞 Gọi 115 — Cấp cứu y tế</div>
       <div class="sos-sms">✉️ SMS SOS cho Minh (0912•••678) — kèm toạ độ + link bản đồ</div>
       <div class="sos-share">📍 Chia sẻ vị trí (không khẩn cấp)</div>
-      <div style="font-size:10.5px;color:var(--text2);margin-top:8px">POTTER hỗ trợ liên lạc — KHÔNG thay thế dịch vụ cứu hộ. Cần sóng di động.</div>
+      <div class="sos-note">POTTER hỗ trợ liên lạc — KHÔNG thay thế dịch vụ cứu hộ. Cần sóng di động.</div>
+    </div>
+
+    <!-- ==== Sheet XÁC NHẬN MUA (docs/04 — waiver bắt buộc trước cung Khó) ==== -->
+    <div id="buy-back" onclick="closeBuy()"></div>
+    <div id="buy-sheet">
+      <h3>Xác nhận mua cung</h3>
+      <div class="buyrow"><span>Cung</span><b>Tà Xùa – Sống lưng khủng long</b></div>
+      <div class="buyrow"><span>Gói</span><b>GPX dẫn đường + Guide A Của ★4.9</b></div>
+      <div class="buyrow"><span>Độ khó</span><b style="color:var(--terra-deep)">Khó — 17.2km · +1.880m</b></div>
+      <div class="buyrow" style="border-bottom:none"><span>Thanh toán</span><b>350.000đ · VNPay/MoMo</b></div>
+      <label class="waiver"><input type="checkbox" id="waiver-ck" onchange="waiverChanged()"/>
+        <span>Tôi xác nhận đủ sức khoẻ, hiểu rủi ro trekking cung Khó và đồng ý
+        <b>Bản miễn trừ trách nhiệm</b>. POTTER là nền tảng kết nối — an toàn do tôi
+        và guide chịu trách nhiệm.</span></label>
+      <button class="confirmbtn" id="buy-confirm" disabled onclick="confirmBuy()">XÁC NHẬN &amp; THANH TOÁN 350.000đ</button>
+    </div>
+
+    <!-- ==== Sheet FAB XUẤT PHÁT — nối cung đã mua ==== -->
+    <div id="go-back" onclick="closeGo()"></div>
+    <div id="go-sheet">
+      <h3>🧭 Sẵn sàng xuất phát</h3>
+      <div class="buyrow"><span>Cung đã mua</span><b>Tà Xùa – Sống lưng khủng long</b></div>
+      <div class="buyrow" style="border-bottom:none"><span>Điểm xuất phát</span><b>Bản Tà Xùa · cách 3,2km</b></div>
+      <button class="confirmbtn" onclick="goStart()">➜ DẪN TÔI TỚI ĐIỂM XUẤT PHÁT (Bước 1)</button>
     </div>
 
     <!-- ============ TAB 3: BẢN ĐỒ ============ -->
@@ -361,25 +473,25 @@
           <div class="ft"><span>Còn lại <b id="nv-rem">—</b></span><span>ETA <b id="nv-eta">—</b></span><span>Độ cao <b id="nv-ele">—</b></span></div>
         </div>
         <div class="mapstats">
-          <div><div class="v" id="mx-km">…</div><div class="k">KM</div></div>
-          <div><div class="v" id="mx-gain">…</div><div class="k">TỔNG LEO</div></div>
-          <div><div class="v" id="mx-peak">…</div><div class="k">ĐỈNH</div></div>
-          <div><div class="v" style="color:var(--forest)">Tà Xùa</div><div class="k">GPX THẬT</div></div>
+          <div><div class="v" id="mx-km">…</div><span class="k">km</span></div>
+          <div><div class="v" id="mx-gain">…</div><span class="k">Tổng leo</span></div>
+          <div><div class="v" id="mx-peak">…</div><span class="k">Đỉnh</span></div>
+          <div><div class="v" style="color:var(--sage-deep)">Tà Xùa</div><span class="k">GPX thật</span></div>
         </div>
       </div>
     </section>
 
     <!-- ============ TAB 4: TIN NHẮN ============ -->
     <section class="screen" id="s-msg">
-      <div class="hd"><h1>Tin nhắn</h1><span class="act">＋ Nhóm</span></div>
+      <div class="hd"><div><h1>Tin nhắn</h1><div class="sub">Guide · nhóm đi cung · hỗ trợ</div></div><span class="act">＋ Nhóm</span></div>
       <div class="convs">
         <div class="conv" onclick="openChat()"><div class="avwrap"><div class="ava">AC</div><span class="online"></span></div>
           <div class="p"><div class="nm">A Của — Guide Tà Xùa</div><div class="last">Đoàn mình 6h sáng xuất phát nhé, nhớ mang áo mưa ⛈</div></div>
           <div class="meta">17:02<br/><span class="badge">2</span></div></div>
-        <div class="conv"><div class="ava" style="background:var(--mist)">PT</div>
+        <div class="conv"><div class="ava c-blue">PT</div>
           <div class="p"><div class="nm">Nhóm Putaleng 23-25/11</div><div class="last">Bạn: đã gửi GPX cung dự phòng</div></div>
           <div class="meta">Hôm qua</div></div>
-        <div class="conv"><div class="ava" style="background:var(--gold)">PO</div>
+        <div class="conv"><div class="ava c-gold">PO</div>
           <div class="p"><div class="nm">POTTER Support</div><div class="last">Hồ sơ Cấp 2 của bạn đã được duyệt 🎉</div></div>
           <div class="meta">T2</div></div>
       </div>
@@ -389,16 +501,16 @@
     <section class="screen" id="s-profile">
       <div class="cover">
         <div class="ava">NC</div><h2>Nao Chi</h2>
-        <div class="lv">● Cấp 2 — Có kinh nghiệm · được mở & bán cung</div>
+        <div class="lv">● Cấp 2 — Có kinh nghiệm · được mở &amp; bán cung</div>
         <div class="rep"><div class="bar"><div class="fill"></div></div><div class="t">Uy tín 780/1000 — còn 220 điểm tới Cấp 3</div></div>
       </div>
       <div class="pstats">
-        <div class="card"><div class="v">14</div><div class="k">CUNG</div></div>
-        <div class="card"><div class="v">168</div><div class="k">KM</div></div>
-        <div class="card"><div class="v">9.400</div><div class="k">M LEO</div></div>
-        <div class="card"><div class="v">21</div><div class="k">NGÀY</div></div>
+        <div><div class="v">14</div><span class="k">Cung</span></div>
+        <div><div class="v">168</div><span class="k">km</span></div>
+        <div><div class="v">9.400</div><span class="k">m leo</span></div>
+        <div><div class="v">21</div><span class="k">Ngày</span></div>
       </div>
-      <div class="sec" style="margin-top:4px">Cột mốc</div>
+      <div class="sec" style="margin-top:6px">Cột mốc</div>
       <div class="mile"><span class="ic">🏔</span><span><b>Nóc nhà Đông Dương</b> — Fansipan 3.143m · 10/2024</span></div>
       <div class="mile"><span class="ic">🦖</span><span><b>Sống lưng khủng long</b> — Tà Xùa · 3 lần</span></div>
       <div class="mile"><span class="ic">🧭</span><span><b>Người mở đường</b> — 2 cung được duyệt</span></div>
@@ -424,8 +536,8 @@ tabs.forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(t.dataset.s).classList.add('on');
   document.querySelectorAll('nav .tab').forEach(x=>x.classList.toggle('on',x===t));
-  closeDetail();
-  if(t.dataset.s==='s-map') initMap();
+  closeDetail();closeGo();closeBuy();
+  if(t.dataset.s==='s-map'){initMap();if(t.classList.contains('fab')&&PURCHASED&&!SUPPRESS_GO)setTimeout(openGo,300);SUPPRESS_GO=false;}
 });
 function openDetail(){document.getElementById('detail').classList.add('on');loadWeather();}
 function closeDetail(){document.getElementById('detail').classList.remove('on');}
@@ -463,11 +575,11 @@ async function loadWeather(){
     const caution=!danger&&j.daily.precipitation_probability_max.slice(0,3).some(p=>p>70);
     el.innerHTML=`
       <div class="now"><span class="e">${cw[0]}</span><span class="t">${Math.round(j.current.temperature_2m)}°</span>
-        <span style="font-size:13px"><b>${cw[1]}</b><br/><span style="color:var(--text2)">gió ${Math.round(j.current.wind_speed_10m)} km/h · độ cao ~${Math.round(j.elevation)}m</span></span></div>
+        <span style="font-size:13px"><b>${cw[1]}</b><br/><span style="color:var(--mute)">gió ${Math.round(j.current.wind_speed_10m)} km/h · độ cao ~${Math.round(j.elevation)}m</span></span></div>
       <div class="days">${j.daily.time.map((d,i)=>`<div class="d">${d.slice(8)}/${d.slice(5,7)}<br/>${wmo(j.daily.weather_code[i])[0]}<br/><b>${Math.round(j.daily.temperature_2m_min[i])}–${Math.round(j.daily.temperature_2m_max[i])}°</b><br/>💧${j.daily.precipitation_probability_max[i]??0}%</div>`).join('')}</div>
       <div class="safety ${danger?'danger':caution?'warn':''}">${danger?'⛔ Mưa lớn/giông 3 ngày tới — KHÔNG nên đi cung':caution?'⚠️ Khả năng mưa cao — chuẩn bị áo mưa, cân nhắc lùi lịch':'✅ Thời tiết 3 ngày tới thuận lợi cho trekking'}</div>`;
     wxLoaded=true;
-  }catch(e){el.innerHTML='<div class="now"><span style="font-size:13px;color:var(--text2);padding:4px">Không lấy được thời tiết (cần internet)</span></div>';}
+  }catch(e){el.innerHTML='<div class="now"><span style="font-size:13px;color:var(--mute);padding:4px">Không lấy được thời tiết (cần internet)</span></div>';}
 }
 
 // ===== Map THẬT (MapLibre + track nhúng) =====
@@ -480,11 +592,11 @@ function addTrack(){
   if(map.getSource('t'))return;
   map.addSource('t',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:TAXUA.map(p=>[p[0],p[1]])}}});
   map.addLayer({id:'t-c',type:'line',source:'t',paint:{'line-color':'#fff','line-width':8},layout:{'line-cap':'round','line-join':'round'}});
-  map.addLayer({id:'t-l',type:'line',source:'t',paint:{'line-color':'#2F5233','line-width':4.5},layout:{'line-cap':'round','line-join':'round'}});
+  map.addLayer({id:'t-l',type:'line',source:'t',paint:{'line-color':'#121315','line-width':4.5},layout:{'line-cap':'round','line-join':'round'}});
   map.addSource('e',{type:'geojson',data:{type:'FeatureCollection',features:[
-    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[0][0],TAXUA[0][1]]},properties:{c:'#2F5233'}},
-    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA.at(-1)[0],TAXUA.at(-1)[1]]},properties:{c:'#FF5233'}}]}});
-  map.addLayer({id:'e-c',type:'circle',source:'e',paint:{'circle-radius':7,'circle-color':['get','c'],'circle-stroke-width':2.5,'circle-stroke-color':'#fff'}});
+    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[0][0],TAXUA[0][1]]},properties:{c:'#C9E265'}},
+    {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA.at(-1)[0],TAXUA.at(-1)[1]]},properties:{c:'#B0765A'}}]}});
+  map.addLayer({id:'e-c',type:'circle',source:'e',paint:{'circle-radius':7,'circle-color':['get','c'],'circle-stroke-width':2.5,'circle-stroke-color':'#121315'}});
 }
 function initMap(){
   if(map)return;
@@ -502,6 +614,15 @@ function fitTrack(){
 }
 
 // ===== BƯỚC 1: Điểm xuất phát =====
+// ==== Trạng thái mua (preview) — app thật lưu server (purchases) ====
+let PURCHASED=false;let SUPPRESS_GO=false;
+function openBuy(){document.getElementById('buy-back').classList.add('on');document.getElementById('buy-sheet').classList.add('on');}
+function closeBuy(){document.getElementById('buy-back').classList.remove('on');document.getElementById('buy-sheet').classList.remove('on');}
+function waiverChanged(){document.getElementById('buy-confirm').disabled=!document.getElementById('waiver-ck').checked;}
+function confirmBuy(){PURCHASED=true;closeBuy();openStart();}
+function openGo(){document.getElementById('go-back').classList.add('on');document.getElementById('go-sheet').classList.add('on');}
+function closeGo(){document.getElementById('go-back').classList.remove('on');document.getElementById('go-sheet').classList.remove('on');}
+function goStart(){closeGo();openStart();}
 function openStart(){document.getElementById('startpoint').classList.add('on');}
 function closeStart(){document.getElementById('startpoint').classList.remove('on');}
 
@@ -517,6 +638,7 @@ const TURNS=[];{let last=0;
 let navTimer=null,navIdx=0;
 function fmt(m){return m>=1000?(m/1000).toFixed(1)+' km':Math.round(m/10)*10+' m';}
 function startTrek(){
+  SUPPRESS_GO=true;
   closeStart();closeDetail();
   document.querySelector('nav .fab').click(); // sang tab map
   document.getElementById('navcard').classList.add('on');
