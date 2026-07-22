@@ -35,7 +35,7 @@
 | Code theo module | ✅ | — | app: screens/components/lib/theme; server: module NestJS |
 | Không hard-code key | ✅ | 0 | `.env.example` cả 2 phía |
 
-## 3. Backend (GĐ2 — đang dựng)
+## 3. Backend (GĐ2 — ✅ scaffold xong 2026-07-22, commit `43f1506`; typecheck 0 lỗi, parser verify với GPX thật)
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | REST API rõ ràng | 🟡 | NestJS theo api-contract + Swagger |
