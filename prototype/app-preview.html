@@ -8,6 +8,7 @@
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="taxua-track.js"></script>
 <script src="taxua-dem.js"></script>
+<script src="brand/icons.js"></script>
 <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
 <style>
   /* ============================================================
@@ -231,17 +232,73 @@
   .rep-thumb{width:34px;height:34px;border-radius:8px;border:2px solid #fff;object-fit:cover;
     box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
   /* ===== Núi 3D Core Map (contour isometric brand, mesh xoay 360°) ===== */
-  #mount3d{position:absolute;inset:0;background:#0e1712;display:none;z-index:12;flex-direction:column}
+  #mount3d{position:absolute;inset:0;background:#0e1712;display:none;z-index:12;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+  #mount3d::-webkit-scrollbar{display:none}
   #mount3d.on{display:flex}
   .m3-head{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-shrink:0}
-  .m3-head .back{background:rgba(234,241,228,.12);border-color:transparent;color:#EAF1E4}
-  .m3-head h2{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:18px}
-  .m3-head .sub{font-size:11px;color:#8FA07F}
-  #m3-canvas{flex:1;touch-action:none;cursor:grab}
-  .m3-stats{display:flex;gap:0;padding:10px 14px 14px;flex-shrink:0}
+  .m3-head .back{background:rgba(234,241,228,.12);border-color:transparent;color:#EAF1E4;flex-shrink:0}
+  .m3-tabs{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
+  .m3-tabs .t1{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:17px;white-space:nowrap}
+  .m3-tabs .sep{color:#3E5245}
+  .m3-tabs .t2{font-size:12.5px;color:#8FA07F;white-space:nowrap}
+  .m3-go{background:#C9E265;color:#182200;border-radius:999px;padding:7px 13px;font-size:11.5px;
+    font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
+  #m3-wrap{position:relative;height:46%;min-height:300px;flex-shrink:0}
+  #m3-canvas{width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+  #m3guide{position:absolute;left:10px;right:10px;top:8px;display:none;padding:9px 6px 7px;
+    border-radius:14px;background:rgba(14,23,18,.72);backdrop-filter:blur(6px);text-align:center;color:#EAF1E4}
+  #m3guide.on{display:block}
+  #m3guide .row{display:flex}
+  #m3guide .c{flex:1}
+  #m3guide .n{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+  #m3guide .u{font-size:9px;color:#8FA07F;letter-spacing:.6px;text-transform:uppercase}
+  .m3-stats{display:flex;gap:0;padding:10px 14px 6px;flex-shrink:0}
   .m3-stats>div{flex:1;text-align:center}
   .m3-stats .k{color:#8FA07F}
   .m3-stats .v{color:#EAF1E4}
+  .clog{padding:4px 14px 26px}
+  .clog-head{display:flex;align-items:baseline;gap:10px;margin:10px 0 12px}
+  .clog-head .t1{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:16px}
+  .clog-head .t2{font-size:12px;color:#8FA07F}
+  .clog-item{display:flex;gap:12px;margin-bottom:4px}
+  .clog-rail{display:flex;flex-direction:column;align-items:center;width:26px;flex-shrink:0}
+  .clog-rail svg{width:24px;height:24px;flex-shrink:0}
+  .clog-rail .bar{width:1px;flex:1;background:#2A3A2F;margin:4px 0 2px}
+  .clog-body{flex:1;padding-bottom:14px;min-width:0}
+  .clog-body .ti{color:#EAF1E4;font-size:13.5px;font-weight:700}
+  .clog-body .tm{color:#8FA07F;font-size:11px;margin-top:2px;font-variant-numeric:tabular-nums}
+  .clog-card{background:#15221A;border:1px solid #24331F;border-radius:14px;padding:11px 13px;margin-top:8px;
+    display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:11.5px}
+  .clog-card .ck{color:#8FA07F}
+  .clog-card .cv{color:#EAF1E4;font-weight:600;font-variant-numeric:tabular-nums}
+  .clog-card .cv.ok{color:#C9E265}
+  .avars{display:flex;margin-top:3px}
+  .avars span{width:20px;height:20px;border-radius:50%;background:#C9E265;color:#182200;font-size:9px;
+    font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #15221A;margin-left:-5px}
+  .avars span:first-child{margin-left:0}
+  #cpmodal{position:absolute;inset:0;z-index:16;display:none;align-items:center;justify-content:center;
+    background:rgba(14,18,14,.6)}
+  #cpmodal.on{display:flex}
+  .cpbox{width:270px;background:var(--ground);border-radius:18px;overflow:hidden}
+  .cpbox img{width:100%;height:140px;object-fit:cover;display:block}
+  .cpbox .b{padding:12px 14px}
+  .cpbox .h{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13.5px}
+  .cpbox .h svg{width:22px;height:22px}
+  .cpbox .d{font-size:11.5px;color:var(--mute);margin-top:4px;line-height:1.45}
+  .cpshot{display:block;width:100%;background:var(--go);border:none;border-radius:11px;padding:11px;
+    font-weight:800;font-size:12.5px;color:var(--go-ink);cursor:pointer;margin-top:10px}
+  .cpskip{display:block;width:100%;text-align:center;font-size:11.5px;color:var(--mute);padding:8px;cursor:pointer}
+  #finsheet{position:absolute;left:0;right:0;bottom:-110%;background:var(--ground);z-index:15;
+    border-radius:22px 22px 0 0;padding:16px 16px 24px;transition:bottom .3s;max-height:78%;overflow-y:auto}
+  #finsheet.on{bottom:0}
+  #finsheet h3{font-family:'YoungDisplay',serif;font-size:19px;margin-bottom:4px}
+  .fin-cert{display:inline-flex;align-items:center;gap:6px;background:var(--go);color:var(--go-ink);
+    border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800;margin:6px 0 10px}
+  .fin-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--hairline);font-size:12.5px}
+  .fin-row svg{width:22px;height:22px;flex-shrink:0}
+  .fin-row .nm{flex:1}
+  .fin-row .st{font-weight:700}
+  .fin-row .st.ok{color:var(--sage-deep)} .fin-row .st.skip{color:var(--mute)}
   .m3-note{text-align:center;font-size:10.5px;color:#8FA07F;padding-bottom:10px}
   /* ===== Overlay chung (StartPoint, Chat) ===== */
   .ovl{position:absolute;inset:0;background:var(--ground);display:none;flex-direction:column;z-index:11;overflow-y:auto;scrollbar-width:none}
@@ -456,17 +513,59 @@
     <section id="mount3d">
       <div class="m3-head">
         <span class="back" onclick="close3D()">←</span>
-        <div><h2>Núi 3D · Tà Xùa</h2>
-        <div class="sub">DEM thật 96×96 (terrarium z13) · kéo xoay · lăn chuột thu phóng</div></div>
+        <div class="m3-tabs"><span class="t1">Route covered</span><span class="sep">|</span><span class="t2">Tà Xùa · DEM thật</span></div>
+        <span class="m3-go" id="m3-gobtn" onclick="toggleGuide3D()">▶ ĐI THỬ</span>
       </div>
-      <canvas id="m3-canvas"></canvas>
+      <div id="m3-wrap">
+        <canvas id="m3-canvas"></canvas>
+        <div id="m3guide">
+          <div class="row">
+            <div class="c"><div class="n" id="g3-km">0,00</div><div class="u">km</div></div>
+            <div class="c"><div class="n" id="g3-ele">—</div><div class="u">độ cao m</div></div>
+            <div class="c"><div class="n" id="g3-gain">0</div><div class="u">m leo</div></div>
+            <div class="c"><div class="n" id="g3-eta">0:00</div><div class="u">giờ (ước)</div></div>
+          </div>
+        </div>
+      </div>
       <div class="m3-stats">
         <div><div class="k">ĐỈNH</div><div class="v">2.871 m</div></div>
         <div><div class="k">CHÂN NÚI</div><div class="v">818 m</div></div>
         <div><div class="k">VÙNG</div><div class="v">~10 km</div></div>
         <div><div class="k">TRACK</div><div class="v">17,2 km</div></div>
       </div>
-      <div class="m3-note">Đường bình độ mỗi 60m — sáng dần theo độ cao (phong cách Route covered)</div>
+      <!-- Climbing log: dữ liệu theo schema đơn mua thật (preview mock đúng cấu trúc) -->
+      <div class="clog">
+        <div class="clog-head"><span class="t1">Climbing log</span><span class="t2">Tà Xùa · 24.11</span></div>
+        <div class="clog-item">
+          <div class="clog-rail"><svg><use href="#pin-s"/></svg><div class="bar"></div></div>
+          <div class="clog-body">
+            <div class="ti">Bắt đầu leo</div><div class="tm">24.11 · 07:34</div>
+            <div class="avars"><span>NC</span><span>AC</span><span>TL</span><span>HP</span><span>+2</span></div>
+            <div class="clog-card">
+              <div><div class="ck">Nhóm</div><div class="cv">6 người · xem danh sách</div></div>
+              <div><div class="ck">Guide</div><div class="cv">A Của ★ 4.9</div></div>
+              <div><div class="ck">Mã hồ sơ</div><div class="cv">PT-C2-0847</div></div>
+              <div><div class="ck">Trạng thái</div><div class="cv ok">Waiver đã ký ✓✓</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="clog-item">
+          <div class="clog-rail"><svg><use href="#pin-camp"/></svg><div class="bar"></div></div>
+          <div class="clog-body"><div class="ti">Trại 1 — rừng trúc</div><div class="tm">24.11 · 12:10 · 1.612 m</div></div>
+        </div>
+        <div class="clog-item">
+          <div class="clog-rail"><svg><use href="#pin-check"/></svg><div class="bar"></div></div>
+          <div class="clog-body"><div class="ti">Checkpoint sống lưng — đã xác minh</div><div class="tm">24.11 · 14:22 · ảnh khớp GPS 18 m</div></div>
+        </div>
+        <div class="clog-item">
+          <div class="clog-rail"><svg><use href="#pin-summit"/></svg><div class="bar"></div></div>
+          <div class="clog-body"><div class="ti">Đỉnh Tà Xùa</div><div class="tm">24.11 · 16:05 · 2.865 m</div></div>
+        </div>
+        <div class="clog-item">
+          <div class="clog-rail"><svg><use href="#pin-f"/></svg></div>
+          <div class="clog-body"><div class="ti">Kết thúc</div><div class="tm">24.11 · 17:48 · 17,2 km · +1.880 m</div></div>
+        </div>
+      </div>
     </section>
 
     <!-- ==== SOS sheet (docs/05 §5 — SMS + gọi, không qua server) ==== -->
@@ -513,7 +612,7 @@
       <div id="mapscreen" style="position:absolute;inset:0">
         <div id="map"></div>
         <div id="repbar">
-          <div class="logo">◆ POTTER · XEM LẠI HÀNH TRÌNH</div>
+          <div class="logo">◆ POTTER · DẪN ĐƯỜNG THEO CUNG</div>
           <div class="row">
             <div class="c"><div class="ic">🥾</div><div class="n" id="rp-km">0.00</div><div class="u">km</div></div>
             <div class="c"><div class="ic">⛰</div><div class="n" id="rp-ele">—</div><div class="u">m</div></div>
@@ -523,13 +622,27 @@
         </div>
         <span id="repx" onclick="stopReplay()">✕</span>
         <div id="repphoto"><img id="repphoto-img" src="photos/yt-a.jpg" alt=""/></div>
+        <div id="cpmodal">
+          <div class="cpbox">
+            <img id="cp-img" src="photos/yt-a.jpg" alt="Ảnh mẫu checkpoint"/>
+            <div class="b">
+              <div class="h"><svg><use href="#pin-check"/></svg><span id="cp-title">Checkpoint 1</span></div>
+              <div class="d">Ảnh mẫu của người tạo cung. Chụp ảnh tại đây để xác minh — toạ độ GPS phải khớp đường đi ≤ 50 m (docs/08).</div>
+              <button class="cpshot" onclick="cpShoot()">📷 CHỤP ẢNH XÁC MINH</button>
+              <span class="cpskip" onclick="cpSkip()">Bỏ qua (giảm mức xác minh)</span>
+            </div>
+          </div>
+        </div>
+        <div id="finsheet" onclick="this.classList.remove('on')">
+          <h3>Hoàn thành cung</h3>
+          <span class="fin-cert" id="fin-cert">CERTIFIED · đủ xác minh</span>
+          <div id="fin-rows"></div>
+        </div>
         <div class="maptools">
-          <span class="mtool on" data-b="clean" onclick="setBase(this)">🗺</span>
-          <span class="mtool" data-b="topo" onclick="setBase(this)">⛰</span>
-          <span class="mtool" data-b="sat" onclick="setBase(this)">🛰</span>
-          <span class="mtool" onclick="fitTrack()">🎯</span>
-          <span class="mtool" onclick="open3D()">🗻</span>
-          <span class="mtool" onclick="startReplay()">▶</span>
+          <span class="mtool" id="mt-guide" style="font-size:10px;font-weight:800" onclick="toggleGuideMode()">DẪN</span>
+          <span class="mtool" id="mt-sat" style="font-size:10px;font-weight:800" onclick="toggleSat()">VT</span>
+          <span class="mtool" style="font-size:10px;font-weight:800" onclick="open3D()">NÚI</span>
+          <span class="mtool" onclick="fitTrack()">◎</span>
         </div>
         <span class="sos" onclick="openSos()">SOS</span>
         <div id="navcard">
@@ -666,13 +779,22 @@ function addTrack(){
 }
 function initMap(){
   if(map)return;
-  map=new maplibregl.Map({container:'map',style:BASES.clean,center:[TAXUA[0][0],TAXUA[0][1]],zoom:12,attributionControl:{compact:true}});
+  map=new maplibregl.Map({container:'map',style:BASES.topo,center:[TAXUA[0][0],TAXUA[0][1]],zoom:12,attributionControl:{compact:true}});
   map.on('load',()=>{addTrack();fitTrack();});
   map.on('style.load',addTrack);
 }
-function setBase(el){
-  document.querySelectorAll('.mtool[data-b]').forEach(x=>x.classList.toggle('on',x===el));
-  if(map)map.setStyle(BASES[el.dataset.b]);
+// ===== 3 CHẾ ĐỘ MAP (docs/09 §7): M1 DẪN ĐƯỜNG · M2 VỆ TINH · M3 NÚI 3D =====
+let SAT=false;
+function applyBaseStyle(){
+  if(!map)return;
+  map.setStyle(SAT?BASES.sat:BASES.topo);
+  const b=document.getElementById('mt-sat');if(b)b.classList.toggle('on',SAT);
+}
+function toggleSat(){SAT=!SAT;if(!map)initMap();applyBaseStyle();}
+function toggleGuideMode(){
+  const b=document.getElementById('mt-guide');
+  if(REP.active){stopReplay(false);if(b)b.classList.remove('on');}
+  else{startReplay();if(b)b.classList.add('on');}
 }
 function fitTrack(){
   if(!map)return;const b=new maplibregl.LngLatBounds();
@@ -797,9 +919,8 @@ function startReplay(){
   if(REP.active)return;
   if(!map){initMap();setTimeout(startReplay,700);return;}
   REP.active=true;REP.idx=0;repShownPhoto=-1;
-  // Nền topo như COROS (vân địa hình + bình độ) — style đổi xong sẽ tự re-add qua addTrack
-  const topoBtn=document.querySelector('.mtool[data-b="topo"]');
-  if(topoBtn&&!topoBtn.classList.contains('on'))setBase(topoBtn);
+  // M1 chạy trên nền hiện tại (topo mặc định; M2 vệ tinh vẫn dẫn được — docs/09 §7)
+  CP_STATE={asked:new Set(),res:{}};
   document.getElementById('repbar').classList.add('on');
   document.getElementById('repx').classList.add('on');
   stopNav();closeGo();closeBuy();
@@ -829,14 +950,10 @@ function repTick(){
   document.getElementById('rp-gain').textContent=Math.round(REP.gain[i]);
   const mins=(CUM[i]/4000)*60+(REP.gain[i]/600)*60;
   document.getElementById('rp-eta').textContent=Math.floor(mins/60)+':'+String(Math.round(mins%60)).padStart(2,'0');
-  // Ảnh phóng to khi đi qua điểm chụp
+  // Tới checkpoint (≤2 index ~ <100m demo) -> modal chụp ảnh xác minh, tạm dừng dẫn
   REP_PHOTOS.forEach(([pi,src],k)=>{
-    if(Math.abs(i-pi)<=2&&repShownPhoto!==k){
-      repShownPhoto=k;
-      const ph=document.getElementById('repphoto');
-      document.getElementById('repphoto-img').src=src;
-      ph.classList.add('on');
-      setTimeout(()=>ph.classList.remove('on'),1600);
+    if(Math.abs(i-pi)<=2&&!CP_STATE.asked.has(k)){
+      CP_STATE.asked.add(k);openCp(k,src);
     }
   });
   REP.idx=i+2;
@@ -847,10 +964,46 @@ function stopReplay(finished){
   document.getElementById('repx').classList.remove('on');
   document.getElementById('repphoto').classList.remove('on');
   repMarkers.forEach(m=>m.remove());repMarkers=[];
+  const gb=document.getElementById('mt-guide');if(gb)gb.classList.remove('on');
+  document.getElementById('cpmodal').classList.remove('on');
   if(map){
-    if(finished){map.easeTo({pitch:40,duration:900});setTimeout(fitTrack,1000);}
+    if(finished){map.easeTo({pitch:40,duration:900});setTimeout(fitTrack,1000);buildFinish();}
     else{try{map.setTerrain(null);}catch(e){}map.easeTo({pitch:0,duration:600});fitTrack();}
   }
+}
+
+// ===== CHECKPOINT XÁC MINH (docs/08 A2 P2_CHECKPOINT — demo preview) =====
+let CP_STATE={asked:new Set(),res:{}},cpCur=-1;
+function openCp(k,src){
+  cpCur=k;
+  if(REP.timer){clearInterval(REP.timer);REP.timer=null;} // tạm dừng dẫn khi hỏi
+  document.getElementById('cp-img').src=src;
+  document.getElementById('cp-title').textContent='Checkpoint '+(k+1)+' / 6';
+  document.getElementById('cpmodal').classList.add('on');
+}
+function cpClose(resume){
+  document.getElementById('cpmodal').classList.remove('on');
+  if(resume&&REP.active&&!REP.timer)REP.timer=setInterval(repTick,240);
+}
+function cpShoot(){CP_STATE.res[cpCur]='ok';cpClose(true);}
+function cpSkip(){CP_STATE.res[cpCur]='skip';cpClose(true);}
+function buildFinish(){
+  const rows=document.getElementById('fin-rows');let ok=0;
+  let html='';
+  for(let k=0;k<REP_PHOTOS.length;k++){
+    const r=CP_STATE.res[k];if(r==='ok')ok++;
+    html+='<div class="fin-row"><svg><use href="#'+(r==='ok'?'pin-check':'pin-photo')+'"/></svg>'
+      +'<span class="nm">Checkpoint '+(k+1)+'</span>'
+      +'<span class="st '+(r==='ok'?'ok':'skip')+'">'+(r==='ok'?'Đã xác minh ≤50 m':'Bỏ qua')+'</span></div>';
+  }
+  rows.innerHTML=html;
+  // verify_score docs/08 C3 (demo: mốc km + liên tục coi như đạt)
+  const score=0.6*(ok/REP_PHOTOS.length)+0.4;
+  const cert=document.getElementById('fin-cert');
+  cert.textContent=score>=0.7?('CERTIFIED · điểm xác minh '+score.toFixed(2)):('Chưa đủ xác minh · '+score.toFixed(2));
+  cert.style.background=score>=0.7?'var(--go)':'var(--gold-bg)';
+  cert.style.color=score>=0.7?'var(--go-ink)':'var(--gold-deep)';
+  setTimeout(()=>document.getElementById('finsheet').classList.add('on'),1100);
 }
 
 // ===== NÚI 3D CORE MAP — mesh DEM THẬT + bình độ brand, xoay 360° (three.js) =====
@@ -928,19 +1081,51 @@ function init3D(){
   track.computeLineDistances();M3.scene.add(track);
   const tg2=tg.clone();tg2.translate(0,.0025,0);
   const track2=new THREE.Line(tg2,trackMat);track2.computeLineDistances();M3.scene.add(track2);
-  // --- Pin đầu/đỉnh/cuối (cột + cầu màu) ---
+  // --- Pin ICON BRAND (icons.js — như ảnh mẫu: 2 trại, 2 cảnh báo, checkpoint, S/F, đỉnh) ---
   let pk=0,mx=-1e9;TAXUA.forEach((p,i)=>{if(p[2]!=null&&p[2]>mx){mx=p[2];pk=i;}});
-  [[0,0x7FB069],[pk,0xE8C877],[TAXUA.length-1,0xFF5233]].forEach(([idx,c])=>{
-    const v=tp[Math.min(idx,tp.length-1)];
-    const lg=new THREE.BufferGeometry().setFromPoints([v,new THREE.Vector3(v.x,v.y+.09,v.z)]);
-    M3.scene.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.5})));
-    const s=new THREE.Mesh(new THREE.SphereGeometry(.02,12,12),new THREE.MeshBasicMaterial({color:c}));
-    s.position.set(v.x,v.y+.1,v.z);M3.scene.add(s);
+  const PINS=[
+    {i:0,ic:'pin-s'},{i:55,ic:'pin-camp'},{i:105,ic:'pin-warn'},{i:150,ic:'pin-check'},
+    {i:200,ic:'pin-camp'},{i:238,ic:'pin-warn'},{i:pk,ic:'pin-summit'},{i:TAXUA.length-1,ic:'pin-f'}];
+  PINS.forEach(({i,ic})=>{
+    const v=tp[Math.min(i,tp.length-1)];
+    // thân pin mảnh + chấm chân (đúng ảnh mẫu)
+    const lg=new THREE.BufferGeometry().setFromPoints([v,new THREE.Vector3(v.x,v.y+.1,v.z)]);
+    M3.scene.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xEAF1E4,transparent:true,opacity:.45})));
+    const base=new THREE.Mesh(new THREE.SphereGeometry(.007,8,8),new THREE.MeshBasicMaterial({color:0x8FA07F}));
+    base.position.copy(v);M3.scene.add(base);
+    // đầu pin = sprite icon SVG brand (raster 128px)
+    const sym=document.getElementById(ic);
+    if(sym){
+      const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+sym.getAttribute('viewBox')+'" width="128" height="128">'+sym.innerHTML+'</svg>';
+      const url='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));
+      new THREE.TextureLoader().load(url,tex=>{
+        const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
+        sp.scale.set(.088,.088,1);sp.position.set(v.x,v.y+.145,v.z);M3.scene.add(sp);
+      });
+    }
   });
+  // --- Dẫn đường trong Núi 3D: line tiến trình Lime (setDrawRange) + chấm vị trí ---
+  const pg=new THREE.BufferGeometry().setFromPoints(tp);
+  M3.progLine=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xC9E265}));
+  M3.progLine.geometry.setDrawRange(0,0);
+  const pg2=pg.clone();pg2.translate(0,.003,0);
+  M3.progLine2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xC9E265}));
+  M3.progLine2.geometry.setDrawRange(0,0);
+  M3.scene.add(M3.progLine);M3.scene.add(M3.progLine2);
+  M3.dot=new THREE.Mesh(new THREE.SphereGeometry(.016,12,12),new THREE.MeshBasicMaterial({color:0xC9E265}));
+  M3.dot.visible=false;M3.scene.add(M3.dot);
+  M3.tp=tp;
   // --- Vòng la bàn + nhãn N/E/S/W (sprite canvas) ---
   const ring=[];for(let k=0;k<=96;k++){const a=k/96*Math.PI*2;ring.push(new THREE.Vector3(Math.cos(a)*1.12,0,Math.sin(a)*1.12));}
   M3.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ring),
     new THREE.LineBasicMaterial({color:0x8FA07F,transparent:true,opacity:.4})));
+  // vạch tick quanh chu vi (72 vạch — như mặt la bàn ảnh mẫu)
+  const tickPts=[];
+  for(let k=0;k<72;k++){const a=k/72*Math.PI*2,r1=1.13,r2=(k%6===0)?1.185:1.16;
+    tickPts.push(new THREE.Vector3(Math.cos(a)*r1,0,Math.sin(a)*r1),
+                 new THREE.Vector3(Math.cos(a)*r2,0,Math.sin(a)*r2));}
+  M3.scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPts),
+    new THREE.LineBasicMaterial({color:0x8FA07F,transparent:true,opacity:.5})));
   [['N',0,-1.24],['E',1.24,0],['S',0,1.24],['W',-1.24,0]].forEach(([t,x,z])=>{
     const c2=document.createElement('canvas');c2.width=c2.height=64;const g2=c2.getContext('2d');
     g2.fillStyle='rgba(234,241,228,.85)';g2.font='bold 40px Segoe UI';g2.textAlign='center';g2.textBaseline='middle';g2.fillText(t,32,34);
@@ -966,6 +1151,35 @@ function init3D(){
   cv.addEventListener('wheel',e=>{e.preventDefault();M3.dist=Math.min(4.5,Math.max(.65,M3.dist+e.deltaY*.0015));},{passive:false});
   cv.addEventListener('dblclick',()=>{M3.dist=M3.dist>1.4?.85:2.7;});
   resize3D();
+}
+// ===== ĐI THỬ trong Núi 3D — guidance COROS trên mesh (số liệu thật CUM/gain) =====
+let M3G={on:false,idx:0,timer:null};
+function toggleGuide3D(){
+  if(!M3.inited){open3D();setTimeout(toggleGuide3D,900);return;}
+  const btn=document.getElementById('m3-gobtn'),bar=document.getElementById('m3guide');
+  if(M3G.on){
+    clearInterval(M3G.timer);M3G={on:false,idx:0,timer:null};
+    btn.textContent='▶ ĐI THỬ';bar.classList.remove('on');
+    if(M3.progLine){M3.progLine.geometry.setDrawRange(0,0);M3.progLine2.geometry.setDrawRange(0,0);}
+    if(M3.dot)M3.dot.visible=false;
+    return;
+  }
+  M3G={on:true,idx:0,timer:setInterval(g3Tick,200)};
+  btn.textContent='⏸ DỪNG';bar.classList.add('on');
+  if(M3.dot)M3.dot.visible=true;
+}
+function g3Tick(){
+  const i=Math.min(M3G.idx,M3.tp.length-1);
+  M3.progLine.geometry.setDrawRange(0,i+1);
+  M3.progLine2.geometry.setDrawRange(0,i+1);
+  M3.dot.position.copy(M3.tp[i]);
+  document.getElementById('g3-km').textContent=(CUM[i]/1000).toFixed(2).replace('.',',');
+  document.getElementById('g3-ele').textContent=TAXUA[i][2]!=null?Math.round(TAXUA[i][2]):'—';
+  document.getElementById('g3-gain').textContent=Math.round(REP.gain[i]);
+  const mins=(CUM[i]/4000)*60+(REP.gain[i]/600)*60;
+  document.getElementById('g3-eta').textContent=Math.floor(mins/60)+':'+String(Math.round(mins%60)).padStart(2,'0');
+  if(M3G.idx>=M3.tp.length-1){clearInterval(M3G.timer);document.getElementById('m3-gobtn').textContent='↻ ĐI LẠI';M3G.on=false;return;}
+  M3G.idx+=2;
 }
 function loop3D(){
   if(!M3.drag)M3.az+=.0012; // tự xoay chậm khi không kéo

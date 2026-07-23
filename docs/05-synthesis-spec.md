@@ -72,6 +72,16 @@ Thang uy tín 0–1000; ma trận phân quyền; enforce trong-app + waiver là 
 3. **Mô hình giá:** hướng Premium thuê bao + hoa hồng marketplace — mức giá & % ra sao?
 4. **Bước kế tiếp:** sau khi chốt, khởi động **agent Code** (dựng khung dự án thật) + **agent Kiểm-tra-chéo**?
 
+### ✅ QUYẾT ĐỊNH ĐÃ CHỐT (2026-07-22 — map hướng dẫn & checkpoint, docs/08+09)
+7. **Map = HƯỚNG DẪN ĐI, không phải record.** 3 chế độ duy nhất: M1 Dẫn đường 3D kiểu COROS
+   · M2 Vệ tinh · M3 Núi 3D (Core Map). Bỏ nền Sạch và replay-record.
+8. **Checkpoint 2 loại:** ảnh người tạo cung chụp giữa đường (chính) + mốc km tự động 2km.
+9. **Ảnh checkpoint = xác minh hoàn thành:** GPS khớp ≤50m (trần 80m theo accuracy), 5 bước
+   validate chống spoof; verify_score ≥0.7 = CERTIFIED (cột mốc + uy tín docs/04).
+10. **Climbing log** dưới Núi 3D lấy từ đơn mua thật (nhóm/guide/mã hồ sơ/waiver/timeline).
+11. **Icon:** theo Porter Brand Guidelines "Bảng icon UI" — outline 24px stroke 1.6; bộ tự tạo
+    prototype/brand/icons.js (kit gốc không kèm file icon).
+
 ### ✅ QUYẾT ĐỊNH ĐÃ CHỐT (2026-07-22 — bổ sung GĐ3)
 5. **SOS:** cơ chế **SMS + gọi số khẩn cấp (112/115), KHÔNG qua server** — chạy được khi
    chỉ có sóng thoại; app không hứa hẹn cứu hộ → giảm rủi ro trách nhiệm (docs/04).
