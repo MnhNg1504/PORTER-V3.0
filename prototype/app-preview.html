@@ -238,6 +238,8 @@
   .m3-go{background:#C9E265;color:#182200;border-radius:999px;padding:7px 13px;font-size:11.5px;
     font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
   #m3-wrap{position:relative;height:46%;min-height:300px;flex-shrink:0}
+  #m3-coord{position:absolute;right:12px;top:10px;background:#121315;color:#EAF1E4;border-radius:999px;
+    padding:5px 11px;font-size:10px;letter-spacing:.8px;font-variant-numeric:tabular-nums}
   #m3-canvas{width:100%;height:100%;touch-action:none;cursor:grab;display:block}
   #m3guide{position:absolute;left:10px;right:10px;top:8px;display:none;padding:9px 6px 7px;
     border-radius:14px;background:rgba(255,255,255,.85);border:1px solid var(--line);backdrop-filter:blur(6px);text-align:center;color:#121315}
@@ -310,6 +312,17 @@
   .sphoto-cap .k{color:rgba(242,243,241,.75)}
   .sphoto-cap b{font-size:14px;font-weight:700;display:block;margin-top:3px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
   .stitle{font-family:'YoungDisplay',serif;font-size:21px;margin-bottom:2px}
+  .sprow{display:flex;align-items:flex-start;gap:9px}
+  .spi{width:19px;height:19px;color:var(--ink);flex-shrink:0}
+  .spnote .sprow{margin-bottom:8px}
+  .spnote .sprow:last-child{margin-bottom:0}
+  #sp-bar{height:5px;border-radius:3px;background:var(--badge);margin:10px 0 2px;overflow:hidden;display:none}
+  #sp-bar.on{display:block}
+  #sp-fill{height:100%;width:0%;background:var(--go);transition:width .3s}
+  #sp-arrive-back{position:absolute;inset:0;background:rgba(18,19,21,.5);z-index:14;display:none}
+  #sp-arrive{position:absolute;left:0;right:0;bottom:-110%;background:var(--ground);z-index:15;
+    border-radius:22px 22px 0 0;padding:18px 16px 24px;transition:bottom .3s}
+  #sp-arrive.on{bottom:0} #sp-arrive-back.on{display:block}
   .spdist{display:flex;justify-content:space-between;align-items:center;background:var(--go);color:var(--go-ink);
     border-radius:14px;padding:12px 14px;font-size:13px;margin:12px 0;font-weight:600;font-variant-numeric:tabular-nums}
   .spdist b{font-weight:800}
@@ -480,19 +493,42 @@
       <div class="sphoto">
         <span class="back" onclick="closeStart()">←</span>
         <img src="photos/yty-2.jpg" alt="Ảnh thực địa điểm xuất phát — đường đất đầu bản Tà Xùa"/>
-        <div class="sphoto-cap"><span class="k">📷 Ảnh thực địa thật</span><b>Cổng đầu bản, đường đất — biển "Tà Xùa"</b></div>
+        <div class="sphoto-cap"><span class="k">Ảnh thực địa thật</span><b>Cổng đầu bản, đường đất — biển "Tà Xùa"</b></div>
       </div>
       <div style="padding:14px 16px">
         <h2 class="stitle">Bước 1 — Tới điểm xuất phát</h2>
-        <div class="spdist"><span>📍 Cách bạn</span><b>3,2 km · ~9 phút xe máy</b></div>
-        <div class="spnote">
-          🪧 <b>Mốc nhận diện:</b> Cổng gỗ đầu bản, có biển "Tà Xùa".<br/>
-          🛵 Gửi xe tại nhà anh Sơn cuối đường bê tông.<br/>
-          👤 Guide: <b>A Của ★4.9</b> — sẽ đợi tại điểm xuất phát.
+
+        <!-- Khoảng cách + trạng thái GPS -->
+        <div class="spdist">
+          <span class="sprow"><svg class="spi"><use href="#ic-routes"/></svg><span id="sp-label">Cách bạn</span></span>
+          <b id="sp-dist">3,2 km · ~9 phút xe máy</b>
         </div>
-        <div style="font-size:12px;color:var(--mute);margin-top:10px">Khi bạn tới gần 50m, app tự thông báo và chuyển Bước 2.</div>
+        <div id="sp-bar"><div id="sp-fill"></div></div>
+
+        <div class="spnote">
+          <div class="sprow"><svg class="spi"><use href="#ic-photo"/></svg><span><b>Mốc nhận diện:</b> Cổng gỗ đầu bản, có biển "Tà Xùa".</span></div>
+          <div class="sprow"><svg class="spi"><use href="#ic-home"/></svg><span>Gửi xe tại nhà anh Sơn cuối đường bê tông.</span></div>
+          <div class="sprow"><svg class="spi"><use href="#ic-guide"/></svg><span>Guide: <b>A Của ★ 4.9</b> — đợi tại điểm xuất phát.</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--mute);margin-top:10px">Tới gần 50 m, app tự xác nhận và mở màn bắt đầu Bước 2.</div>
       </div>
-      <div class="cta"><button class="buybtn" onclick="startTrek()">✅ ĐÃ TỚI NƠI — BẮT ĐẦU ĐI CUNG (Bước 2)</button></div>
+
+      <!-- GPS SNAP: bấm là dẫn tự động tới điểm xuất phát -->
+      <div class="cta"><button class="buybtn" id="sp-go" onclick="spSnap()">
+        <svg class="spi" style="vertical-align:-4px;margin-right:6px"><use href="#ic-compass"/></svg>SNAP GPS — DẪN TỚI ĐIỂM XUẤT PHÁT</button></div>
+
+      <!-- Sheet XÁC NHẬN — CHỈ hiện khi đã tới nơi (≤50m) -->
+      <div id="sp-arrive-back"></div>
+      <div id="sp-arrive">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg style="width:34px;height:34px"><use href="#pin-s"/></svg>
+          <div><h3 style="font-family:'YoungDisplay',serif;font-size:18px">Đã tới điểm xuất phát</h3>
+          <div style="font-size:11.5px;color:var(--mute)">GPS khớp ≤ 50 m · guide A Của đang đợi</div></div>
+        </div>
+        <img src="photos/yty-2.jpg" alt="Đối chiếu ảnh thực địa" style="width:100%;height:110px;object-fit:cover;border-radius:12px;margin:12px 0"/>
+        <button class="confirmbtn" onclick="spConfirm()">XÁC NHẬN — BẮT ĐẦU ĐI CUNG (BƯỚC 2)</button>
+        <span class="cpskip" onclick="spArriveClose()">Chưa phải chỗ này (tiếp tục dẫn)</span>
+      </div>
     </section>
 
     <!-- ==== Chat view (bubble, đã xem, thu hồi, typing) ==== -->
@@ -523,6 +559,7 @@
       </div>
       <div id="m3-wrap">
         <canvas id="m3-canvas"></canvas>
+        <span id="m3-coord">—</span>
         <div id="m3guide">
           <div class="row">
             <div class="c"><div class="n" id="g3-pct" style="color:#B98A00">0%</div><div class="u">lộ trình</div></div>
@@ -543,6 +580,8 @@
       </div>
       <div class="m3-stats">
         <div><div class="k">ĐỈNH</div><div class="v">2.871 m</div></div>
+      <!-- Biểu đồ cao độ (guidelines) — từ ele GPX THẬT -->
+      <div style="padding:2px 16px 0"><svg id="m3-elev" width="100%" height="34" preserveAspectRatio="none"></svg></div>
         <div><div class="k">CHÂN NÚI</div><div class="v">818 m</div></div>
         <div><div class="k">VÙNG</div><div class="v">~10 km</div></div>
         <div><div class="k">TRACK</div><div class="v">17,2 km</div></div>
@@ -808,7 +847,46 @@ function confirmBuy(){PURCHASED=true;closeBuy();openStart();}
 function openGo(){document.getElementById('go-back').classList.add('on');document.getElementById('go-sheet').classList.add('on');}
 function closeGo(){document.getElementById('go-back').classList.remove('on');document.getElementById('go-sheet').classList.remove('on');}
 function goStart(){closeGo();openStart();}
-function openStart(){document.getElementById('startpoint').classList.add('on');}
+function openStart(){document.getElementById('startpoint').classList.add('on');spReset();}
+// ---- BƯỚC 1: GPS snap tới điểm xuất phát (docs/08 P1) — preview mô phỏng 3.2km ----
+let SP={timer:null,d:3200};
+function spReset(){
+  if(SP.timer)clearInterval(SP.timer);SP={timer:null,d:3200};
+  document.getElementById('sp-label').textContent='Cách bạn';
+  document.getElementById('sp-dist').textContent='3,2 km · ~9 phút xe máy';
+  document.getElementById('sp-bar').classList.remove('on');
+  document.getElementById('sp-fill').style.width='0%';
+  const b=document.getElementById('sp-go');b.disabled=false;
+  b.innerHTML='<svg class="spi" style="vertical-align:-4px;margin-right:6px"><use href="#ic-compass"/></svg>SNAP GPS — DẪN TỚI ĐIỂM XUẤT PHÁT';
+  spArriveClose();
+}
+function spSnap(){
+  if(SP.timer)return;
+  document.getElementById('sp-label').textContent='Đang dẫn bạn tới…';
+  document.getElementById('sp-bar').classList.add('on');
+  document.getElementById('sp-go').innerHTML='◉ GPS ĐANG DẪN — bạn đang di chuyển…';
+  SP.timer=setInterval(()=>{
+    SP.d=Math.max(0,SP.d-120); // ~120m mỗi nhịp (xe máy ~26km/h) — preview nhanh
+    const pct=(1-SP.d/3200)*100;
+    document.getElementById('sp-fill').style.width=pct+'%';
+    document.getElementById('sp-dist').textContent=SP.d>=1000
+      ?(SP.d/1000).toFixed(1).replace('.',',')+' km · ~'+Math.ceil(SP.d/370)+' phút xe máy'
+      :SP.d+' m';
+    if(SP.d<=50){ // ≤50m: TỚI NƠI -> mới hiện xác nhận (docs/08 P1_NEAR)
+      clearInterval(SP.timer);SP.timer=null;
+      document.getElementById('sp-label').textContent='Đã tới nơi';
+      document.getElementById('sp-dist').textContent='≤ 50 m · GPS khớp';
+      document.getElementById('sp-go').innerHTML='✓ ĐÃ TỚI ĐIỂM XUẤT PHÁT';
+      document.getElementById('sp-arrive-back').classList.add('on');
+      document.getElementById('sp-arrive').classList.add('on');
+    }
+  },300);
+}
+function spArriveClose(){
+  document.getElementById('sp-arrive-back').classList.remove('on');
+  document.getElementById('sp-arrive').classList.remove('on');
+}
+function spConfirm(){spArriveClose();startTrek();}
 function closeStart(){document.getElementById('startpoint').classList.remove('on');}
 
 // ===== BƯỚC 2: Điều hướng — khúc rẽ THẬT từ hình học track =====
@@ -1007,9 +1085,31 @@ function buildFinish(){
 // ===== NÚI 3D CORE MAP — mesh DEM THẬT + bình độ brand, xoay 360° (three.js) =====
 const M3={inited:false,az:.65,pol:1.02,dist:2.7,drag:false,lx:0,ly:0,raf:null};
 function h3(e){const g=TAXUA_DEM;return (e-g.min)/((g.max-g.min)||1)*0.55;}
+function fmtDMS(v,isLat){
+  const d=Math.floor(Math.abs(v)),m=Math.round((Math.abs(v)-d)*60);
+  return d+'°'+String(m).padStart(2,'0')+'′'+(isLat?(v>=0?'N':'S'):(v>=0?'E':'W'));
+}
+let M3EXTRA=false;
+function initM3Extras(){
+  if(M3EXTRA)return;M3EXTRA=true;
+  document.getElementById('m3-coord').textContent=fmtDMS(TAXUA[0][1],true)+' · '+fmtDMS(TAXUA[0][0],false);
+  const svg=document.getElementById('m3-elev');
+  const W=svg.clientWidth||330,H=34;svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  const eles=TAXUA.map(p=>p[2]??818),mn=Math.min.apply(null,eles),mx=Math.max.apply(null,eles);
+  const step=Math.max(1,Math.floor(eles.length/80));
+  let pts='',peakX=0,peakY=H;
+  for(let i=0;i<eles.length;i+=step){
+    const x=i/(eles.length-1)*W,y=H-3-(eles[i]-mn)/((mx-mn)||1)*(H-8);
+    pts+=x.toFixed(1)+','+y.toFixed(1)+' ';
+    if(y<peakY){peakY=y;peakX=x;}
+  }
+  svg.innerHTML='<polyline points="'+pts+'" fill="none" stroke="#121315" stroke-width="1.6" stroke-linejoin="round"/>'
+    +'<circle cx="'+peakX+'" cy="'+peakY+'" r="3" fill="#E8B400"/>';
+}
 function open3D(){
   document.getElementById('mount3d').classList.add('on');
   if(!M3.inited)init3D(); else resize3D();
+  initM3Extras();
   loop3D();
 }
 function close3D(){
@@ -1053,7 +1153,7 @@ function init3D(){
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
   // Núi nằm GỌN trong vòng la bàn (như ảnh mẫu): ngoài bán kính 1.04 -> phẳng về đáy
   // ĐẢO 3D ISOMETRIC: vertex ngoài vòng chiếu về đúng mép tròn R=1.02, y=0
-  {const R=1.02;
+  {const R=0.98; // < 1.0: mọi vertex biên lưới vuông đều được chiếu -> vòng KHÉP KÍN
    for(let k=0;k<pos.count;k++){
      const x=pos.getX(k),z=pos.getZ(k),r=Math.sqrt(x*x+z*z);
      if(r>R){const f=R/r;pos.setX(k,x*f);pos.setZ(k,z*f);pos.setY(k,0);}
@@ -1076,7 +1176,7 @@ function init3D(){
     const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,flat=[];
     for(let k=0;k<segs.length;k+=2){
       const[ax,az]=gxy(segs[k][0],segs[k][1]),[bx,bz]=gxy(segs[k+1][0],segs[k+1][1]);
-      if(ax*ax+az*az>1.0404||bx*bx+bz*bz>1.0404)continue; // ngoài vòng la bàn -> bỏ
+      if(ax*ax+az*az>0.9216||bx*bx+bz*bz>0.9216)continue; // ngoài vòng la bàn -> bỏ
       flat.push(ax,y,az,bx,y,bz);
     }
     if(!flat.length)continue;
@@ -1144,6 +1244,11 @@ function init3D(){
                  new THREE.Vector3(Math.cos(a)*r2,0,Math.sin(a)*r2));}
   M3.scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPts),
     new THREE.LineBasicMaterial({color:0xB9BDBF,transparent:true,opacity:.9})));
+  [1.24,1.36,1.48].forEach((rr,ri)=>{
+    const cps=[];for(let k=0;k<=96;k++){const a=k/96*Math.PI*2;cps.push(new THREE.Vector3(Math.cos(a)*rr,0,Math.sin(a)*rr));}
+    M3.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(cps),
+      new THREE.LineBasicMaterial({color:0xB9BDBF,transparent:true,opacity:.28-ri*.08})));
+  });
   [['N',0,-1.24],['E',1.24,0],['S',0,1.24],['W',-1.24,0]].forEach(([t,x,z])=>{
     const c2=document.createElement('canvas');c2.width=c2.height=64;const g2=c2.getContext('2d');
     g2.fillStyle='rgba(18,19,21,.8)';g2.font='bold 40px Segoe UI';g2.textAlign='center';g2.textBaseline='middle';g2.fillText(t,32,34);
@@ -1182,7 +1287,7 @@ function buildMiniScene(){
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
   // ĐẢO 3D ISOMETRIC: vertex ngoài vòng chiếu về đúng mép tròn R=1.02, y=0
-  {const R=1.02;
+  {const R=0.98; // < 1.0: mọi vertex biên lưới vuông đều được chiếu -> vòng KHÉP KÍN
    for(let k=0;k<pos.count;k++){
      const x=pos.getX(k),z=pos.getZ(k),r=Math.sqrt(x*x+z*z);
      if(r>R){const f=R/r;pos.setX(k,x*f);pos.setZ(k,z*f);pos.setY(k,0);}
@@ -1202,7 +1307,7 @@ function buildMiniScene(){
     const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,flat=[];
     for(let k=0;k<segs.length;k+=2){
       const[ax,az]=gxy(segs[k][0],segs[k][1]),[bx,bz]=gxy(segs[k+1][0],segs[k+1][1]);
-      if(ax*ax+az*az>1.0404||bx*bx+bz*bz>1.0404)continue;
+      if(ax*ax+az*az>0.9216||bx*bx+bz*bz>0.9216)continue;
       flat.push(ax,y,az,bx,y,bz);
     }
     if(!flat.length)continue;
