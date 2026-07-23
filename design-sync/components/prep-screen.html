@@ -1,0 +1,55 @@
+<!-- @dsCard group="Component" -->
+<meta charset="utf-8"/><title>Màn PREP trước chuyến đi</title>
+<style>
+:root{
+  --ground:#F2F3F1; --card:#FFFFFF; --panel:#ECEEE8; --badge:#E6E8E2;
+  --line:#E1E3DC; --hairline:#E9EBE5;
+  --ink:#121315; --mute:#70766F; --soft:#4A4F4B;
+  --go:#C9E265; --go-ink:#182200;
+  --terra:#B0765A; --terra-deep:#8E5136; --terra-bg:#F4E8E1;
+  --gold:#A98F5E; --gold-deep:#776132; --gold-bg:#F2ECDD;
+  --sage:#6FA08A; --sage-deep:#3E6B57; --sage-bg:#E4EEE8;
+  --bluegray:#7E93AC; --bluegray-deep:#4E637C; --bluegray-bg:#E7ECF1;
+  --pine:#16281A; --lime:#C9E265; --cream:#EAF1E4; --mist:#A9CDD8; --ember:#FF5233;
+  --island:#FAFBF8; --route-gold:#E8B400; --progress-gold:#FFD100;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ground);font-family:"Segoe UI","SF Pro Text",-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:18px}
+.young{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+.v{font-size:16px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.chip{display:inline-block;padding:4px 11px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.3px}
+.chip.easy{background:var(--sage-bg);color:var(--sage-deep)}
+.chip.std{background:var(--gold-bg);color:var(--gold-deep)}
+.chip.hard{background:var(--terra-bg);color:var(--terra-deep)}
+.confirmbtn{display:block;width:100%;border:none;border-radius:999px;background:var(--go);color:var(--go-ink);
+  font-weight:800;font-size:13.5px;letter-spacing:.6px;padding:14px;cursor:pointer}
+.sec{font-family:Georgia,serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin:16px 0 8px;font-weight:700}
+.note{font-size:11px;color:var(--mute);margin-top:10px;line-height:1.5}
+.prow{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;margin-bottom:9px}
+  .prow input{margin-top:2px;accent-color:var(--ink)}
+  .wx{padding:11px 13px;margin-bottom:9px}
+  .wx .t{display:flex;align-items:baseline;gap:9px;font-size:12.5px;color:var(--mute)}
+  .wx .t b{font-size:20px;color:var(--ink)}.wx .t span:first-of-type{color:var(--ink);font-weight:600}
+  .wx .s{font-size:11.5px}
+  .vd{margin-top:6px;font-size:11.5px;font-weight:600}
+  .vd.ok{color:var(--sage-deep)}.vd.warn{color:var(--gold-deep)}.vd.danger{color:var(--terra-deep);font-weight:700}
+  .confirmbtn:disabled{opacity:.45}</style>
+<h2 class="young" style="font-size:21px">Chuẩn bị trước chuyến đi</h2>
+  <div style="font-size:12px;color:var(--mute);margin:2px 0 12px">Cung Khó · 17,2 km · +1.880 m — kiểm tra trước khi xuất phát</div>
+  <label class="prow"><input type="checkbox" checked/> Đủ sức khoẻ, không chấn thương đang điều trị</label>
+  <label class="prow"><input type="checkbox" checked/> Giày bám tốt, áo mưa, đèn pin, ≥2L nước</label>
+  <label class="prow"><input type="checkbox"/> Pin điện thoại ≥80% (khuyến nghị kèm sạc dự phòng)</label>
+  <label class="prow"><input type="checkbox"/> Đã báo người thân lịch trình + giờ xuống núi dự kiến</label>
+  <div class="sec">Thời tiết thật (Open-Meteo) — 3 trạng thái</div>
+  <div class="card wx"><div class="t"><b>18°</b><span>Mây rải rác</span><span class="s">· gió 9 km/h · xuất phát ~1.740 m</span></div>
+    <div class="vd ok">3 ngày tới thuận lợi cho trekking</div></div>
+  <div class="card wx"><div class="t"><b>16°</b><span>Mưa phùn</span><span class="s">· gió 14 km/h</span></div>
+    <div class="vd warn">Khả năng mưa cao — chuẩn bị áo mưa, cân nhắc lùi lịch</div></div>
+  <div class="card wx"><div class="t"><b>15°</b><span>Giông bão</span><span class="s">· gió 28 km/h</span></div>
+    <div class="vd danger">Mưa lớn/giông 3 ngày tới — khuyến cáo KHÔNG đi cung</div></div>
+  <button class="confirmbtn" style="margin-top:14px" disabled>SẴN SÀNG — TỚI ĐIỂM XUẤT PHÁT</button>
+  <div style="text-align:center;font-size:11.5px;color:var(--mute);padding:9px">Bỏ qua (demo)</div>
+  <p class="note">Nút chính bị khoá tới khi tick đủ 4 mục. Trạng thái thời tiết đổi màu theo mức khuyến cáo.</p>

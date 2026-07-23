@@ -1,0 +1,61 @@
+<!-- @dsCard group="Component" -->
+<meta charset="utf-8"/><title>Núi 3D — đảo contour isometric</title>
+<style>
+:root{
+  --ground:#F2F3F1; --card:#FFFFFF; --panel:#ECEEE8; --badge:#E6E8E2;
+  --line:#E1E3DC; --hairline:#E9EBE5;
+  --ink:#121315; --mute:#70766F; --soft:#4A4F4B;
+  --go:#C9E265; --go-ink:#182200;
+  --terra:#B0765A; --terra-deep:#8E5136; --terra-bg:#F4E8E1;
+  --gold:#A98F5E; --gold-deep:#776132; --gold-bg:#F2ECDD;
+  --sage:#6FA08A; --sage-deep:#3E6B57; --sage-bg:#E4EEE8;
+  --bluegray:#7E93AC; --bluegray-deep:#4E637C; --bluegray-bg:#E7ECF1;
+  --pine:#16281A; --lime:#C9E265; --cream:#EAF1E4; --mist:#A9CDD8; --ember:#FF5233;
+  --island:#FAFBF8; --route-gold:#E8B400; --progress-gold:#FFD100;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ground);font-family:"Segoe UI","SF Pro Text",-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:18px}
+.young{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+.v{font-size:16px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.chip{display:inline-block;padding:4px 11px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.3px}
+.chip.easy{background:var(--sage-bg);color:var(--sage-deep)}
+.chip.std{background:var(--gold-bg);color:var(--gold-deep)}
+.chip.hard{background:var(--terra-bg);color:var(--terra-deep)}
+.confirmbtn{display:block;width:100%;border:none;border-radius:999px;background:var(--go);color:var(--go-ink);
+  font-weight:800;font-size:13.5px;letter-spacing:.6px;padding:14px;cursor:pointer}
+.sec{font-family:Georgia,serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin:16px 0 8px;font-weight:700}
+.note{font-size:11px;color:var(--mute);margin-top:10px;line-height:1.5}
+.wrap{position:relative;background:var(--island);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+  svg{width:100%;display:block}
+  .pct{position:absolute;left:14px;bottom:12px;font-size:15px;color:#B98A00}</style>
+<div class="wrap">
+  <svg viewBox="0 0 340 300">
+    <circle cx="170" cy="150" r="132" fill="none" stroke="#B9BDBF" stroke-width="1.2"/>
+    <circle cx="170" cy="150" r="138" fill="none" stroke="#B9BDBF" stroke-width="5" stroke-dasharray="1.4 10.6" opacity=".8"/>
+    <ellipse cx="170" cy="158" rx="118" ry="96" fill="#121315"/>
+    <ellipse cx="170" cy="150" rx="118" ry="96" fill="#FAFBF8"/>
+    <g fill="none" stroke-linejoin="round">
+      <ellipse cx="170" cy="150" rx="118" ry="96" stroke="#A5A8AB" stroke-width="1"/>
+      <path d="M78 168 C 92 120, 150 96, 196 104 S 262 150, 246 190 S 150 218, 110 200 S 70 190 78 168 Z" stroke="#8C8F92" stroke-width="1"/>
+      <path d="M104 162 C 116 128, 158 112, 194 120 S 240 152, 228 178 S 156 200, 126 188 S 96 180 104 162 Z" stroke="#6E7174" stroke-width="1.1"/>
+      <path d="M126 156 C 136 134, 166 124, 192 130 S 222 154, 213 170 S 160 184, 140 176 S 120 168 126 156 Z" stroke="#4B4E51" stroke-width="1.2"/>
+      <path d="M144 152 C 152 138, 172 132, 190 137 S 208 154, 201 163 S 166 172, 152 166 S 140 160 144 152 Z" stroke="#2A2C2F" stroke-width="1.3"/>
+      <path d="M158 149 C 164 141, 176 138,186 141 S 196 152, 191 157 S 168 162, 160 158 S 154 154 158 149 Z" stroke="#121315" stroke-width="1.4"/>
+    </g>
+    <path d="M96 196 C 120 186, 138 170, 150 160 S 168 148, 174 148" fill="none" stroke="#E8B400" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round"/>
+    <path d="M96 196 C 112 190, 124 180, 132 172" fill="none" stroke="#FFD100" stroke-width="3.4" stroke-linecap="round"/>
+    <circle cx="96" cy="196" r="6" fill="#C9E265" stroke="#121315" stroke-width="2"/>
+    <circle cx="174" cy="148" r="6" fill="#EAF1E4" stroke="#121315" stroke-width="2"/>
+    <circle cx="150" cy="160" r="5" fill="#A9CDD8" stroke="#121315" stroke-width="1.6"/>
+    <rect x="222" y="34" rx="10" width="104" height="20" fill="#121315"/>
+    <text x="274" y="47.5" text-anchor="middle" fill="#EAF1E4" font-size="9" letter-spacing="1" font-family="Consolas,monospace">21°17′N 104°28′E</text>
+    <polyline points="30,268 60,258 88,262 122,240 158,244 196,214 232,220 268,196 300,200" fill="none" stroke="#121315" stroke-width="1.4"/>
+    <circle cx="268" cy="196" r="3.4" fill="#FFD100" stroke="#121315" stroke-width="1.2"/>
+    <text x="30" y="284" font-size="8.5" letter-spacing="1.6" fill="#5D6368" font-family="Consolas,monospace">CAO ĐỘ THẬT · ĐỈNH 2.865 M</text>
+  </svg>
+  <div class="pct young">62% lộ trình</div></div>
+  <p class="note">Bản chạy thật = mesh three.js từ DEM 96×96 + GPX thật (app-preview.html). Nền #FAFBF8 · bình độ xám→đen ·
+  route #E8B400 đứt · đã đi #FFD100 · vòng la bàn 72 tick · KHÔNG tự xoay · pin icon brand.</p>

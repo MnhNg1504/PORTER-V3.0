@@ -1,0 +1,56 @@
+<!-- @dsCard group="Component" -->
+<meta charset="utf-8"/><title>Checkpoint + Hoàn thành CERTIFIED</title>
+<style>
+:root{
+  --ground:#F2F3F1; --card:#FFFFFF; --panel:#ECEEE8; --badge:#E6E8E2;
+  --line:#E1E3DC; --hairline:#E9EBE5;
+  --ink:#121315; --mute:#70766F; --soft:#4A4F4B;
+  --go:#C9E265; --go-ink:#182200;
+  --terra:#B0765A; --terra-deep:#8E5136; --terra-bg:#F4E8E1;
+  --gold:#A98F5E; --gold-deep:#776132; --gold-bg:#F2ECDD;
+  --sage:#6FA08A; --sage-deep:#3E6B57; --sage-bg:#E4EEE8;
+  --bluegray:#7E93AC; --bluegray-deep:#4E637C; --bluegray-bg:#E7ECF1;
+  --pine:#16281A; --lime:#C9E265; --cream:#EAF1E4; --mist:#A9CDD8; --ember:#FF5233;
+  --island:#FAFBF8; --route-gold:#E8B400; --progress-gold:#FFD100;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ground);font-family:"Segoe UI","SF Pro Text",-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;padding:18px}
+.young{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
+.v{font-size:16px;font-weight:600;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.chip{display:inline-block;padding:4px 11px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.3px}
+.chip.easy{background:var(--sage-bg);color:var(--sage-deep)}
+.chip.std{background:var(--gold-bg);color:var(--gold-deep)}
+.chip.hard{background:var(--terra-bg);color:var(--terra-deep)}
+.confirmbtn{display:block;width:100%;border:none;border-radius:999px;background:var(--go);color:var(--go-ink);
+  font-weight:800;font-size:13.5px;letter-spacing:.6px;padding:14px;cursor:pointer}
+.sec{font-family:Georgia,serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin:16px 0 8px;font-weight:700}
+.note{font-size:11px;color:var(--mute);margin-top:10px;line-height:1.5}
+.cpbox{max-width:330px}
+  .phx{height:130px;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:2px;color:#fff;
+    background:linear-gradient(135deg,#6FA08A66,#16281A99),linear-gradient(180deg,#A9CDD8,#3E6B57)}
+  .cert{display:inline-block;background:var(--sage-bg);color:var(--sage-deep);font-weight:800;font-size:11px;
+    letter-spacing:.5px;border-radius:999px;padding:5px 12px;margin:8px 0 6px}
+  .frow{display:flex;justify-content:space-between;padding:8px 2px;font-size:12.5px;border-bottom:1px solid var(--hairline)}
+  .frow span{color:var(--mute)}</style>
+<div class="cpbox card">
+    <div class="phx">ẢNH MẪU CỦA NGƯỜI TẠO CUNG</div>
+    <div style="padding:13px 15px">
+      <b style="font-size:14px">📍 Checkpoint 2 · Sống lưng 1.865 m</b>
+      <div style="font-size:12px;color:var(--mute);margin:5px 0 11px;line-height:1.5">Chụp ảnh tại đây để xác minh — toạ độ GPS phải khớp đường đi ≤ 50 m (docs/08).</div>
+      <button class="confirmbtn">📷 CHỤP ẢNH XÁC MINH</button>
+      <div style="text-align:center;font-size:11.5px;color:var(--mute);padding:8px 0 2px">Bỏ qua (giảm mức xác minh)</div>
+    </div></div>
+  <div class="sec">Finish sheet — verify_score</div>
+  <div class="card" style="padding:15px 16px">
+    <h3 class="young" style="font-size:16px">Hoàn thành cung</h3>
+    <span class="cert">CERTIFIED · đủ xác minh</span>
+    <div class="frow"><span>Checkpoint đạt</span><b>5/6</b></div>
+    <div class="frow"><span>Quãng đường khớp</span><b>98%</b></div>
+    <div class="frow"><span>Liền mạch GPS</span><b>✔</b></div>
+    <div class="frow"><span>verify_score</span><b>0.90 ≥ 0.70</b></div>
+    <div class="frow" style="border:none"><span>Uy tín</span><b style="color:var(--sage-deep)">+25 điểm</b></div>
+  </div>
+  <p class="note">Điểm = 0.6×checkpoint + 0.2×km + 0.2×liền mạch (khớp server completions 62/62 test).</p>
