@@ -58,7 +58,7 @@
 | GPX export | ✅ | `toGpxXml()` + test roundtrip (2026-07-22) |
 | Lưu hành trình / độ cao / khoảng cách / thời gian | 🟡 | Lib tính đủ; lưu server GĐ2 |
 | Tốc độ | ❌ | GĐ1 (từ timestamp GPX / GPS) |
-| Check-in, cắm trại, nguồn nước | ❌ | GĐ2 — waypoint types (đã đặc tả docs/03 §6) |
+| Check-in, cắm trại, nguồn nước | ✅ | route_checkpoints (7 kind) + xác minh ảnh-GPS server-side 5 bước, verify_score, CERTIFIED +25 uy tín (2026-07-22) |
 | Mức độ khó | ✅ | DifficultyChip + thang docs/04 |
 | Ảnh từng waypoint | 🟡 | Design có (điểm xuất phát BẮT BUỘC ảnh); upload GĐ3 |
 | Offline map | ❌ | GĐ5 — PMTiles |

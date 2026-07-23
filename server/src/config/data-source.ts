@@ -9,6 +9,7 @@ import { Report } from '../moderation/report.entity';
 import { UserBlock } from '../moderation/user-block.entity';
 import { Conversation, Message } from '../chat/chat.entities';
 import { DeviceToken } from '../notifications/device-token.entity';
+import { RouteCheckpoint, Completion, CheckpointEvidence } from '../completions/completions.entities';
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -17,7 +18,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USER ?? 'potter',
   password: process.env.DB_PASSWORD ?? 'potter_dev_only',
   database: process.env.DB_NAME ?? 'potter',
-  entities: [User, TrekRoute, GpxSubmission, Purchase, Report, UserBlock, Conversation, Message, DeviceToken],
+  entities: [User, TrekRoute, GpxSubmission, Purchase, Report, UserBlock, Conversation, Message, DeviceToken, RouteCheckpoint, Completion, CheckpointEvidence],
   migrations: [__dirname + '/../migrations/*.{ts,js}'],
   synchronize: false, // LUÔN dùng migration (checklist §4)
   logging: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
