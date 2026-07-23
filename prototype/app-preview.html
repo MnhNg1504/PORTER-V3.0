@@ -7,6 +7,7 @@
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="taxua-track.js"></script>
+<script src="laothan-track.js"></script>
 <script src="taxua-dem.js"></script>
 <script src="brand/icons.js"></script>
 <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
@@ -22,6 +23,8 @@
   @font-face{font-family:'YoungDisplay';src:url('brand/Young-Bold-Display.otf') format('opentype')}
   @font-face{font-family:'Young';src:url('brand/Young.otf') format('opentype')}
   :root{
+    /* z-slot docs/11 §4.1: base<float<hud<banner<backdrop<sheet<modal<toast */
+    --z-float:10; --z-hud:20; --z-banner:30; --z-backdrop:40; --z-sheet:50; --z-modal:60; --z-toast:70;
     --ground:#F2F3F1; --card:#FFFFFF; --panel:#ECEEE8; --badge:#E6E8E2;
     --line:#E1E3DC; --hairline:#E9EBE5;
     --ink:#121315; --mute:#70766F; --soft:#4A4F4B;
@@ -238,7 +241,8 @@
   .m3-go{background:#C9E265;color:#182200;border-radius:999px;padding:7px 13px;font-size:11.5px;
     font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
   #m3-wrap{position:relative;height:46%;min-height:300px;flex-shrink:0}
-  #m3-coord{position:absolute;right:12px;top:10px;background:#121315;color:#EAF1E4;border-radius:999px;
+  #m3-wrap.guiding #m3-coord{top:70px}
+  #m3-coord{transition:top .25s;z-index:var(--z-float);position:absolute;right:12px;top:10px;background:#121315;color:#EAF1E4;border-radius:999px;
     padding:5px 11px;font-size:10px;letter-spacing:.8px;font-variant-numeric:tabular-nums}
   #m3-canvas{width:100%;height:100%;touch-action:none;cursor:grab;display:block}
   #m3guide{position:absolute;left:10px;right:10px;top:8px;display:none;padding:9px 6px 7px;
@@ -312,6 +316,8 @@
   .sphoto-cap .k{color:rgba(242,243,241,.75)}
   .sphoto-cap b{font-size:14px;font-weight:700;display:block;margin-top:3px;text-shadow:0 1px 6px rgba(0,0,0,.5)}
   .stitle{font-family:'YoungDisplay',serif;font-size:21px;margin-bottom:2px}
+  .prow{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;cursor:pointer}
+  .prow input{margin-top:2px;accent-color:var(--ink)}
   .sprow{display:flex;align-items:flex-start;gap:9px}
   .spi{width:19px;height:19px;color:var(--ink);flex-shrink:0}
   .spnote .sprow{margin-bottom:8px}
@@ -370,6 +376,13 @@
   #sos-sheet.on,#buy-sheet.on,#go-sheet.on{bottom:0}
   #sos-back.on,#buy-back.on,#go-back.on{display:block}
   #buy-sheet h3,#go-sheet h3{font-family:'YoungDisplay',serif;font-size:20px}
+  .pkg{display:flex;gap:10px;align-items:center;padding:10px 11px;border:1.5px solid var(--line);
+    border-radius:13px;margin:8px 0;cursor:pointer;font-size:12.5px}
+  .pkg.on{border-color:var(--ink);background:#fff}
+  .pkr{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);flex-shrink:0}
+  .pkg.on .pkr{border-width:5px;border-color:var(--ink)}
+  .pkn{font-size:10.5px;color:var(--terra-deep)}
+  .pkp{font-variant-numeric:tabular-nums}
   .buyrow{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px solid var(--hairline)}
   .buyrow b{font-variant-numeric:tabular-nums}
   .waiver{display:flex;gap:10px;align-items:flex-start;background:var(--terra-bg);border:1px solid #EBD9CE;
@@ -480,6 +493,9 @@
         </div>
       </div>
       
+      <div class="sec">Thời tiết điểm xuất phát <span style="font-size:10px;color:var(--mute)">(OPEN-METEO — THẬT)</span></div>
+      <div style="margin:0 16px"><div class="card" id="dt-wx" style="padding:11px 13px;font-size:12.5px;color:var(--mute)">Đang lấy thời tiết thật…</div></div>
+
       <div class="sec">Điểm xuất phát (bắt buộc có ảnh)</div>
       <div class="card startcard">
         <div class="sph"><img src="photos/yty-2.jpg" alt="Đường đất đầu bản Tà Xùa"/></div>
@@ -641,15 +657,42 @@
     <div id="buy-sheet">
       <h3>Xác nhận mua cung</h3>
       <div class="buyrow"><span>Cung</span><b>Tà Xùa – Sống lưng khủng long</b></div>
-      <div class="buyrow"><span>Gói</span><b>GPX dẫn đường + Guide A Của ★4.9</b></div>
+      <div class="pkg" data-pk="solo" onclick="pickPkg('solo')">
+        <span class="pkr"></span>
+        <span style="flex:1"><b>Tự đi</b> · GPX dẫn đường + checkpoint<br/>
+        <span class="pkn">Cấp 1 không mua được gói này với cung Khó (docs/04)</span></span>
+        <b class="pkp">150.000đ</b>
+      </div>
+      <div class="pkg on" data-pk="guide" onclick="pickPkg('guide')">
+        <span class="pkr"></span>
+        <span style="flex:1"><b>Có guide</b> · A Của ★ 4.9 đi kèm + support</span>
+        <b class="pkp">350.000đ</b>
+      </div>
       <div class="buyrow"><span>Độ khó</span><b style="color:var(--terra-deep)">Khó — 17.2km · +1.880m</b></div>
-      <div class="buyrow" style="border-bottom:none"><span>Thanh toán</span><b>350.000đ · VNPay/MoMo</b></div>
+      <div class="buyrow" style="border-bottom:none"><span>Thanh toán</span><b id="buy-total">350.000đ · VNPay/MoMo</b></div>
       <label class="waiver"><input type="checkbox" id="waiver-ck" onchange="waiverChanged()"/>
         <span>Tôi xác nhận đủ sức khoẻ, hiểu rủi ro trekking cung Khó và đồng ý
         <b>Bản miễn trừ trách nhiệm</b>. POTTER là nền tảng kết nối — an toàn do tôi
         và guide chịu trách nhiệm.</span></label>
-      <button class="confirmbtn" id="buy-confirm" disabled onclick="confirmBuy()">XÁC NHẬN &amp; THANH TOÁN 350.000đ</button>
+      <button class="confirmbtn" id="buy-confirm" disabled onclick="confirmBuy()">XÁC NHẬN &amp; THANH TOÁN <span id="buy-btn-price">350.000đ</span></button>
     </div>
+
+    <!-- ==== PREP: chuẩn bị trước khi đi (docs/08 — checklist + thời tiết thật) ==== -->
+    <section id="prep" class="ovl">
+      <div style="padding:14px 16px 0"><h2 class="stitle">Chuẩn bị trước chuyến đi</h2>
+      <div style="font-size:12px;color:var(--mute);margin-top:2px">Cung Khó · 17,2 km · +1.880 m — kiểm tra trước khi xuất phát</div></div>
+      <div style="padding:10px 16px;display:flex;flex-direction:column;gap:8px" id="prep-list">
+        <label class="prow"><input type="checkbox" onchange="prepCk()"/> Đủ sức khoẻ, không chấn thương đang điều trị</label>
+        <label class="prow"><input type="checkbox" onchange="prepCk()"/> Giày bám tốt, áo mưa, đèn pin, ≥2L nước</label>
+        <label class="prow"><input type="checkbox" onchange="prepCk()"/> Pin điện thoại ≥80% (khuyến nghị kèm sạc dự phòng)</label>
+        <label class="prow"><input type="checkbox" onchange="prepCk()"/> Đã báo người thân lịch trình + giờ xuống núi dự kiến</label>
+      </div>
+      <div style="padding:0 16px"><div class="card" id="prep-wx" style="padding:11px 13px;font-size:12.5px;color:var(--mute)">Đang lấy thời tiết thật (Open-Meteo)…</div></div>
+      <div class="cta">
+        <button class="confirmbtn" id="prep-go" disabled onclick="prepDone()">SẴN SÀNG — TỚI ĐIỂM XUẤT PHÁT</button>
+        <span class="cpskip" onclick="prepDone()">Bỏ qua (demo)</span>
+      </div>
+    </section>
 
     <!-- ==== Sheet FAB XUẤT PHÁT — nối cung đã mua ==== -->
     <div id="go-back" onclick="closeGo()"></div>
@@ -770,7 +813,7 @@ tabs.forEach(t=>t.onclick=()=>{
   closeDetail();closeGo();closeBuy();
   if(t.dataset.s==='s-map'){initMap();if(t.classList.contains('fab')&&PURCHASED&&!SUPPRESS_GO)setTimeout(openGo,300);SUPPRESS_GO=false;}
 });
-function openDetail(){document.getElementById('detail').classList.add('on');startMini();}
+function openDetail(){document.getElementById('detail').classList.add('on');startMini();loadWx('dt-wx');}
 function closeDetail(){document.getElementById('detail').classList.remove('on');stopMini();}
 
 // ===== Số liệu THẬT từ track Tà Xùa nhúng =====
@@ -843,7 +886,46 @@ let PURCHASED=false;let SUPPRESS_GO=false;
 function openBuy(){document.getElementById('buy-back').classList.add('on');document.getElementById('buy-sheet').classList.add('on');}
 function closeBuy(){document.getElementById('buy-back').classList.remove('on');document.getElementById('buy-sheet').classList.remove('on');}
 function waiverChanged(){document.getElementById('buy-confirm').disabled=!document.getElementById('waiver-ck').checked;}
-function confirmBuy(){PURCHASED=true;closeBuy();openStart();}
+let PKG='guide';
+function pickPkg(k){
+  PKG=k;
+  document.querySelectorAll('.pkg').forEach(x=>x.classList.toggle('on',x.dataset.pk===k));
+  const price=k==='guide'?'350.000đ':'150.000đ';
+  document.getElementById('buy-total').textContent=price+' · VNPay/MoMo';
+  document.getElementById('buy-btn-price').textContent=price;
+}
+function confirmBuy(){PURCHASED=true;closeBuy();openPrep();}
+// ---- PREP (docs/08) ----
+function openPrep(){document.getElementById('prep').classList.add('on');loadWx('prep-wx');}
+function prepCk(){
+  const all=[...document.querySelectorAll('#prep-list input')].every(i=>i.checked);
+  document.getElementById('prep-go').disabled=!all;
+}
+function prepDone(){document.getElementById('prep').classList.remove('on');openStart();}
+// ---- Thời tiết THẬT Open-Meteo (gọn — dùng cho PREP + card chi tiết cung) ----
+const WXI={0:'Trời quang',1:'Nắng nhẹ',2:'Mây rải rác',3:'Nhiều mây',45:'Sương mù',51:'Mưa phùn nhẹ',
+ 53:'Mưa phùn',55:'Mưa phùn dày',61:'Mưa nhỏ',63:'Mưa vừa',65:'Mưa to',80:'Mưa rào nhẹ',81:'Mưa rào',82:'Mưa rào dữ dội',95:'Giông bão'};
+let WXCACHE=null;
+async function loadWx(elId){
+  const el=document.getElementById(elId);if(!el)return;
+  try{
+    if(!WXCACHE){
+      const st=TAXUA[0];
+      const u='https://api.open-meteo.com/v1/forecast?latitude='+st[1]+'&longitude='+st[0]
+        +'&elevation='+(st[2]??1200)+'&current=temperature_2m,weather_code,wind_speed_10m'
+        +'&daily=temperature_2m_min,temperature_2m_max,precipitation_sum,precipitation_probability_max,weather_code&timezone=Asia%2FBangkok&forecast_days=3';
+      WXCACHE=await(await fetch(u)).json();
+    }
+    const j=WXCACHE,cw=WXI[j.current.weather_code]||('Mã '+j.current.weather_code);
+    const danger=j.daily.weather_code.slice(0,3).some(c=>c>=82||c===65)||j.daily.precipitation_sum.slice(0,3).some(x=>x>30);
+    const warn=!danger&&j.daily.precipitation_probability_max.slice(0,3).some(x=>x>70);
+    el.innerHTML='<div style="display:flex;align-items:baseline;gap:10px"><b style="font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums">'
+      +Math.round(j.current.temperature_2m)+'°</b><span style="color:var(--ink);font-weight:600">'+cw
+      +'</span><span>· gió '+Math.round(j.current.wind_speed_10m)+' km/h · điểm xuất phát ~'+Math.round(j.elevation)+' m</span></div>'
+      +'<div style="margin-top:6px;font-size:11.5px;'+(danger?'color:var(--terra-deep);font-weight:700':warn?'color:var(--gold-deep);font-weight:600':'color:var(--sage-deep)')+'">'
+      +(danger?'Mưa lớn/giông 3 ngày tới — khuyến cáo KHÔNG đi cung':warn?'Khả năng mưa cao — chuẩn bị áo mưa, cân nhắc lùi lịch':'3 ngày tới thuận lợi cho trekking')+'</div>';
+  }catch(e){el.textContent='Không lấy được thời tiết (cần internet).';}
+}
 function openGo(){document.getElementById('go-back').classList.add('on');document.getElementById('go-sheet').classList.add('on');}
 function closeGo(){document.getElementById('go-back').classList.remove('on');document.getElementById('go-sheet').classList.remove('on');}
 function goStart(){closeGo();openStart();}
@@ -1373,13 +1455,13 @@ function toggleGuide3D(){
   const btn=document.getElementById('m3-gobtn'),bar=document.getElementById('m3guide');
   if(M3G.on){
     clearInterval(M3G.timer);M3G={on:false,idx:0,timer:null};
-    btn.textContent='▶ MÔ PHỎNG LỘ TRÌNH';bar.classList.remove('on');
+    btn.textContent='▶ MÔ PHỎNG LỘ TRÌNH';bar.classList.remove('on');document.getElementById('m3-wrap').classList.remove('guiding');
     if(M3.progLine){M3.progLine.geometry.setDrawRange(0,0);M3.progLine2.geometry.setDrawRange(0,0);}
     if(M3.dot)M3.dot.visible=false;
     return;
   }
   M3G={on:true,idx:0,timer:setInterval(g3Tick,200)};
-  btn.textContent='⏸ DỪNG';bar.classList.add('on');
+  btn.textContent='⏸ DỪNG';bar.classList.add('on');document.getElementById('m3-wrap').classList.add('guiding');
   if(M3.dot)M3.dot.visible=true;
 }
 function g3Tick(){
