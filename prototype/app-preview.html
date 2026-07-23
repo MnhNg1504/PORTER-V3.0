@@ -256,6 +256,8 @@
   .m3-stats>div{flex:1;text-align:center}
   .m3-stats .k{color:#8FA07F}
   .m3-stats .v{color:#EAF1E4}
+  .mm-btn{width:26px;height:26px;border-radius:8px;background:rgba(234,241,228,.14);color:#EAF1E4;
+    display:inline-flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;user-select:none}
   .clog{padding:4px 14px 26px}
   .clog-head{display:flex;align-items:baseline;gap:10px;margin:10px 0 12px}
   .clog-head .t1{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:16px}
@@ -459,8 +461,18 @@
         <div><div class="k">Đỉnh</div><div class="v"><span id="dx-peak">…</span> <span class="u">m</span></div></div>
         <div><div class="k">88 review</div><div class="v">★4.7</div></div>
       </div>
-      <div class="sec">Thời tiết · Bản Tà Xùa (Open-Meteo — thật)</div>
-      <div class="card wx" id="wx"><div class="now"><span class="e">⏳</span><span style="font-size:13px;color:var(--mute)">Đang lấy thời tiết thật…</span></div></div>
+      <div class="sec">Preview hành trình · Núi 3D <span style="font-size:11px;color:var(--mute)">(DEM + GPX thật)</span></div>
+      <div class="card" id="minimt-card" style="background:#0e1712;border-color:#24331F;position:relative">
+        <canvas id="minimt" style="width:100%;height:210px;display:block;touch-action:none;cursor:grab"></canvas>
+        <div style="position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:1px;color:#8FA07F">TÀ XÙA · HÀNH TRÌNH 17,2 KM</div>
+        <div id="minimt-pct" style="position:absolute;left:12px;bottom:10px;font-family:'YoungDisplay',serif;font-size:15px;color:#C9E265">0% lộ trình</div>
+        <div style="position:absolute;right:10px;bottom:8px;display:flex;gap:6px">
+          <span class="mm-btn" onclick="miniZoom(-1)">+</span>
+          <span class="mm-btn" onclick="miniZoom(1)">−</span>
+          <span class="mm-btn" onclick="miniReset()">⟲</span>
+          <span class="mm-btn" style="width:auto;padding:0 10px;font-size:10px;font-weight:800" onclick="open3D()">TOÀN MÀN</span>
+        </div>
+      </div>
       <div style="margin:0 16px"><button class="buybtn" style="background:#16281A;color:#C9E265" onclick="open3D()">🗻 XEM NÚI 3D — ROUTE COVERED</button></div>
       <div class="sec">Điểm xuất phát (bắt buộc có ảnh)</div>
       <div class="card startcard">
@@ -718,8 +730,8 @@ tabs.forEach(t=>t.onclick=()=>{
   closeDetail();closeGo();closeBuy();
   if(t.dataset.s==='s-map'){initMap();if(t.classList.contains('fab')&&PURCHASED&&!SUPPRESS_GO)setTimeout(openGo,300);SUPPRESS_GO=false;}
 });
-function openDetail(){document.getElementById('detail').classList.add('on');loadWeather();}
-function closeDetail(){document.getElementById('detail').classList.remove('on');}
+function openDetail(){document.getElementById('detail').classList.add('on');startMini();}
+function closeDetail(){document.getElementById('detail').classList.remove('on');stopMini();}
 
 // ===== Số liệu THẬT từ track Tà Xùa nhúng =====
 function hav(a,b){const R=6371000,r=Math.PI/180,dLat=(b[1]-a[1])*r,dLon=(b[0]-a[0])*r,
@@ -776,6 +788,18 @@ function addTrack(){
     {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[0][0],TAXUA[0][1]]},properties:{c:'#C9E265'}},
     {type:'Feature',geometry:{type:'Point',coordinates:[TAXUA.at(-1)[0],TAXUA.at(-1)[1]]},properties:{c:'#B0765A'}}]}});
   map.addLayer({id:'e-c',type:'circle',source:'e',paint:{'circle-radius':7,'circle-color':['get','c'],'circle-stroke-width':2.5,'circle-stroke-color':'#121315'}});
+  // Chấm VỊ TRÍ CỦA TÔI (bị rớt ở bản redesign — gây lỗi 'VT không bám điểm đi')
+  if(!map.getSource('me')){
+    map.addSource('me',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
+    map.addLayer({id:'me-hal',type:'circle',source:'me',paint:{'circle-radius':15,'circle-color':'#C9E265','circle-opacity':.25}});
+    map.addLayer({id:'me-dot',type:'circle',source:'me',paint:{'circle-radius':7.5,'circle-color':'#C9E265','circle-stroke-width':3,'circle-stroke-color':'#121315'}});
+  }
+  // Đang dẫn mà style vừa đổi (VT<->topo) -> dựng lại terrain + line + BÁM NGAY vị trí hiện tại
+  if(typeof REP!=='undefined'&&REP.active){
+    enableTerrain();ensureProgress();
+    const ci=Math.min(REP.idx,TAXUA.length-1);
+    map.jumpTo({center:[TAXUA[ci][0],TAXUA[ci][1]],pitch:66,bearing:(REP.bear!=null?REP.bear:repBearing(ci)),zoom:13.6});
+  }
 }
 function initMap(){
   if(map)return;
@@ -932,7 +956,8 @@ function startReplay(){
       .setLngLat([TAXUA[idx][0],TAXUA[idx][1]]).addTo(map));
   });
   map.easeTo({center:[TAXUA[0][0],TAXUA[0][1]],zoom:13.6,pitch:66,bearing:repBearing(0),duration:1200});
-  REP.timer=setInterval(repTick,240);
+  REP.bear=repBearing(0);
+  REP.timer=setInterval(repTick,450);
 }
 function repTick(){
   const i=REP.idx;
@@ -942,8 +967,9 @@ function repTick(){
     coordinates:TAXUA.slice(0,i+1).map(p=>[p[0],p[1]])}});
   if(map.getSource('me'))map.getSource('me').setData({type:'FeatureCollection',
     features:[{type:'Feature',geometry:{type:'Point',coordinates:[TAXUA[i][0],TAXUA[i][1]]}}]});
-  // Camera bay theo
-  map.easeTo({center:[TAXUA[i][0],TAXUA[i][1]],bearing:repBearing(i),pitch:66,duration:260,easing:t=>t});
+  // Camera bay theo — bearing NỘI SUY (không quay giật), easing chuẩn, duration = tick
+  const tb=repBearing(i);let db=((tb-REP.bear+540)%360)-180;REP.bear=(REP.bear+db*0.18+360)%360;
+  map.easeTo({center:[TAXUA[i][0],TAXUA[i][1]],bearing:REP.bear,pitch:66,duration:450,essential:true});
   // Stats THẬT
   document.getElementById('rp-km').textContent=(CUM[i]/1000).toFixed(2);
   document.getElementById('rp-ele').textContent=TAXUA[i][2]!=null?Math.round(TAXUA[i][2]):'—';
@@ -956,7 +982,7 @@ function repTick(){
       CP_STATE.asked.add(k);openCp(k,src);
     }
   });
-  REP.idx=i+2;
+  REP.idx=i+1;
 }
 function stopReplay(finished){
   if(REP.timer)clearInterval(REP.timer);REP.timer=null;REP.active=false;
@@ -983,7 +1009,7 @@ function openCp(k,src){
 }
 function cpClose(resume){
   document.getElementById('cpmodal').classList.remove('on');
-  if(resume&&REP.active&&!REP.timer)REP.timer=setInterval(repTick,240);
+  if(resume&&REP.active&&!REP.timer)REP.timer=setInterval(repTick,450);
 }
 function cpShoot(){CP_STATE.res[cpCur]='ok';cpClose(true);}
 function cpSkip(){CP_STATE.res[cpCur]='skip';cpClose(true);}
@@ -1152,6 +1178,80 @@ function init3D(){
   cv.addEventListener('dblclick',()=>{M3.dist=M3.dist>1.4?.85:2.7;});
   resize3D();
 }
+// ===== MINI NÚI 3D trong chi tiết cung khó — preview hành trình tự chạy =====
+const MM={inited:false,az:.9,dist:2.35,pol:1.0,idx:0,raf:null,drag:false,lx:0};
+function buildMiniScene(){
+  const g=TAXUA_DEM,n=g.n,W=n+1;
+  const cv=document.getElementById('minimt');
+  MM.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+  MM.scene=new THREE.Scene();MM.scene.background=new THREE.Color(0x0e1712);
+  MM.camera=new THREE.PerspectiveCamera(45,1,.02,60);
+  const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
+  const pos=geo.attributes.position;
+  for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
+  MM.scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x101c14,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1})));
+  // bình độ thưa hơn (80m) cho card nhỏ — vẫn 2 lớp dễ nhìn
+  const OFF=.006,interval=80,start=Math.ceil(g.min/interval)*interval;
+  for(let lv=start;lv<=g.max;lv+=interval){
+    const segs=m3Segs(lv);if(!segs.length)continue;
+    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
+    segs.forEach((pt,k)=>{const[x,z]=gxy(pt[0],pt[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
+    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
+    const col=new THREE.Color('rgb('+Math.round(148+hN*53)+','+Math.round(168+hN*58)+','+Math.round(118-hN*17)+')');
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.55+hN*.45});
+    MM.scene.add(new THREE.LineSegments(bg,mat));
+    const bg2=bg.clone();bg2.translate(0,.0022,0);
+    MM.scene.add(new THREE.LineSegments(bg2,mat));
+  }
+  const b=g.bbox,tp=[];
+  TAXUA.forEach(pt=>{const pi=(pt[0]-b.minLon)/(b.maxLon-b.minLon)*n,pj=(b.maxLat-pt[1])/(b.maxLat-b.minLat)*n;
+    const[x,z]=gxy(pi,pj);tp.push(new THREE.Vector3(x,h3(pt[2]??g.min)+OFF*2,z));});
+  MM.tp=tp;
+  const tg=new THREE.BufferGeometry().setFromPoints(tp);
+  const tm=new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022,transparent:true,opacity:.55});
+  const tl=new THREE.Line(tg,tm);tl.computeLineDistances();MM.scene.add(tl);
+  const pg=new THREE.BufferGeometry().setFromPoints(tp);
+  MM.prog=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xC9E265}));
+  MM.prog.geometry.setDrawRange(0,0);MM.scene.add(MM.prog);
+  const pg2=pg.clone();pg2.translate(0,.003,0);
+  MM.prog2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xC9E265}));
+  MM.prog2.geometry.setDrawRange(0,0);MM.scene.add(MM.prog2);
+  MM.dot=new THREE.Mesh(new THREE.SphereGeometry(.015,10,10),new THREE.MeshBasicMaterial({color:0xC9E265}));
+  MM.scene.add(MM.dot);
+  // điều khiển chạm nhẹ: kéo xoay ngang, cuộn zoom
+  cv.addEventListener('pointerdown',e=>{MM.drag=true;MM.lx=e.clientX;});
+  addEventListener('pointerup',()=>{MM.drag=false;});
+  addEventListener('pointermove',e=>{if(MM.drag)MM.az+=(e.clientX-MM.lx)*.007,MM.lx=e.clientX;});
+  cv.addEventListener('wheel',e=>{e.preventDefault();MM.dist=Math.min(3.6,Math.max(.9,MM.dist+e.deltaY*.0015));},{passive:false});
+  MM.inited=true;
+}
+function miniZoom(d){MM.dist=Math.min(3.6,Math.max(.9,MM.dist+d*.35));}
+function miniReset(){MM.az=.9;MM.dist=2.35;MM.pol=1.0;MM.idx=0;}
+function startMini(){
+  const cv=document.getElementById('minimt');if(!cv)return;
+  if(!MM.inited)buildMiniScene();
+  const dpr=Math.min(devicePixelRatio||1,2);
+  MM.renderer.setSize(cv.clientWidth*dpr,cv.clientHeight*dpr,false);
+  MM.camera.aspect=cv.clientWidth/cv.clientHeight;MM.camera.updateProjectionMatrix();
+  if(!MM.raf)mmLoop();
+}
+function stopMini(){if(MM.raf)cancelAnimationFrame(MM.raf);MM.raf=null;}
+function mmLoop(){
+  if(!MM.drag)MM.az+=.0016; // tự xoay chậm
+  // hành trình tự chạy lặp — % lộ trình theo CUM thật
+  MM.idx=(MM.idx+1)%MM.tp.length;
+  const i=MM.idx;
+  MM.prog.geometry.setDrawRange(0,i+1);MM.prog2.geometry.setDrawRange(0,i+1);
+  MM.dot.position.copy(MM.tp[i]);
+  const el=document.getElementById('minimt-pct');
+  if(el)el.textContent=Math.round(CUM[i]/CUM[CUM.length-1]*100)+'% lộ trình · '+(CUM[i]/1000).toFixed(1)+' km';
+  const sp=Math.sin(MM.pol),c=MM.camera;
+  c.position.set(Math.cos(MM.az)*sp*MM.dist,Math.cos(MM.pol)*MM.dist,Math.sin(MM.az)*sp*MM.dist);
+  c.lookAt(0,.14,0);
+  MM.renderer.render(MM.scene,MM.camera);
+  MM.raf=requestAnimationFrame(mmLoop);
+}
+
 // ===== ĐI THỬ trong Núi 3D — guidance COROS trên mesh (số liệu thật CUM/gain) =====
 let M3G={on:false,idx:0,timer:null};
 function toggleGuide3D(){
