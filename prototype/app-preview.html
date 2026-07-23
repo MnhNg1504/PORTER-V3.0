@@ -67,11 +67,11 @@
   nav .tab.on svg{color:var(--ink)}
   nav .tab.on{color:var(--ink);font-weight:700}
   nav .tab.on::before{content:'';position:absolute;top:6px;width:18px;height:3px;border-radius:2px;background:var(--go)}
-  nav .fabwrap{flex:1.15;display:flex;justify-content:center}
-  nav .fab{width:62px;height:62px;border-radius:50%;background:var(--go);margin-top:-24px;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
-    border:4px solid var(--ground);box-shadow:0 6px 18px -4px rgba(120,144,59,.6);color:var(--go-ink);font-weight:800}
-  nav .fab svg{width:30px;height:30px;color:var(--go-ink)}
+  nav .fabwrap{flex:1;display:flex;justify-content:center;align-items:center}
+  nav .fab{width:46px;height:46px;border-radius:50%;background:var(--go);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;align-self:center;
+    box-shadow:0 4px 12px -3px rgba(120,144,59,.55);color:var(--go-ink);font-weight:800}
+  nav .fab svg{width:26px;height:26px;color:var(--go-ink)}
   /* ===== Cards & nhãn chung ===== */
   .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
   .k{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}
@@ -1052,8 +1052,12 @@ function init3D(){
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
   // Núi nằm GỌN trong vòng la bàn (như ảnh mẫu): ngoài bán kính 1.04 -> phẳng về đáy
-  for(let k=0;k<pos.count;k++){const x=pos.getX(k),z=pos.getZ(k);
-    if(x*x+z*z>1.04*1.04)pos.setY(k,0);}
+  // ĐẢO 3D ISOMETRIC: vertex ngoài vòng chiếu về đúng mép tròn R=1.02, y=0
+  {const R=1.02;
+   for(let k=0;k<pos.count;k++){
+     const x=pos.getX(k),z=pos.getZ(k),r=Math.sqrt(x*x+z*z);
+     if(r>R){const f=R/r;pos.setX(k,x*f);pos.setZ(k,z*f);pos.setY(k,0);}
+   }}
   geo.computeVertexNormals();
   // Thân/chân núi ĐEN như nét line (yêu cầu user) — chuyển mượt lên đỉnh trắng
   {const cols=new Float32Array(pos.count*3);
@@ -1177,8 +1181,12 @@ function buildMiniScene(){
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
-  for(let k=0;k<pos.count;k++){const x=pos.getX(k),z=pos.getZ(k);
-    if(x*x+z*z>1.04*1.04)pos.setY(k,0);}
+  // ĐẢO 3D ISOMETRIC: vertex ngoài vòng chiếu về đúng mép tròn R=1.02, y=0
+  {const R=1.02;
+   for(let k=0;k<pos.count;k++){
+     const x=pos.getX(k),z=pos.getZ(k),r=Math.sqrt(x*x+z*z);
+     if(r>R){const f=R/r;pos.setX(k,x*f);pos.setZ(k,z*f);pos.setY(k,0);}
+   }}
   {const cols=new Float32Array(pos.count*3);
    for(let k=0;k<pos.count;k++){
      const y=pos.getY(k);let t=(y-0.13)/0.07;t=Math.max(0,Math.min(1,t));
