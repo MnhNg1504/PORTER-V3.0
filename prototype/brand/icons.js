@@ -21,13 +21,17 @@ const G={
   summit:'<path d="M9.5 19V5.8 M9.5 6.2h6.6l-2 2.5 2 2.5H9.5" fill="none"/>',
   photo:'<rect x="5.7" y="8.5" width="12.6" height="9.3" rx="2" fill="none"/><path d="M9 8.5l1.4-2.1h3.2L15 8.5" fill="none"/><circle cx="12" cy="13" r="2.6" fill="none"/>',
   guide:'<circle cx="12" cy="9" r="2.8" fill="none"/><path d="M6.8 18.5c1-3.1 2.9-4.4 5.2-4.4s4.2 1.3 5.2 4.4" fill="none"/>',
+  home:'<path d="M5.5 11.5 L12 5.5 L18.5 11.5 M7 10.2V18.5h10V10.2 M10.4 18.5v-4.6h3.2v4.6" fill="none"/>',
+  routes:'<path d="M4.5 18.5 L9.5 8.5 L12.8 14.5 L15 10.5 L19.5 18.5 Z" fill="none"/><circle cx="15" cy="6.8" r="1.4" fill="none"/>',
+  chat:'<path d="M5.5 7.5h13v8.4h-7.6L7.5 19v-3.1h-2Z" fill="none" stroke-linejoin="round"/>',
+  compass:'<circle cx="12" cy="12" r="7.5" fill="none"/><path d="M14.8 9.2 L13 13 L9.2 14.8 L11 11 Z" fill="currentColor" stroke="none"/>',
   s:'<text x="12" y="16.3" text-anchor="middle" font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" fill="currentColor" stroke="none">S</text>',
   f:'<text x="12" y="16.3" text-anchor="middle" font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" fill="currentColor" stroke="none">F</text>',
   e:'<text x="12" y="16.3" text-anchor="middle" font-family="Segoe UI,Arial" font-size="11.5" font-weight="700" fill="currentColor" stroke="none">E</text>',
 };
 // Nền pin theo semantic (đầu tròn phẳng như ảnh mẫu)
 const BG={camp:'#A9CDD8',warn:'#FF5233',check:'#C9E265',water:'#A9CDD8',summit:'#EAF1E4',
-  photo:'#EAF1E4',guide:'#C9E265',s:'#EAF1E4',f:'#EAF1E4',e:'#EAF1E4'};
+  photo:'#EAF1E4',guide:'#C9E265',home:'#EAF1E4',routes:'#EAF1E4',chat:'#EAF1E4',compass:'#C9E265',s:'#EAF1E4',f:'#EAF1E4',e:'#EAF1E4'};
 // Màu glyph trên nền pin: Ember dùng nét cream cho tương phản, còn lại nét Pine
 const FG={warn:'#EAF1E4'};
 

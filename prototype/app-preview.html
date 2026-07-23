@@ -60,18 +60,18 @@
     border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
   /* ===== Bottom nav ===== */
   nav{height:74px;background:var(--ground);border-top:1px solid var(--hairline);display:flex;
-    align-items:stretch;flex-shrink:0;position:relative;z-index:8}
+    align-items:stretch;flex-shrink:0;position:relative;z-index:20;overflow:visible}
   nav .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:3px;font-size:9.5px;font-weight:600;letter-spacing:.2px;color:#899086;cursor:pointer;user-select:none;position:relative}
-  nav .tab .ic{font-size:21px;filter:grayscale(1) contrast(.7)}
+  nav .tab svg{width:22px;height:22px;color:#899086}
+  nav .tab.on svg{color:var(--ink)}
   nav .tab.on{color:var(--ink);font-weight:700}
-  nav .tab.on .ic{filter:none}
   nav .tab.on::before{content:'';position:absolute;top:6px;width:18px;height:3px;border-radius:2px;background:var(--go)}
   nav .fabwrap{flex:1.15;display:flex;justify-content:center}
   nav .fab{width:62px;height:62px;border-radius:50%;background:var(--go);margin-top:-24px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
     border:4px solid var(--ground);box-shadow:0 6px 18px -4px rgba(120,144,59,.6);color:var(--go-ink);font-weight:800}
-  nav .fab .ic{font-size:21px}
+  nav .fab svg{width:22px;height:22px;color:var(--go-ink)}
   nav .fab .lb{font-size:8.5px;letter-spacing:.5px}
   /* ===== Cards & nhãn chung ===== */
   .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
@@ -714,11 +714,11 @@
 
   <!-- ============ BOTTOM NAV ============ -->
   <nav>
-    <span class="tab on" data-s="s-community"><span class="ic">🏠</span>Cộng đồng</span>
-    <span class="tab" data-s="s-routes"><span class="ic">🥾</span>Cung đường</span>
-    <span class="fabwrap"><span class="fab" data-s="s-map"><span class="ic">🧭</span><span class="lb">XUẤT PHÁT</span></span></span>
-    <span class="tab" data-s="s-msg"><span class="ic">💬</span>Tin nhắn</span>
-    <span class="tab" data-s="s-profile"><span class="ic">👤</span>Hồ sơ</span>
+    <span class="tab on" data-s="s-community"><svg><use href="#ic-home"/></svg>Cộng đồng</span>
+    <span class="tab" data-s="s-routes"><svg><use href="#ic-routes"/></svg>Cung đường</span>
+    <span class="fabwrap"><span class="fab" data-s="s-map"><svg><use href="#ic-compass"/></svg><span class="lb">XUẤT PHÁT</span></span></span>
+    <span class="tab" data-s="s-msg"><svg><use href="#ic-chat"/></svg>Tin nhắn</span>
+    <span class="tab" data-s="s-profile"><svg><use href="#ic-guide"/></svg>Hồ sơ</span>
   </nav>
 </div>
 
@@ -1052,6 +1052,9 @@ function init3D(){
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
+  // Núi nằm GỌN trong vòng la bàn (như ảnh mẫu): ngoài bán kính 1.04 -> phẳng về đáy
+  for(let k=0;k<pos.count;k++){const x=pos.getX(k),z=pos.getZ(k);
+    if(x*x+z*z>1.04*1.04)pos.setY(k,0);}
   geo.computeVertexNormals();
   const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFFFFFF,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
   M3.scene.add(mesh);
@@ -1059,9 +1062,14 @@ function init3D(){
   const OFF=.006,interval=60,start=Math.ceil(g.min/interval)*interval;
   for(let lv=start;lv<=g.max;lv+=interval){
     const segs=m3Segs(lv);if(!segs.length)continue;
-    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
-    segs.forEach((p,k)=>{const[x,z]=gxy(p[0],p[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
-    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
+    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,flat=[];
+    for(let k=0;k<segs.length;k+=2){
+      const[ax,az]=gxy(segs[k][0],segs[k][1]),[bx,bz]=gxy(segs[k+1][0],segs[k+1][1]);
+      if(ax*ax+az*az>1.0404||bx*bx+bz*bz>1.0404)continue; // ngoài vòng la bàn -> bỏ
+      flat.push(ax,y,az,bx,y,bz);
+    }
+    if(!flat.length)continue;
+    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(flat),3));
     // Sáng tối thiểu cao (dễ nhìn như ảnh mẫu), vẫn sáng dần lên Lime ở đỉnh
     const col=new THREE.Color(`rgb(${Math.round(165-hN*140)},${Math.round(167-hN*140)},${Math.round(165-hN*140)})`);
     const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.8+hN*.2});
@@ -1162,14 +1170,21 @@ function buildMiniScene(){
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
+  for(let k=0;k<pos.count;k++){const x=pos.getX(k),z=pos.getZ(k);
+    if(x*x+z*z>1.04*1.04)pos.setY(k,0);}
   MM.scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFFFFFF,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1})));
   // bình độ thưa hơn (80m) cho card nhỏ — vẫn 2 lớp dễ nhìn
   const OFF=.006,interval=80,start=Math.ceil(g.min/interval)*interval;
   for(let lv=start;lv<=g.max;lv+=interval){
     const segs=m3Segs(lv);if(!segs.length)continue;
-    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
-    segs.forEach((pt,k)=>{const[x,z]=gxy(pt[0],pt[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
-    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
+    const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,flat=[];
+    for(let k=0;k<segs.length;k+=2){
+      const[ax,az]=gxy(segs[k][0],segs[k][1]),[bx,bz]=gxy(segs[k+1][0],segs[k+1][1]);
+      if(ax*ax+az*az>1.0404||bx*bx+bz*bz>1.0404)continue;
+      flat.push(ax,y,az,bx,y,bz);
+    }
+    if(!flat.length)continue;
+    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(flat),3));
     const col=new THREE.Color('rgb('+Math.round(165-hN*140)+','+Math.round(167-hN*140)+','+Math.round(165-hN*140)+')');
     const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.8+hN*.2});
     MM.scene.add(new THREE.LineSegments(bg,mat));
@@ -1210,7 +1225,6 @@ function startMini(){
 }
 function stopMini(){if(MM.raf)cancelAnimationFrame(MM.raf);MM.raf=null;}
 function mmLoop(){
-  if(!MM.drag)MM.az+=.0016; // tự xoay chậm
   // hành trình tự chạy lặp — % lộ trình theo CUM thật
   MM.idx=(MM.idx+1)%MM.tp.length;
   const i=MM.idx;
@@ -1256,7 +1270,6 @@ function g3Tick(){
   M3G.idx+=2;
 }
 function loop3D(){
-  if(!M3.drag)M3.az+=.0012; // tự xoay chậm khi không kéo
   const sp=Math.sin(M3.pol),c=M3.camera;
   c.position.set(Math.cos(M3.az)*sp*M3.dist,Math.cos(M3.pol)*M3.dist,Math.sin(M3.az)*sp*M3.dist);
   c.lookAt(0,.16,0);
