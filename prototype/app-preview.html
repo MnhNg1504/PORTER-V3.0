@@ -122,7 +122,7 @@
   .stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin:14px 16px;background:var(--card);
     border:1px solid var(--line);border-radius:20px;padding:15px 16px}
   .stats .v{font-size:15.5px}
-  .sec{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);margin:18px 16px 8px}
+  .sec{font-family:'YoungDisplay',serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);margin:18px 16px 8px}
   /* weather */
   .wx{margin:0 16px;background:var(--card)}
   .wx .now{display:flex;align-items:center;gap:12px;padding:14px 16px}
@@ -224,59 +224,54 @@
   #repx{position:absolute;top:10px;right:12px;z-index:8;width:30px;height:30px;border-radius:50%;
     background:rgba(18,19,21,.55);color:#fff;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
   #repx.on{display:flex}
-  #repphoto{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.85);z-index:7;
-    width:230px;border-radius:14px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5);
-    opacity:0;pointer-events:none;transition:.3s}
-  #repphoto.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  #repphoto img{width:100%;display:block}
   .rep-thumb{width:34px;height:34px;border-radius:8px;border:2px solid #fff;object-fit:cover;
     box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
   /* ===== Núi 3D Core Map (contour isometric brand, mesh xoay 360°) ===== */
-  #mount3d{position:absolute;inset:0;background:#0e1712;display:none;z-index:12;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+  #mount3d{position:absolute;inset:0;background:#FAFBF8;display:none;z-index:12;flex-direction:column;overflow-y:auto;scrollbar-width:none}
   #mount3d::-webkit-scrollbar{display:none}
   #mount3d.on{display:flex}
   .m3-head{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-shrink:0}
-  .m3-head .back{background:rgba(234,241,228,.12);border-color:transparent;color:#EAF1E4;flex-shrink:0}
+  .m3-head .back{background:#fff;border:1px solid var(--line);color:#121315;flex-shrink:0}
   .m3-tabs{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
-  .m3-tabs .t1{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:17px;white-space:nowrap}
-  .m3-tabs .sep{color:#3E5245}
-  .m3-tabs .t2{font-size:12.5px;color:#8FA07F;white-space:nowrap}
+  .m3-tabs .t1{font-family:'YoungDisplay',serif;color:#121315;font-size:17px;white-space:nowrap}
+  .m3-tabs .sep{color:#C6CACD}
+  .m3-tabs .t2{font-size:12.5px;color:#5D6368;white-space:nowrap}
   .m3-go{background:#C9E265;color:#182200;border-radius:999px;padding:7px 13px;font-size:11.5px;
     font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
   #m3-wrap{position:relative;height:46%;min-height:300px;flex-shrink:0}
   #m3-canvas{width:100%;height:100%;touch-action:none;cursor:grab;display:block}
   #m3guide{position:absolute;left:10px;right:10px;top:8px;display:none;padding:9px 6px 7px;
-    border-radius:14px;background:rgba(14,23,18,.72);backdrop-filter:blur(6px);text-align:center;color:#EAF1E4}
+    border-radius:14px;background:rgba(255,255,255,.85);border:1px solid var(--line);backdrop-filter:blur(6px);text-align:center;color:#121315}
   #m3guide.on{display:block}
   #m3guide .row{display:flex}
   #m3guide .c{flex:1}
   #m3guide .n{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
-  #m3guide .u{font-size:9px;color:#8FA07F;letter-spacing:.6px;text-transform:uppercase}
+  #m3guide .u{font-size:9px;color:#5D6368;letter-spacing:.6px;text-transform:uppercase}
   .m3-stats{display:flex;gap:0;padding:10px 14px 6px;flex-shrink:0}
   .m3-stats>div{flex:1;text-align:center}
-  .m3-stats .k{color:#8FA07F}
-  .m3-stats .v{color:#EAF1E4}
-  .mm-btn{width:26px;height:26px;border-radius:8px;background:rgba(234,241,228,.14);color:#EAF1E4;
+  .m3-stats .k{color:#5D6368}
+  .m3-stats .v{color:#121315;font-family:'YoungDisplay',serif}
+  .mm-btn{width:26px;height:26px;border-radius:8px;background:#fff;border:1px solid var(--line);color:#121315;
     display:inline-flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;user-select:none}
   .clog{padding:4px 14px 26px}
   .clog-head{display:flex;align-items:baseline;gap:10px;margin:10px 0 12px}
-  .clog-head .t1{font-family:'YoungDisplay',serif;color:#EAF1E4;font-size:16px}
-  .clog-head .t2{font-size:12px;color:#8FA07F}
+  .clog-head .t1{font-family:'YoungDisplay',serif;color:#121315;font-size:16px}
+  .clog-head .t2{font-size:12px;color:#5D6368}
   .clog-item{display:flex;gap:12px;margin-bottom:4px}
   .clog-rail{display:flex;flex-direction:column;align-items:center;width:26px;flex-shrink:0}
   .clog-rail svg{width:24px;height:24px;flex-shrink:0}
-  .clog-rail .bar{width:1px;flex:1;background:#2A3A2F;margin:4px 0 2px}
+  .clog-rail .bar{width:1px;flex:1;background:#DDE0DA;margin:4px 0 2px}
   .clog-body{flex:1;padding-bottom:14px;min-width:0}
-  .clog-body .ti{color:#EAF1E4;font-size:13.5px;font-weight:700}
-  .clog-body .tm{color:#8FA07F;font-size:11px;margin-top:2px;font-variant-numeric:tabular-nums}
-  .clog-card{background:#15221A;border:1px solid #24331F;border-radius:14px;padding:11px 13px;margin-top:8px;
+  .clog-body .ti{color:#121315;font-size:13.5px;font-weight:700}
+  .clog-body .tm{color:#5D6368;font-size:11px;margin-top:2px;font-variant-numeric:tabular-nums}
+  .clog-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-top:8px;
     display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:11.5px}
-  .clog-card .ck{color:#8FA07F}
-  .clog-card .cv{color:#EAF1E4;font-weight:600;font-variant-numeric:tabular-nums}
-  .clog-card .cv.ok{color:#C9E265}
+  .clog-card .ck{color:#5D6368}
+  .clog-card .cv{color:#121315;font-weight:600;font-variant-numeric:tabular-nums}
+  .clog-card .cv.ok{color:#3E6B57}
   .avars{display:flex;margin-top:3px}
   .avars span{width:20px;height:20px;border-radius:50%;background:#C9E265;color:#182200;font-size:9px;
-    font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #15221A;margin-left:-5px}
+    font-weight:800;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;margin-left:-5px}
   .avars span:first-child{margin-left:0}
   #cpmodal{position:absolute;inset:0;z-index:16;display:none;align-items:center;justify-content:center;
     background:rgba(14,18,14,.6)}
@@ -301,7 +296,6 @@
   .fin-row .nm{flex:1}
   .fin-row .st{font-weight:700}
   .fin-row .st.ok{color:var(--sage-deep)} .fin-row .st.skip{color:var(--mute)}
-  .m3-note{text-align:center;font-size:10.5px;color:#8FA07F;padding-bottom:10px}
   /* ===== Overlay chung (StartPoint, Chat) ===== */
   .ovl{position:absolute;inset:0;background:var(--ground);display:none;flex-direction:column;z-index:11;overflow-y:auto;scrollbar-width:none}
   .ovl::-webkit-scrollbar{display:none}
@@ -462,10 +456,10 @@
         <div><div class="k">88 review</div><div class="v">★4.7</div></div>
       </div>
       <div class="sec">Preview hành trình · Núi 3D <span style="font-size:11px;color:var(--mute)">(DEM + GPX thật)</span></div>
-      <div class="card" id="minimt-card" style="background:#0e1712;border-color:#24331F;position:relative">
+      <div class="card" id="minimt-card" style="background:#FAFBF8;position:relative">
         <canvas id="minimt" style="width:100%;height:210px;display:block;touch-action:none;cursor:grab"></canvas>
-        <div style="position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:1px;color:#8FA07F">TÀ XÙA · HÀNH TRÌNH 17,2 KM</div>
-        <div id="minimt-pct" style="position:absolute;left:12px;bottom:10px;font-family:'YoungDisplay',serif;font-size:15px;color:#C9E265">0% lộ trình</div>
+        <div style="position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:1px;color:#5D6368">TÀ XÙA · HÀNH TRÌNH 17,2 KM</div>
+        <div id="minimt-pct" style="position:absolute;left:12px;bottom:10px;font-family:'YoungDisplay',serif;font-size:15px;color:#B98A00">0% lộ trình</div>
         <div style="position:absolute;right:10px;bottom:8px;display:flex;gap:6px">
           <span class="mm-btn" onclick="miniZoom(-1)">+</span>
           <span class="mm-btn" onclick="miniZoom(1)">−</span>
@@ -526,18 +520,27 @@
       <div class="m3-head">
         <span class="back" onclick="close3D()">←</span>
         <div class="m3-tabs"><span class="t1">Route covered</span><span class="sep">|</span><span class="t2">Tà Xùa · DEM thật</span></div>
-        <span class="m3-go" id="m3-gobtn" onclick="toggleGuide3D()">▶ ĐI THỬ</span>
+        <span class="m3-go" id="m3-gobtn" onclick="toggleGuide3D()">▶ MÔ PHỎNG LỘ TRÌNH</span>
       </div>
       <div id="m3-wrap">
         <canvas id="m3-canvas"></canvas>
         <div id="m3guide">
           <div class="row">
+            <div class="c"><div class="n" id="g3-pct" style="color:#B98A00">0%</div><div class="u">lộ trình</div></div>
             <div class="c"><div class="n" id="g3-km">0,00</div><div class="u">km</div></div>
             <div class="c"><div class="n" id="g3-ele">—</div><div class="u">độ cao m</div></div>
             <div class="c"><div class="n" id="g3-gain">0</div><div class="u">m leo</div></div>
             <div class="c"><div class="n" id="g3-eta">0:00</div><div class="u">giờ (ước)</div></div>
           </div>
         </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 14px 0">
+        <span style="font-size:10.5px;color:#5D6368">Kéo xoay & nghiêng · lăn/véo để phóng · double-click zoom</span>
+        <span style="display:flex;gap:6px">
+          <span class="mm-btn" onclick="M3.dist=Math.max(.65,M3.dist-.35)">+</span>
+          <span class="mm-btn" onclick="M3.dist=Math.min(4.5,M3.dist+.35)">−</span>
+          <span class="mm-btn" onclick="M3.az=.65;M3.pol=1.02;M3.dist=2.7">⟲</span>
+        </span>
       </div>
       <div class="m3-stats">
         <div><div class="k">ĐỈNH</div><div class="v">2.871 m</div></div>
@@ -633,8 +636,7 @@
           </div>
         </div>
         <span id="repx" onclick="stopReplay()">✕</span>
-        <div id="repphoto"><img id="repphoto-img" src="photos/yt-a.jpg" alt=""/></div>
-        <div id="cpmodal">
+                <div id="cpmodal">
           <div class="cpbox">
             <img id="cp-img" src="photos/yt-a.jpg" alt="Ảnh mẫu checkpoint"/>
             <div class="b">
@@ -745,37 +747,9 @@ const km=(dist/1000).toFixed(1);
 ['tx-gain','dx-gain','mx-gain'].forEach(id=>document.getElementById(id).textContent=Math.round(gain));
 ['dx-peak','mx-peak'].forEach(id=>document.getElementById(id).textContent=peak);
 
-// ===== Thời tiết THẬT (Open-Meteo, không key) =====
-const WMO={0:['☀️','Trời quang'],1:['🌤️','Nắng nhẹ'],2:['⛅','Mây rải rác'],3:['☁️','Nhiều mây'],
- 45:['🌫️','Sương mù'],51:['🌦️','Mưa phùn nhẹ'],53:['🌦️','Mưa phùn'],55:['🌧️','Mưa phùn dày'],
- 61:['🌧️','Mưa nhỏ'],63:['🌧️','Mưa vừa'],65:['🌧️','Mưa to'],80:['🌦️','Mưa rào nhẹ'],81:['🌧️','Mưa rào'],
- 82:['⛈️','Mưa rào dữ dội'],95:['⛈️','Giông bão'],96:['⛈️','Giông mưa đá'],99:['⛈️','Giông nặng']};
-const wmo=c=>WMO[c]||['❓','Mã '+c];
-let wxLoaded=false;
-async function loadWeather(){
-  if(wxLoaded)return;
-  const el=document.getElementById('wx');
-  try{
-    const s=TAXUA[0];
-    const u=`https://api.open-meteo.com/v1/forecast?latitude=${s[1]}&longitude=${s[0]}&elevation=${s[2]??1200}`+
-      `&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_min,temperature_2m_max,`+
-      `precipitation_sum,precipitation_probability_max,weather_code&timezone=Asia%2FBangkok&forecast_days=5`;
-    const j=await(await fetch(u)).json();
-    const cw=wmo(j.current.weather_code);
-    const danger=j.daily.weather_code.slice(0,3).some(c=>c>=82||c===65)||j.daily.precipitation_sum.slice(0,3).some(p=>p>30);
-    const caution=!danger&&j.daily.precipitation_probability_max.slice(0,3).some(p=>p>70);
-    el.innerHTML=`
-      <div class="now"><span class="e">${cw[0]}</span><span class="t">${Math.round(j.current.temperature_2m)}°</span>
-        <span style="font-size:13px"><b>${cw[1]}</b><br/><span style="color:var(--mute)">gió ${Math.round(j.current.wind_speed_10m)} km/h · độ cao ~${Math.round(j.elevation)}m</span></span></div>
-      <div class="days">${j.daily.time.map((d,i)=>`<div class="d">${d.slice(8)}/${d.slice(5,7)}<br/>${wmo(j.daily.weather_code[i])[0]}<br/><b>${Math.round(j.daily.temperature_2m_min[i])}–${Math.round(j.daily.temperature_2m_max[i])}°</b><br/>💧${j.daily.precipitation_probability_max[i]??0}%</div>`).join('')}</div>
-      <div class="safety ${danger?'danger':caution?'warn':''}">${danger?'⛔ Mưa lớn/giông 3 ngày tới — KHÔNG nên đi cung':caution?'⚠️ Khả năng mưa cao — chuẩn bị áo mưa, cân nhắc lùi lịch':'✅ Thời tiết 3 ngày tới thuận lợi cho trekking'}</div>`;
-    wxLoaded=true;
-  }catch(e){el.innerHTML='<div class="now"><span style="font-size:13px;color:var(--mute);padding:4px">Không lấy được thời tiết (cần internet)</span></div>';}
-}
 
 // ===== Map THẬT (MapLibre + track nhúng) =====
 const BASES={
- clean:'https://tiles.openfreemap.org/styles/positron',
  topo:{version:8,sources:{b:{type:'raster',tiles:['https://a.tile.opentopomap.org/{z}/{x}/{y}.png','https://b.tile.opentopomap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:17,attribution:'© OpenTopoMap © OSM'}},layers:[{id:'b',type:'raster',source:'b'}]},
  sat:{version:8,sources:{b:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,attribution:'© Esri'}},layers:[{id:'b',type:'raster',source:'b'}]}};
 let map=null;
@@ -916,7 +890,7 @@ for(let i=1;i<TAXUA.length;i++){
 // Ảnh thật ghim dọc track (vị trí minh hoạ preview — app thật lấy toạ độ EXIF/waypoint)
 const REP_PHOTOS=[[40,'photos/yt-a.jpg'],[90,'photos/yt-b.jpg'],[135,'photos/yty-2.jpg'],
   [180,'photos/bacha-pano.jpg'],[225,'photos/caobang-2.jpg'],[265,'photos/cb-d.jpg']];
-let repMarkers=[],repShownPhoto=-1;
+let repMarkers=[];
 
 function enableTerrain(){
   if(!map.getSource('dem')){
@@ -942,7 +916,7 @@ function repBearing(i){
 function startReplay(){
   if(REP.active)return;
   if(!map){initMap();setTimeout(startReplay,700);return;}
-  REP.active=true;REP.idx=0;repShownPhoto=-1;
+  REP.active=true;REP.idx=0;
   // M1 chạy trên nền hiện tại (topo mặc định; M2 vệ tinh vẫn dẫn được — docs/09 §7)
   CP_STATE={asked:new Set(),res:{}};
   document.getElementById('repbar').classList.add('on');
@@ -988,7 +962,6 @@ function stopReplay(finished){
   if(REP.timer)clearInterval(REP.timer);REP.timer=null;REP.active=false;
   document.getElementById('repbar').classList.remove('on');
   document.getElementById('repx').classList.remove('on');
-  document.getElementById('repphoto').classList.remove('on');
   repMarkers.forEach(m=>m.remove());repMarkers=[];
   const gb=document.getElementById('mt-guide');if(gb)gb.classList.remove('on');
   document.getElementById('cpmodal').classList.remove('on');
@@ -1073,14 +1046,14 @@ function init3D(){
   const g=TAXUA_DEM,n=g.n,W=n+1;
   const cv=document.getElementById('m3-canvas');
   M3.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-  M3.scene=new THREE.Scene();M3.scene.background=new THREE.Color(0x0e1712);
+  M3.scene=new THREE.Scene();M3.scene.background=new THREE.Color(0xFAFBF8);
   M3.camera=new THREE.PerspectiveCamera(45,1,.02,60);
   // --- Mesh địa hình (màu nền Pine — che khuất đường phía sau núi) ---
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
   geo.computeVertexNormals();
-  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x101c14,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
+  const mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFFFFFF,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}));
   M3.scene.add(mesh);
   // --- Đường bình độ 60m: rêu tối -> Lime theo độ cao ---
   const OFF=.006,interval=60,start=Math.ceil(g.min/interval)*interval;
@@ -1090,8 +1063,8 @@ function init3D(){
     segs.forEach((p,k)=>{const[x,z]=gxy(p[0],p[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
     const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
     // Sáng tối thiểu cao (dễ nhìn như ảnh mẫu), vẫn sáng dần lên Lime ở đỉnh
-    const col=new THREE.Color(`rgb(${Math.round(148+hN*53)},${Math.round(168+hN*58)},${Math.round(118+hN*-17)})`);
-    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.6+hN*.4});
+    const col=new THREE.Color(`rgb(${Math.round(165-hN*140)},${Math.round(167-hN*140)},${Math.round(165-hN*140)})`);
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.8+hN*.2});
     M3.scene.add(new THREE.LineSegments(bg,mat));
     // Lớp thứ 2 lệch nhẹ -> nét dày ~2px, rõ khi zoom xa lẫn gần
     const bg2=bg.clone();bg2.translate(0,.0022,0);
@@ -1102,7 +1075,7 @@ function init3D(){
   TAXUA.forEach(p=>{const pi=(p[0]-b.minLon)/(b.maxLon-b.minLon)*n,pj=(b.maxLat-p[1])/(b.maxLat-b.minLat)*n;
     const[x,z]=gxy(pi,pj);tp.push(new THREE.Vector3(x,h3(p[2]??g.min)+OFF*2,z));});
   const tg=new THREE.BufferGeometry().setFromPoints(tp);
-  const trackMat=new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022});
+  const trackMat=new THREE.LineDashedMaterial({color:0xE8B400,dashSize:.03,gapSize:.022,transparent:true,opacity:.95});
   const track=new THREE.Line(tg,trackMat);
   track.computeLineDistances();M3.scene.add(track);
   const tg2=tg.clone();tg2.translate(0,.0025,0);
@@ -1116,8 +1089,8 @@ function init3D(){
     const v=tp[Math.min(i,tp.length-1)];
     // thân pin mảnh + chấm chân (đúng ảnh mẫu)
     const lg=new THREE.BufferGeometry().setFromPoints([v,new THREE.Vector3(v.x,v.y+.1,v.z)]);
-    M3.scene.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xEAF1E4,transparent:true,opacity:.45})));
-    const base=new THREE.Mesh(new THREE.SphereGeometry(.007,8,8),new THREE.MeshBasicMaterial({color:0x8FA07F}));
+    M3.scene.add(new THREE.Line(lg,new THREE.LineBasicMaterial({color:0x43494D,transparent:true,opacity:.5})));
+    const base=new THREE.Mesh(new THREE.SphereGeometry(.007,8,8),new THREE.MeshBasicMaterial({color:0xB9BDBF}));
     base.position.copy(v);M3.scene.add(base);
     // đầu pin = sprite icon SVG brand (raster 128px)
     const sym=document.getElementById(ic);
@@ -1132,29 +1105,29 @@ function init3D(){
   });
   // --- Dẫn đường trong Núi 3D: line tiến trình Lime (setDrawRange) + chấm vị trí ---
   const pg=new THREE.BufferGeometry().setFromPoints(tp);
-  M3.progLine=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xC9E265}));
+  M3.progLine=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xFFD100}));
   M3.progLine.geometry.setDrawRange(0,0);
   const pg2=pg.clone();pg2.translate(0,.003,0);
-  M3.progLine2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xC9E265}));
+  M3.progLine2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xFFD100}));
   M3.progLine2.geometry.setDrawRange(0,0);
   M3.scene.add(M3.progLine);M3.scene.add(M3.progLine2);
-  M3.dot=new THREE.Mesh(new THREE.SphereGeometry(.016,12,12),new THREE.MeshBasicMaterial({color:0xC9E265}));
+  M3.dot=new THREE.Mesh(new THREE.SphereGeometry(.016,12,12),new THREE.MeshBasicMaterial({color:0x121315}));
   M3.dot.visible=false;M3.scene.add(M3.dot);
   M3.tp=tp;
   // --- Vòng la bàn + nhãn N/E/S/W (sprite canvas) ---
   const ring=[];for(let k=0;k<=96;k++){const a=k/96*Math.PI*2;ring.push(new THREE.Vector3(Math.cos(a)*1.12,0,Math.sin(a)*1.12));}
   M3.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ring),
-    new THREE.LineBasicMaterial({color:0x8FA07F,transparent:true,opacity:.4})));
+    new THREE.LineBasicMaterial({color:0xB9BDBF,transparent:true,opacity:.8})));
   // vạch tick quanh chu vi (72 vạch — như mặt la bàn ảnh mẫu)
   const tickPts=[];
   for(let k=0;k<72;k++){const a=k/72*Math.PI*2,r1=1.13,r2=(k%6===0)?1.185:1.16;
     tickPts.push(new THREE.Vector3(Math.cos(a)*r1,0,Math.sin(a)*r1),
                  new THREE.Vector3(Math.cos(a)*r2,0,Math.sin(a)*r2));}
   M3.scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPts),
-    new THREE.LineBasicMaterial({color:0x8FA07F,transparent:true,opacity:.5})));
+    new THREE.LineBasicMaterial({color:0xB9BDBF,transparent:true,opacity:.9})));
   [['N',0,-1.24],['E',1.24,0],['S',0,1.24],['W',-1.24,0]].forEach(([t,x,z])=>{
     const c2=document.createElement('canvas');c2.width=c2.height=64;const g2=c2.getContext('2d');
-    g2.fillStyle='rgba(234,241,228,.85)';g2.font='bold 40px Segoe UI';g2.textAlign='center';g2.textBaseline='middle';g2.fillText(t,32,34);
+    g2.fillStyle='rgba(18,19,21,.8)';g2.font='bold 40px Segoe UI';g2.textAlign='center';g2.textBaseline='middle';g2.fillText(t,32,34);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c2),transparent:true}));
     sp.scale.set(.12,.12,1);sp.position.set(x,.02,z);M3.scene.add(sp);
   });
@@ -1184,12 +1157,12 @@ function buildMiniScene(){
   const g=TAXUA_DEM,n=g.n,W=n+1;
   const cv=document.getElementById('minimt');
   MM.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-  MM.scene=new THREE.Scene();MM.scene.background=new THREE.Color(0x0e1712);
+  MM.scene=new THREE.Scene();MM.scene.background=new THREE.Color(0xFAFBF8);
   MM.camera=new THREE.PerspectiveCamera(45,1,.02,60);
   const geo=new THREE.PlaneGeometry(2,2,n,n);geo.rotateX(-Math.PI/2);
   const pos=geo.attributes.position;
   for(let j=0;j<W;j++)for(let i=0;i<W;i++){pos.setY(j*W+i,h3(g.elev[j*W+i]));}
-  MM.scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0x101c14,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1})));
+  MM.scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xFFFFFF,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1})));
   // bình độ thưa hơn (80m) cho card nhỏ — vẫn 2 lớp dễ nhìn
   const OFF=.006,interval=80,start=Math.ceil(g.min/interval)*interval;
   for(let lv=start;lv<=g.max;lv+=interval){
@@ -1197,8 +1170,8 @@ function buildMiniScene(){
     const hN=(lv-g.min)/((g.max-g.min)||1),y=h3(lv)+OFF,arr=new Float32Array(segs.length*3);
     segs.forEach((pt,k)=>{const[x,z]=gxy(pt[0],pt[1]);arr[k*3]=x;arr[k*3+1]=y;arr[k*3+2]=z;});
     const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(arr,3));
-    const col=new THREE.Color('rgb('+Math.round(148+hN*53)+','+Math.round(168+hN*58)+','+Math.round(118-hN*17)+')');
-    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.55+hN*.45});
+    const col=new THREE.Color('rgb('+Math.round(165-hN*140)+','+Math.round(167-hN*140)+','+Math.round(165-hN*140)+')');
+    const mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.8+hN*.2});
     MM.scene.add(new THREE.LineSegments(bg,mat));
     const bg2=bg.clone();bg2.translate(0,.0022,0);
     MM.scene.add(new THREE.LineSegments(bg2,mat));
@@ -1208,15 +1181,15 @@ function buildMiniScene(){
     const[x,z]=gxy(pi,pj);tp.push(new THREE.Vector3(x,h3(pt[2]??g.min)+OFF*2,z));});
   MM.tp=tp;
   const tg=new THREE.BufferGeometry().setFromPoints(tp);
-  const tm=new THREE.LineDashedMaterial({color:0xffffff,dashSize:.03,gapSize:.022,transparent:true,opacity:.55});
+  const tm=new THREE.LineDashedMaterial({color:0xE8B400,dashSize:.03,gapSize:.022,transparent:true,opacity:.9});
   const tl=new THREE.Line(tg,tm);tl.computeLineDistances();MM.scene.add(tl);
   const pg=new THREE.BufferGeometry().setFromPoints(tp);
-  MM.prog=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xC9E265}));
+  MM.prog=new THREE.Line(pg,new THREE.LineBasicMaterial({color:0xFFD100}));
   MM.prog.geometry.setDrawRange(0,0);MM.scene.add(MM.prog);
   const pg2=pg.clone();pg2.translate(0,.003,0);
-  MM.prog2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xC9E265}));
+  MM.prog2=new THREE.Line(pg2,new THREE.LineBasicMaterial({color:0xFFD100}));
   MM.prog2.geometry.setDrawRange(0,0);MM.scene.add(MM.prog2);
-  MM.dot=new THREE.Mesh(new THREE.SphereGeometry(.015,10,10),new THREE.MeshBasicMaterial({color:0xC9E265}));
+  MM.dot=new THREE.Mesh(new THREE.SphereGeometry(.015,10,10),new THREE.MeshBasicMaterial({color:0x121315}));
   MM.scene.add(MM.dot);
   // điều khiển chạm nhẹ: kéo xoay ngang, cuộn zoom
   cv.addEventListener('pointerdown',e=>{MM.drag=true;MM.lx=e.clientX;});
@@ -1259,7 +1232,7 @@ function toggleGuide3D(){
   const btn=document.getElementById('m3-gobtn'),bar=document.getElementById('m3guide');
   if(M3G.on){
     clearInterval(M3G.timer);M3G={on:false,idx:0,timer:null};
-    btn.textContent='▶ ĐI THỬ';bar.classList.remove('on');
+    btn.textContent='▶ MÔ PHỎNG LỘ TRÌNH';bar.classList.remove('on');
     if(M3.progLine){M3.progLine.geometry.setDrawRange(0,0);M3.progLine2.geometry.setDrawRange(0,0);}
     if(M3.dot)M3.dot.visible=false;
     return;
@@ -1273,12 +1246,13 @@ function g3Tick(){
   M3.progLine.geometry.setDrawRange(0,i+1);
   M3.progLine2.geometry.setDrawRange(0,i+1);
   M3.dot.position.copy(M3.tp[i]);
+  document.getElementById('g3-pct').textContent=Math.round(CUM[i]/CUM[CUM.length-1]*100)+'%';
   document.getElementById('g3-km').textContent=(CUM[i]/1000).toFixed(2).replace('.',',');
   document.getElementById('g3-ele').textContent=TAXUA[i][2]!=null?Math.round(TAXUA[i][2]):'—';
   document.getElementById('g3-gain').textContent=Math.round(REP.gain[i]);
   const mins=(CUM[i]/4000)*60+(REP.gain[i]/600)*60;
   document.getElementById('g3-eta').textContent=Math.floor(mins/60)+':'+String(Math.round(mins%60)).padStart(2,'0');
-  if(M3G.idx>=M3.tp.length-1){clearInterval(M3G.timer);document.getElementById('m3-gobtn').textContent='↻ ĐI LẠI';M3G.on=false;return;}
+  if(M3G.idx>=M3.tp.length-1){clearInterval(M3G.timer);document.getElementById('m3-gobtn').textContent='↻ MÔ PHỎNG LẠI';M3G.on=false;return;}
   M3G.idx+=2;
 }
 function loop3D(){
