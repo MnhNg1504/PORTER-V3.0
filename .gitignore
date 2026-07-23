@@ -36,3 +36,6 @@ server/uploads/
 # Claude local
 .claude/
 backups/
+
+# Skill packs cài qua npx skills (công cụ agent, không phải sản phẩm)
+.agents/
