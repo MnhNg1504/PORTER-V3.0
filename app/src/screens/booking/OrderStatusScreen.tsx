@@ -256,6 +256,14 @@ export function OrderStatusScreen({ route }: Props) {
           </View>
         )}
 
+        {order.status === 'completed' && (
+          <Pressable
+            style={styles.journalBtn}
+            onPress={() => nav.navigate('TripJournal', { completionId: order.id })}
+          >
+            <Text style={styles.journalBtnText}>📖 XEM NHẬT KÝ HÀNH TRÌNH</Text>
+          </Pressable>
+        )}
         {isTerminal && (
           <Pressable style={styles.doneBtn} onPress={() => nav.goBack()}>
             <Text style={styles.doneBtnText}>Về trang trước</Text>
@@ -383,6 +391,8 @@ const styles = StyleSheet.create({
   cancelConfirm: { flex: 1, height: sizing.buttonHeight, borderRadius: radius.md, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' },
   cancelConfirmText: { ...type.h2, color: colors.text.primary },
 
+  journalBtn: { height: sizing.buttonHeight, borderRadius: radius.md, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center', marginTop: space[3], ...shadow.limeGlow },
+  journalBtnText: { ...type.h2, color: colors.text.onLime },
   doneBtn: { height: sizing.buttonHeight, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginTop: space[2] },
   doneBtnText: { ...type.h2, color: colors.text.primary },
 
