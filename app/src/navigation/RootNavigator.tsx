@@ -10,6 +10,9 @@ import { StartPointScreen } from '../screens/routes/StartPointScreen';
 import { RouteNavigateScreen } from '../screens/map/RouteNavigateScreen';
 import { ChatScreen } from '../screens/messages/ChatScreen';
 import { SearchScreen } from '../screens/routes/SearchScreen';
+import { BookingScreen } from '../screens/booking/BookingScreen';
+import { OrderStatusScreen } from '../screens/booking/OrderStatusScreen';
+import { WaiverScreen } from '../screens/booking/WaiverScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -30,6 +33,9 @@ export function RootNavigator() {
         <Stack.Screen name="RouteNavigate" component={RouteNavigateScreen} options={{ title: 'Điều hướng cung' }} />
         <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Nhắn tin' }} />
         <Stack.Screen name="Search" component={SearchScreen} options={{ title: 'Tìm kiếm' }} />
+        <Stack.Screen name="Booking" component={BookingScreen} options={{ title: 'Đặt cung' }} />
+        <Stack.Screen name="OrderStatus" component={OrderStatusScreen} options={{ title: 'Đơn của bạn' }} />
+        <Stack.Screen name="Waiver" component={WaiverScreen} options={{ title: 'Cam kết an toàn' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

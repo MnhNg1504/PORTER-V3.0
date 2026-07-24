@@ -97,9 +97,9 @@ export function RouteDetailScreen({ route }: Props) {
       <View style={styles.ctaBar}>
         <Pressable
           style={styles.buyBtn}
-          onPress={() => nav.navigate('StartPoint', { routeId: data.id })}
+          onPress={() => nav.navigate('Booking', { routeId: data.id })}
         >
-          {/* TODO(api): mở màn thanh toán trước, rồi mới sang StartPoint. */}
+          {/* Luồng tiền (docs/16): Booking → cọc 30% → đi cung. StartPoint mở sau khi đặt. */}
           <Text style={styles.buyText}>MUA CUNG HƯỚNG DẪN — {data.priceVnd.toLocaleString('vi-VN')}đ</Text>
         </Pressable>
       </View>
