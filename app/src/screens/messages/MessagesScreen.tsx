@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
   name: { ...type.h2, color: colors.text.primary },
   guideTag: {
     ...type.caption,
-    color: colors.brand.primaryDark,
-    backgroundColor: colors.brand.primaryLight,
+    color: colors.text.onLime,
+    backgroundColor: colors.brand.primary,
     paddingHorizontal: space[2],
     paddingVertical: 1,
     borderRadius: radius.sm,

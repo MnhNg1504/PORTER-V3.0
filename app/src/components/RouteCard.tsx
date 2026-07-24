@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space[2],
     paddingVertical: space[1],
   },
-  hotBadgeText: { color: colors.text.primary, ...type.caption, fontWeight: '700' },
+  hotBadgeText: { color: colors.text.onLime, ...type.caption, fontWeight: '700' },
   chipOnHero: { position: 'absolute', top: space[3], right: space[3] },
   body: { padding: space[4] },
   name: { ...type.h2, color: colors.text.primary },

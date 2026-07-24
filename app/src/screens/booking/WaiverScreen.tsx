@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg.base,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
-    ...shadow.card,
+    ...shadow.glass,
   },
   cta: {
     backgroundColor: colors.brand.primary,

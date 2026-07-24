@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     ...shadow.sos,
   },
-  sosText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15, letterSpacing: 1 },
+  sosText: { color: colors.text.onLime, fontWeight: '800', fontSize: 15, letterSpacing: 1 },
   navCard: {
     position: 'absolute',
     left: space[3],

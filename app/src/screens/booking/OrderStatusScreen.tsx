@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   refundCard: { padding: space[4], borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: colors.danger, marginBottom: space[4], ...shadow.glassSoft },
   refundTitle: { ...type.h2, color: colors.text.primary, marginBottom: space[3] },
   refundRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: space[2], paddingHorizontal: space[3], borderRadius: radius.sm },
-  refundRowActive: { backgroundColor: colors.brand.primaryLight },
+  refundRowActive: { backgroundColor: colors.brand.primary },
   refundWhen: { ...type.meta, color: colors.text.secondary },
   refundPct: { ...type.meta, color: colors.text.primary, fontWeight: '700' },
   refundActiveText: { color: colors.text.onLime },
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   doneBtn: { height: sizing.buttonHeight, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginTop: space[2] },
   doneBtnText: { ...type.h2, color: colors.text.primary },
 
-  ctaBar: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: space.screen, gap: space[3], backgroundColor: colors.bg.base, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border, ...shadow.card },
+  ctaBar: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: space.screen, gap: space[3], backgroundColor: colors.bg.base, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border, ...shadow.glass },
   primaryCta: { backgroundColor: colors.brand.primary, borderRadius: radius.md, height: sizing.buttonHeight, alignItems: 'center', justifyContent: 'center', ...shadow.limeGlow },
   primaryCtaText: { ...type.h2, color: colors.text.onLime, fontWeight: '700' },
   ctaDisabled: { opacity: 0.5 },

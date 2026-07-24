@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   distK: { ...type.meta, color: colors.text.secondary },
   distV: { ...type.meta, color: colors.text.primary, fontWeight: '700', fontVariant: ['tabular-nums'] },
   bar: { height: 6, borderRadius: 3, backgroundColor: colors.border, marginTop: space[3], overflow: 'hidden' },
-  barFill: { height: 6, borderRadius: 3, backgroundColor: colors.brand.primaryLight },
+  barFill: { height: 6, borderRadius: 3, backgroundColor: colors.brand.primary },
   noteCard: {
     marginTop: space[3],
     gap: space[3],
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   hint: { ...type.caption, color: colors.rock, marginTop: space[3] },
   coordRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space[4] },
   meta: { ...type.meta, color: colors.text.secondary },
-  msgBtn: { backgroundColor: colors.brand.primaryLight, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: space[2] },
+  msgBtn: { backgroundColor: colors.brand.primary, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: space[2], ...shadow.limeGlow },
   msgBtnText: { ...type.meta, color: colors.text.onLime, fontWeight: '700' },
   mapPlaceholderText: { ...type.meta, color: colors.rock, textAlign: 'center', padding: space[2] },
   bottomBar: {
@@ -337,6 +337,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadow.limeGlow,
   },
-  confirmText: { color: colors.text.onBrand, ...type.meta, fontWeight: '700' },
+  confirmText: { color: colors.text.onLime, ...type.meta, fontWeight: '700' },
   skipText: { ...type.meta, color: colors.text.secondary, textDecorationLine: 'underline' },
 });
