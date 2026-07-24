@@ -269,7 +269,7 @@ export function OrderStatusScreen({ route }: Props) {
             <PrimaryCta
               disabled={acting || ttl?.expired}
               busy={acting}
-              label="THANH TOÁN CỌC (SANDBOX)"
+              label="THANH TOÁN CỌC (THỬ)"
               onPress={() => runAction(() => paySandbox(orderId), 'Không thanh toán được.')}
             />
           )}

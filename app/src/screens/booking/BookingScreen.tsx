@@ -46,7 +46,8 @@ export function BookingScreen({ route }: Props) {
   const needWaiver = NEEDS_WAIVER.has(data.difficulty);
 
   const days = useMemo(() => nextDays(14), []);
-  const [tripDate, setTripDate] = useState<string>(days[0].iso);
+  // DEMO1: mặc định ~1 tuần tới để beat "thử Hủy" ra hoàn 100% (thang QĐ-1), tránh 0đ.
+  const [tripDate, setTripDate] = useState<string>((days[7] ?? days[0]).iso);
   const [headcount, setHeadcount] = useState<number>(1);
   const [submitting, setSubmitting] = useState(false);
 

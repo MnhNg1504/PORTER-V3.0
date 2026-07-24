@@ -40,9 +40,13 @@ export function RouteDetailScreen({ route }: Props) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* Hero placeholder (ảnh cung thật từ CDN — TODO(api)) */}
+        {/* Hero brand (ảnh thực địa từ CDN gắn sau — TODO(api)) */}
         <View style={styles.hero}>
-          <Text style={styles.heroText}>Ảnh hero cung</Text>
+          <Text style={styles.heroGlyph}>⛰</Text>
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroName} numberOfLines={2}>{data.name}</Text>
+            <Text style={styles.heroRegion}>{data.region}</Text>
+          </View>
           <View style={styles.heroChip}>
             <DifficultyChip difficulty={data.difficulty} />
           </View>
@@ -109,8 +113,11 @@ export function RouteDetailScreen({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg.base },
-  hero: { height: 220, backgroundColor: colors.brand.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  heroText: { color: colors.brand.primaryDark, ...type.meta },
+  hero: { height: 220, backgroundColor: colors.brand.primary, justifyContent: 'flex-end', overflow: 'hidden' },
+  heroGlyph: { position: 'absolute', top: -10, right: 8, fontSize: 168, color: colors.brand.primaryDark, opacity: 0.28 },
+  heroOverlay: { padding: space[4] },
+  heroName: { ...type.h1, color: colors.text.onBrand },
+  heroRegion: { ...type.meta, color: colors.text.onBrand, opacity: 0.85, marginTop: space[1] },
   heroChip: { position: 'absolute', top: space[4], right: space[4] },
   body: { padding: space.screen },
   name: { ...type.display, color: colors.text.primary },

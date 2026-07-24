@@ -44,13 +44,16 @@ function PostCard({ post }: { post: Post }) {
   return (
     <View style={styles.card}>
       <View style={styles.head}>
-        <View style={styles.avatar} />
+        <View style={styles.avatar}>
+          <Text style={styles.avatarInitial}>{post.author.trim().charAt(0).toUpperCase()}</Text>
+        </View>
         <Text style={styles.author}>{post.author}</Text>
         <Text style={styles.level}>⛰ Lv.{post.authorLevel}</Text>
         <Text style={styles.time}>• {post.timeAgo}</Text>
       </View>
       <View style={styles.image}>
-        <Text style={styles.imageText}>Ảnh chuyến đi</Text>
+        <Text style={styles.imageGlyph}>⛰</Text>
+        <Text style={styles.imageText}>{post.routeRef ? post.routeRef.name : post.author}</Text>
       </View>
       <Text style={styles.caption}>{post.caption}</Text>
       {post.routeRef && (
@@ -79,12 +82,14 @@ const styles = StyleSheet.create({
   segTextOn: { color: colors.brand.primary, fontWeight: '700' },
   card: { backgroundColor: colors.bg.base, borderRadius: radius.md, padding: space[4], marginBottom: space.cardGap, ...shadow.card },
   head: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginBottom: space[3] },
-  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brand.primaryLight },
+  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brand.primaryLight, alignItems: 'center', justifyContent: 'center' },
+  avatarInitial: { ...type.meta, color: colors.brand.primaryDark, fontWeight: '800' },
   author: { ...type.h2, color: colors.text.primary },
   level: { ...type.caption, color: colors.brand.primary },
   time: { ...type.caption, color: colors.text.secondary },
-  image: { height: 200, borderRadius: radius.md, backgroundColor: colors.rock, alignItems: 'center', justifyContent: 'center' },
-  imageText: { color: '#fff', ...type.meta, opacity: 0.8 },
+  image: { height: 200, borderRadius: radius.md, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  imageGlyph: { position: 'absolute', fontSize: 128, color: colors.brand.primaryDark, opacity: 0.3 },
+  imageText: { color: colors.text.onBrand, ...type.meta, fontWeight: '700', opacity: 0.95 },
   caption: { ...type.body, color: colors.text.primary, marginTop: space[3] },
   routeChip: { backgroundColor: colors.bg.surface, borderRadius: radius.md, padding: space[3], marginTop: space[3] },
   routeChipName: { ...type.meta, color: colors.text.primary, fontWeight: '700' },
