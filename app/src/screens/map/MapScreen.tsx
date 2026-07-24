@@ -167,7 +167,7 @@ export function MapScreen() {
       <View style={[styles.tools, { top: insets.top + space[3] }]}>
         <ToolButton label="📍" active={followUser} onPress={onLocate} />
         <ToolButton label="⛰️" active={is3D} onPress={() => setIs3D((v) => !v)} />
-        <ToolButton label="▲▲" active={showElev} onPress={() => setShowElev((v) => !v)} />
+        <ToolButton label="Độ cao" active={showElev} onPress={() => setShowElev((v) => !v)} />
       </View>
 
       {/* Chọn lớp nền (Sạch / Bình độ / Vệ tinh) */}

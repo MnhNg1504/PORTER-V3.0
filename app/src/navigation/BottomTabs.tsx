@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.brand.primaryLight,
   },
-  tabLabel: { ...type.caption, fontSize: 9.5, color: colors.rock },
+  tabLabel: { ...type.caption, fontSize: 11, color: colors.rock },
   fabWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   fab: {
     width: 46,
