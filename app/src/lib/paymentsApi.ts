@@ -15,10 +15,18 @@
 // CEO nối vào lúc đăng nhập: configurePaymentsApi({ baseUrl, token }).
 let API_BASE_URL = 'http://localhost:3000'; // TODO(verify): trỏ về API sandbox thật
 let AUTH_TOKEN: string | null = null;
+// DEMO1: mặc định BẬT — app chạy độc lập trên iPhone không cần server (booking mô phỏng
+// cục bộ, KHÔNG tiền thật). Nối backend thật: configurePaymentsApi({ baseUrl, demo:false }).
+let DEMO_MODE = true;
 
-export function configurePaymentsApi(cfg: { baseUrl?: string; token?: string | null }): void {
+export function configurePaymentsApi(cfg: { baseUrl?: string; token?: string | null; demo?: boolean }): void {
   if (cfg.baseUrl !== undefined) API_BASE_URL = cfg.baseUrl.replace(/\/+$/, '');
   if (cfg.token !== undefined) AUTH_TOKEN = cfg.token;
+  if (cfg.demo !== undefined) DEMO_MODE = cfg.demo;
+}
+
+export function isDemoMode(): boolean {
+  return DEMO_MODE;
 }
 
 export function setAuthToken(token: string | null): void {
@@ -98,6 +106,8 @@ export interface CreateOrderInput {
   routeSlug: string;
   tripDate: string; // YYYY-MM-DD
   headcount: number;
+  /** DEMO1: đơn giá 1 suất để tính đơn cục bộ khi chưa có backend (server bỏ qua field này). */
+  demoUnitVnd?: number;
 }
 
 // ==== HẰNG SỐ LUẬT TIỀN (mirror payments.logic.ts — cho preview client) =====
@@ -198,10 +208,50 @@ function safeJson(text: string): any {
   try { return JSON.parse(text); } catch { return null; }
 }
 
+// ==== DEMO1: store cục bộ (mô phỏng backend, KHÔNG tiền thật) ================
+// Cho phép demo trọn luồng đặt cọc trên iPhone mà không cần chạy server NestJS.
+const demoStore = new Map<string, OrderWithLedger>();
+let demoSeq = 0;
+
+function demoNow(): string {
+  return new Date().toISOString();
+}
+
+function demoOrderNotFound(id: string): PaymentsApiError {
+  return new PaymentsApiError(404, `Đơn ${id} không tồn tại (demo)`);
+}
+
+function demoCreate(input: CreateOrderInput): CreateOrderResult {
+  const p = previewPricing(input.demoUnitVnd ?? 0, input.headcount);
+  const id = `demo_${++demoSeq}`;
+  const now = demoNow();
+  const order: OrderWithLedger = {
+    id, tripDate: input.tripDate, headcount: p.headcount,
+    unitVnd: String(p.unitVnd), subtotalVnd: String(p.subtotalVnd),
+    buyerTotalVnd: String(p.buyerTotalVnd), sellerPayoutVnd: String(p.sellerPayoutVnd),
+    potterFeeVnd: String(p.potterFeeVnd), depositVnd: String(p.depositVnd),
+    status: 'pending', pspRef: `sbx_${id}`, createdAt: now, updatedAt: now, escrow: [],
+  };
+  demoStore.set(id, order);
+  return { order, pricing: p, sandboxPayRef: order.pspRef! };
+}
+
+function demoGet(id: string): OrderWithLedger {
+  const o = demoStore.get(id);
+  if (!o) throw demoOrderNotFound(id);
+  return o;
+}
+
+function demoLedger(o: OrderWithLedger, kind: EscrowKind, amountVnd: number, note: string) {
+  if (amountVnd <= 0) return;
+  o.escrow.push({ id: `e_${o.escrow.length + 1}`, kind, amountVnd: String(amountVnd), note, createdAt: demoNow() });
+}
+
 // ==== ENDPOINT ==============================================================
 
 /** POST /orders — tạo đơn 'pending'. */
 export function createOrder(input: CreateOrderInput): Promise<CreateOrderResult> {
+  if (DEMO_MODE) return Promise.resolve(demoCreate(input));
   return request<CreateOrderResult>('/orders', {
     method: 'POST',
     body: JSON.stringify(input),
@@ -210,30 +260,67 @@ export function createOrder(input: CreateOrderInput): Promise<CreateOrderResult>
 
 /** POST /orders/:id/pay-sandbox — mô phỏng PSP callback (pending → deposited, idempotent). */
 export function paySandbox(orderId: string): Promise<Order> {
+  if (DEMO_MODE) {
+    const o = demoGet(orderId);
+    if (o.status === 'pending') {
+      o.status = 'deposited'; o.updatedAt = demoNow();
+      demoLedger(o, 'deposit_in', toVnd(o.depositVnd), 'Khách nạp cọc vào escrow (demo)');
+    }
+    return Promise.resolve(o);
+  }
   return request<Order>(`/orders/${orderId}/pay-sandbox`, { method: 'POST' });
 }
 
 /** POST /orders/:id/confirm — người bán xác nhận (deposited → confirmed). */
 export function confirmOrder(orderId: string): Promise<Order> {
+  if (DEMO_MODE) {
+    const o = demoGet(orderId);
+    if (o.status === 'deposited') { o.status = 'confirmed'; o.updatedAt = demoNow(); }
+    return Promise.resolve(o);
+  }
   return request<Order>(`/orders/${orderId}/confirm`, { method: 'POST' });
 }
 
 /** POST /orders/:id/complete — khách xác nhận xong (confirmed → completed). */
 export function completeOrder(orderId: string): Promise<Order> {
+  if (DEMO_MODE) {
+    const o = demoGet(orderId);
+    if (o.status === 'confirmed') {
+      o.status = 'completed'; o.updatedAt = demoNow();
+      demoLedger(o, 'payout_out', toVnd(o.sellerPayoutVnd), 'Trả người bán (demo)');
+      demoLedger(o, 'potter_fee', toVnd(o.potterFeeVnd), 'Phí Potter 10% (demo)');
+    }
+    return Promise.resolve(o);
+  }
   return request<Order>(`/orders/${orderId}/complete`, { method: 'POST' });
 }
 
 /** POST /orders/:id/cancel — khách hủy, tính hoàn cọc QĐ-1. */
 export function cancelOrder(orderId: string): Promise<CancelResult> {
+  if (DEMO_MODE) {
+    const o = demoGet(orderId);
+    if (o.status === 'pending') {
+      o.status = 'cancelled'; o.updatedAt = demoNow();
+      return Promise.resolve({ refundVnd: 0, tier: '100' });
+    }
+    const r = previewRefund(toVnd(o.depositVnd), o.tripDate);
+    o.status = 'refunded'; o.updatedAt = demoNow();
+    demoLedger(o, 'refund_out', r.refundVnd, `Hoàn cọc demo (${r.tier})`);
+    return Promise.resolve({ refundVnd: r.refundVnd, tier: r.tier });
+  }
   return request<CancelResult>(`/orders/${orderId}/cancel`, { method: 'POST' });
 }
 
 /** GET /orders/mine — danh sách đơn của khách. */
 export function getMyOrders(): Promise<Order[]> {
+  if (DEMO_MODE) {
+    return Promise.resolve([...demoStore.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  }
   return request<Order[]>('/orders/mine', { method: 'GET' });
 }
 
 /** GET /orders/:id — chi tiết đơn kèm sổ escrow. */
 export function getOrder(orderId: string): Promise<OrderWithLedger> {
+  if (DEMO_MODE) return Promise.resolve(demoGet(orderId));
   return request<OrderWithLedger>(`/orders/${orderId}`, { method: 'GET' });
 }

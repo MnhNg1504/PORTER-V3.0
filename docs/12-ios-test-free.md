@@ -81,6 +81,18 @@ Chỉ khi muốn một trong các thứ sau:
 - Test **Android** trước (miễn phí 100%, không cần Apple/Mac): `npx expo run:android`.
 - Hoặc mua Apple Dev sớm để dùng EAS build đám mây.
 
+## 6b. DEMO1 — chạy độc lập, KHÔNG cần server
+
+Cho buổi demo đầu tiên, app **tự chạy trên iPhone mà không cần bật backend NestJS**:
+- **Booking / đặt cọc**: chạy ở `DEMO_MODE` (mặc định BẬT trong `app/src/lib/paymentsApi.ts`) — mô phỏng cục bộ trọn luồng *chọn ngày → cọc 30% → xác nhận → hủy/hoàn theo thang QĐ-1*, **KHÔNG tiền thật**.
+- **Bản đồ + thời tiết**: dùng tile OSM/OpenFreeMap + Open-Meteo công khai → chỉ cần **wifi/4G**, không cần server.
+- **Các tab khác** (Cộng đồng, Hồ sơ, Nhắn tin): dữ liệu mock sẵn.
+
+→ Demo1 chỉ cần: Mac build 1 lần (mục 1–3) + iPhone có mạng. Không cần chạy `server/`.
+Khi nối backend thật: `configurePaymentsApi({ baseUrl, token, demo: false })` lúc đăng nhập.
+
+**Kịch bản demo gợi ý (5'):** mở app → lướt Trang chủ (thời tiết săn mây thật) → chọn cung → xem Chi tiết (bản đồ/độ cao) → **MUA CUNG → Booking → ký cam kết → đặt cọc 30% → xem trạng thái đơn → thử Hủy (xem thang hoàn cọc)** → mở tab Bản đồ (GPS thật) → Hồ sơ.
+
 ## 7. Sự cố hay gặp
 
 | Lỗi | Cách xử lý |

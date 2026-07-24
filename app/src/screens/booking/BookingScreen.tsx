@@ -69,6 +69,7 @@ export function BookingScreen({ route }: Props) {
         routeSlug: routeSlugOf(data.id),
         tripDate,
         headcount,
+        demoUnitVnd: data.priceVnd, // DEMO1: tính đơn cục bộ khi chưa nối backend
       });
       nav.navigate('OrderStatus', { orderId: order.id });
     } catch (e) {
