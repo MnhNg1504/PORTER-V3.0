@@ -49,3 +49,17 @@ export function assertTierAccess(tier: number, role: string, difficulty: Difficu
   const a = tierAccess(tier, role, difficulty);
   if (!a.allowed) throw new ForbiddenException(a.reason);
 }
+
+/**
+ * Quyền ĐẶT ĐƠN có người dẫn (khác tierAccess: đơn LUÔN kèm guide nên Cấp 1 đặt được
+ * cung Chuẩn — thoả QĐ-4 "cung Chuẩn bắt buộc đặt guide"). Cung Khó vẫn cấm Cấp 1.
+ */
+export function assertCanBook(tier: number, role: string, difficulty: Difficulty): void {
+  if (role === 'admin' || tier >= 2) return;
+  if (difficulty === 'hard') {
+    throw new ForbiddenException(
+      'Cấp 1 không thể đặt cung Khó — cần lên Cấp 2 hoặc tham gia tour tổ chức (docs/04 · QĐ-4)',
+    );
+  }
+  // easy & standard: được đặt vì đơn đã kèm người dẫn.
+}
