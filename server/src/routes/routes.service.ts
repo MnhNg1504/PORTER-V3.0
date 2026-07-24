@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TrekRoute, Difficulty } from './route.entity';
 import { Purchase } from '../purchases/purchase.entity';
+import { assertTierAccess } from '../common/access';
 import type { JwtPayload } from '../auth/jwt.strategy';
 
 @Injectable()
@@ -29,20 +30,26 @@ export class RoutesService {
 
   /**
    * Track GeoJSON đầy đủ — CHỈ khi: cung miễn phí, đã mua, là seller, hoặc admin.
-   * Enforce cấp 1 không tự đi cung khó (docs/04): trả kèm cờ requiresGuide.
+   * Enforce cấp (docs/04 + QĐ-4) server-side ở CẢ cung miễn phí (assertTierAccess).
    */
   async fullTrack(slug: string, user: JwtPayload) {
-    const route = await this.detail(slug);
+    const route = await this.routes.findOne({ where: { slug }, relations: { seller: true } });
+    if (!route) throw new NotFoundException('Cung không tồn tại');
+
+    // H8: chặn theo cấp trước — kể cả cung miễn phí (không chỉ là cờ ở app)
+    assertTierAccess(user.tier, user.role, route.difficulty);
+
     const isFree = route.priceVnd === '0';
     const isAdmin = user.role === 'admin';
-    if (!isFree && !isAdmin) {
+    const isSeller = route.seller?.id === user.sub; // H5: seller xem được cung của chính mình
+    if (!isFree && !isAdmin && !isSeller) {
       const paid = await this.purchases.findOne({
         where: { route: { id: route.id }, buyer: { id: user.sub }, status: 'paid' },
       });
       if (!paid) throw new ForbiddenException('Cần mua cung để tải track đầy đủ');
     }
-    // Cấp 1 + cung khó → bắt buộc có hướng dẫn (app chặn điều hướng, docs/04 §1)
-    const requiresGuide = user.tier === 1 && route.difficulty !== 'easy';
+    // Sau assertTierAccess, mọi cấp qua được đều không cần guide (Cấp 1 chỉ còn cung Dễ).
+    const requiresGuide = false;
 
     const row: { geojson: string } | undefined = await this.routes
       .createQueryBuilder('r')

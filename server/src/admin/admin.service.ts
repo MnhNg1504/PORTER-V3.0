@@ -75,15 +75,15 @@ export class AdminService {
     const rows: { id: string }[] = await this.dataSource.query(
       `INSERT INTO trek_routes
         ("name","slug","difficulty","geom","startPoint","distanceM","ascentM","descentM",
-         "maxEleM","minEleM","durationEstMin","seller_id","status")
+         "maxEleM","minEleM","durationEstMin","seller_id","priceVnd","status")
        VALUES ($1,$2,$3, ST_GeomFromText($4,4326), ST_SetSRID(ST_MakePoint($5,$6),4326),
-               $7,$8,$9,$10,$11,$12,$13,'published')
+               $7,$8,$9,$10,$11,$12,$13,$14,'published')
        RETURNING id`,
       [
         sub.routeName, slug, classifyDifficulty(stats.ascentM, stats.distanceM), wkt,
         start.lon, start.lat,
         stats.distanceM, stats.ascentM, stats.descentM, stats.maxEleM, stats.minEleM,
-        estimateMinutes(stats.distanceM, stats.ascentM), sub.user.id,
+        estimateMinutes(stats.distanceM, stats.ascentM), sub.user.id, sub.priceVnd ?? '0',
       ],
     );
     this.log.log(`Duyệt GPX -> tạo cung "${sub.routeName}" (${slug}), seller ${sub.user.id}`);

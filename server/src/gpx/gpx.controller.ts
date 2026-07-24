@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { IsString, MinLength, MaxLength } from 'class-validator';
+import { IsString, MinLength, MaxLength, IsInt, Min, IsOptional } from 'class-validator';
 import { GpxService } from './gpx.service';
 import { CurrentUser, MinTier, RolesGuard } from '../common/auth.decorators';
 import type { JwtPayload } from '../auth/jwt.strategy';
@@ -18,6 +18,12 @@ class SubmitGpxDto {
   @MinLength(100)
   @MaxLength(20_000_000) // ~20MB text
   rawGpx: string;
+
+  @ApiProperty({ example: 350000, description: 'Giá bán đề xuất (VND); 0 = miễn phí', required: false })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  priceVnd?: number;
 }
 
 @ApiTags('gpx')
@@ -31,7 +37,7 @@ export class GpxController {
   @Post('submit')
   @MinTier(2)
   submit(@CurrentUser() user: JwtPayload, @Body() dto: SubmitGpxDto) {
-    return this.gpx.submit(user.sub, dto.routeName, dto.rawGpx);
+    return this.gpx.submit(user.sub, dto.routeName, dto.rawGpx, dto.priceVnd ?? 0);
   }
 
   @Get('mine')

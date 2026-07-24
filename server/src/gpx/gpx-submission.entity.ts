@@ -28,6 +28,10 @@ export class GpxSubmission {
   @Column('int')
   distanceM: number;
 
+  /** Giá bán người mở cung đề xuất (VND); 0 = miễn phí. Admin duyệt xong route lấy giá này. */
+  @Column({ type: 'bigint', default: 0 })
+  priceVnd: string;
+
   @Index()
   @Column({ type: 'varchar', default: 'pending' })
   status: SubmissionStatus;

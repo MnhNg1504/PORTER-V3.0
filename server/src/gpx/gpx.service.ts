@@ -60,8 +60,8 @@ export function trackStats(pts: GpxPoint[]) {
 export class GpxService {
   constructor(@InjectRepository(GpxSubmission) private subs: Repository<GpxSubmission>) {}
 
-  /** User Cấp 2+ nộp GPX mở cung (docs/04) — vào hàng đợi kiểm duyệt */
-  async submit(userId: string, routeName: string, rawGpx: string) {
+  /** User Cấp 2+ nộp GPX mở cung (docs/04) — vào hàng đợi kiểm duyệt. priceVnd = giá đề xuất. */
+  async submit(userId: string, routeName: string, rawGpx: string, priceVnd = 0) {
     const pts = parseGpx(rawGpx);
     const stats = trackStats(pts);
     const sub = this.subs.create({
@@ -70,9 +70,10 @@ export class GpxService {
       rawGpx,
       pointCount: pts.length,
       distanceM: stats.distanceM,
+      priceVnd: String(Math.max(0, Math.trunc(priceVnd))),
     });
     const saved = await this.subs.save(sub);
-    return { id: saved.id, status: saved.status, pointCount: pts.length, ...stats };
+    return { id: saved.id, status: saved.status, pointCount: pts.length, priceVnd: saved.priceVnd, ...stats };
   }
 
   mySubmissions(userId: string) {

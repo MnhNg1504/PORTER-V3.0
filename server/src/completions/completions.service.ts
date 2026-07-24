@@ -14,6 +14,7 @@ import {
   CERTIFIED_THRESHOLD, REPUTATION_CERTIFIED,
 } from './completions.logic';
 import { haversineM } from '../gpx/gpx.service';
+import { assertTierAccess } from '../common/access';
 import type { JwtPayload } from '../auth/jwt.strategy';
 
 /**
@@ -40,6 +41,8 @@ export class CompletionsService {
   }
 
   private async assertAccess(user: JwtPayload, route: TrekRoute): Promise<void> {
+    // H8: enforce cấp TRƯỚC cả cửa cung miễn phí (Cấp 1 không lách được cung Khó/Chuẩn free)
+    assertTierAccess(user.tier, user.role, route.difficulty);
     if (route.priceVnd === '0' || user.role === 'admin') return;
     const paid = await this.purchases.findOne({
       where: { route: { id: route.id }, buyer: { id: user.sub }, status: 'paid' },
@@ -190,9 +193,13 @@ export class CompletionsService {
     });
     const certified = score >= CERTIFIED_THRESHOLD;
 
-    await this.completions.update(completionId, {
-      status: 'finished', finishedAt: new Date(), verifyScore: score, certified,
-    });
+    // H6: chốt trạng thái ATOMIC (WHERE status='active') — 2 request song song thì chỉ
+    // 1 cái affected=1, chặn cộng uy tín 2 lần / ghi đè kết quả.
+    const res = await this.completions.update(
+      { id: completionId, status: 'active' },
+      { status: 'finished', finishedAt: new Date(), verifyScore: score, certified },
+    );
+    if (!res.affected) throw new ConflictException('Đã kết thúc trước đó');
     if (certified) {
       await this.users.addReputation(user.sub, REPUTATION_CERTIFIED);
       await this.notifications.sendToUser(
