@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { difficultyMeta, Difficulty, radius, space } from '../theme';
+import { colors, difficultyMeta, Difficulty, radius, space } from '../theme';
 
 // Chip độ khó màu: Dễ=xanh, Chuẩn=vàng, Khó=đỏ (docs 02).
 export function DifficultyChip({ difficulty }: { difficulty: Difficulty }) {
@@ -19,5 +19,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     alignSelf: 'flex-start',
   },
-  text: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  // Chữ ink tối #182200 — tương phản cao trên cả 3 màu semantic (sage/gold/ember) sáng
+  text: { color: colors.text.onLime, fontSize: 12, fontWeight: '700' },
 });

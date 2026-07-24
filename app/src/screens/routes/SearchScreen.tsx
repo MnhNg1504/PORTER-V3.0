@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/types';
 import { colors, radius, space, type } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { RouteCard } from '../../components/RouteCard';
 import { mockRoutes } from '../../lib/mockData';
 
@@ -65,10 +66,10 @@ const styles = StyleSheet.create({
     margin: space.screen,
     marginBottom: 0,
     paddingHorizontal: space[3],
-    backgroundColor: colors.bg.surface,
+    backgroundColor: glass.fillSunk,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
   },
   searchIcon: { fontSize: 16, marginRight: space[2] },
   input: { flex: 1, height: 46, ...type.body, color: colors.text.primary },

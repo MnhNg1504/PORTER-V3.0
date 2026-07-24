@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, radius, space, shadow, type } from '../../theme';
+import { glass, brandPalette } from '../../theme/tokens';
 import { DifficultyChip } from '../../components/DifficultyChip';
 import { StatCell } from '../../components/StatCell';
 import { ContourCard } from '../../components/ContourCard';
@@ -43,6 +44,7 @@ export function RouteDetailScreen({ route }: Props) {
         {/* Hero brand (ảnh thực địa từ CDN gắn sau — TODO(api)) */}
         <View style={styles.hero}>
           <Text style={styles.heroGlyph}>⛰</Text>
+          <View style={styles.heroScrim} />
           <View style={styles.heroOverlay}>
             <Text style={styles.heroName} numberOfLines={2}>{data.name}</Text>
             <Text style={styles.heroRegion}>{data.region}</Text>
@@ -113,11 +115,12 @@ export function RouteDetailScreen({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg.base },
-  hero: { height: 220, backgroundColor: colors.brand.primary, justifyContent: 'flex-end', overflow: 'hidden' },
-  heroGlyph: { position: 'absolute', top: -10, right: 8, fontSize: 168, color: colors.brand.primaryDark, opacity: 0.28 },
+  hero: { height: 220, backgroundColor: brandPalette.pine, justifyContent: 'flex-end', overflow: 'hidden' },
+  heroGlyph: { position: 'absolute', top: -10, right: 8, fontSize: 168, color: colors.brand.primary, opacity: 0.22 },
+  heroScrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(8,11,8,0.45)' },
   heroOverlay: { padding: space[4] },
-  heroName: { ...type.h1, color: colors.text.onBrand },
-  heroRegion: { ...type.meta, color: colors.text.onBrand, opacity: 0.85, marginTop: space[1] },
+  heroName: { ...type.h1, color: colors.text.primary },
+  heroRegion: { ...type.meta, color: colors.text.primary, opacity: 0.85, marginTop: space[1] },
   heroChip: { position: 'absolute', top: space[4], right: space[4] },
   body: { padding: space.screen },
   name: { ...type.display, color: colors.text.primary },
@@ -125,23 +128,38 @@ const styles = StyleSheet.create({
   stats: {
     flexDirection: 'row',
     marginVertical: space[4],
-    paddingVertical: space[3],
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    paddingVertical: space[4],
+    paddingHorizontal: space[2],
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: glass.border,
+    backgroundColor: glass.fill,
+    ...shadow.glassSoft,
   },
   mapPlaceholder: {
     height: 140,
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
+    borderRadius: radius.lg,
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: space[4],
+    ...shadow.glassSoft,
   },
   mapPlaceholderText: { ...type.meta, color: colors.rock, textAlign: 'center' },
   section: { ...type.h2, color: colors.text.primary, marginTop: space[2], marginBottom: space[2] },
   paragraph: { ...type.body, color: colors.text.secondary },
-  warn: { ...type.meta, color: colors.danger, marginTop: space[4] },
+  warn: {
+    ...type.meta,
+    color: brandPalette.emberSoft,
+    marginTop: space[4],
+    padding: space[3],
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,82,51,0.35)',
+    backgroundColor: 'rgba(255,82,51,0.08)',
+  },
   ctaBar: {
     position: 'absolute',
     left: 0,
@@ -154,11 +172,12 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   buyBtn: {
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: colors.brand.primary,
     borderRadius: radius.md,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.limeGlow,
   },
-  buyText: { color: colors.brand.primary, ...type.h2 },
+  buyText: { color: colors.text.onLime, ...type.h2 },
 });

@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import { colors, radius, space, shadow, type, fonts } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { mockRoutes } from '../../lib/mockData';
 import { haversine } from '../../lib/gpx';
 import { RootStackParamList } from '../../navigation/types';
@@ -228,12 +229,15 @@ const styles = StyleSheet.create({
   step: { ...type.meta, color: colors.text.secondary, padding: space.screen, paddingBottom: space[2] },
   photo: {
     height: 240,
-    backgroundColor: colors.earth,
+    backgroundColor: glass.fillSunk,
     marginHorizontal: space.screen,
     borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: glass.border,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    ...shadow.glassSoft,
   },
   photoPlaceholder: { color: '#fff', ...type.h2, opacity: 0.8 },
   photoCaption: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.45)', padding: space[3] },
@@ -241,11 +245,12 @@ const styles = StyleSheet.create({
   photoCaptionText: { color: '#fff', ...type.meta, marginTop: 2 },
   body: { padding: space.screen },
   distCard: {
-    backgroundColor: colors.bg.surface,
-    borderRadius: radius.md,
-    padding: space[3],
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    backgroundColor: glass.fill,
+    borderRadius: radius.lg,
+    padding: space[4],
+    borderWidth: 1,
+    borderColor: glass.border,
+    ...shadow.glassSoft,
   },
   distRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   iconRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], flexShrink: 1 },
@@ -253,7 +258,16 @@ const styles = StyleSheet.create({
   distV: { ...type.meta, color: colors.text.primary, fontWeight: '700', fontVariant: ['tabular-nums'] },
   bar: { height: 6, borderRadius: 3, backgroundColor: colors.border, marginTop: space[3], overflow: 'hidden' },
   barFill: { height: 6, borderRadius: 3, backgroundColor: colors.brand.primaryLight },
-  noteCard: { marginTop: space[3], gap: space[2] },
+  noteCard: {
+    marginTop: space[3],
+    gap: space[3],
+    backgroundColor: glass.fill,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: glass.border,
+    padding: space[4],
+    ...shadow.glassSoft,
+  },
   noteText: { ...type.body, color: colors.text.secondary, flex: 1 },
   hint: { ...type.caption, color: colors.rock, marginTop: space[3] },
   coordRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space[4] },
@@ -275,11 +289,12 @@ const styles = StyleSheet.create({
   primaryBtn: {
     flexDirection: 'row',
     gap: space[2],
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: colors.brand.primary,
     borderRadius: radius.md,
     paddingVertical: space[4],
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.limeGlow,
   },
   primaryBtnBusy: { opacity: 0.85 },
   primaryText: { color: colors.text.onLime, ...type.meta, fontWeight: '700', textAlign: 'center' },
@@ -307,7 +322,9 @@ const styles = StyleSheet.create({
   sheetPhoto: {
     height: 110,
     borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
+    backgroundColor: glass.fillSunk,
+    borderWidth: 1,
+    borderColor: glass.border,
     marginVertical: space[3],
     alignItems: 'center',
     justifyContent: 'center',
@@ -318,6 +335,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingVertical: space[4],
     alignItems: 'center',
+    ...shadow.limeGlow,
   },
   confirmText: { color: colors.text.onBrand, ...type.meta, fontWeight: '700' },
   skipText: { ...type.meta, color: colors.text.secondary, textDecorationLine: 'underline' },

@@ -15,5 +15,5 @@ export function StatCell({ value, label }: { value: string; label: string }) {
 const styles = StyleSheet.create({
   cell: { flex: 1, alignItems: 'center' },
   value: { ...type.stat, color: colors.text.primary },
-  label: { ...type.caption, color: colors.text.secondary, marginTop: 2 },
+  label: { ...type.kicker, color: colors.text.secondary, textTransform: 'uppercase', marginTop: 3 },
 });

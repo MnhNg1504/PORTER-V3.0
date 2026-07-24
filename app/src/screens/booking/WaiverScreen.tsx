@@ -5,6 +5,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, radius, space, shadow, type, sizing } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { mockRoutes, currentUser } from '../../lib/mockData';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -105,11 +106,12 @@ const styles = StyleSheet.create({
   termsCard: {
     marginTop: space[4],
     padding: space[4],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
+    borderRadius: radius.lg,
+    backgroundColor: glass.fill,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
     gap: space[3],
+    ...shadow.glassSoft,
   },
   termRow: { flexDirection: 'row', gap: space[3] },
   termBullet: {
@@ -141,10 +143,10 @@ const styles = StyleSheet.create({
   input: {
     height: sizing.buttonHeight,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
     borderRadius: radius.md,
     paddingHorizontal: space[4],
-    backgroundColor: colors.bg.surface,
+    backgroundColor: glass.fillSunk,
     ...type.h2,
     color: colors.text.primary,
     // Chữ ký kiểu tay: dùng font display cho cảm giác "ký".
@@ -161,11 +163,12 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   cta: {
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: colors.brand.primary,
     borderRadius: radius.md,
     height: sizing.buttonHeight,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.limeGlow,
   },
   ctaDisabled: { opacity: 0.5 },
   ctaText: { ...type.h2, color: colors.text.onLime, fontWeight: '700' },

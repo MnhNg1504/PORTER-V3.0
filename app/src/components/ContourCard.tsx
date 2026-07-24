@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, { Path, Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { fonts, radius, space, type } from '../theme';
+import { colors, fonts, radius, space, shadow, type } from '../theme';
+import { glass } from '../theme/tokens';
 import type { GpxPoint } from '../lib/gpx';
 import { haversine } from '../lib/gpx';
 import {
@@ -16,12 +17,14 @@ import {
  * DỮ LIỆU THẬT: lưới DEM terrarium (scripts/gen-dem-grid.mjs) + route GPX.
  */
 
-const INK = '#121315';
-const MUTE = '#5D6368';
-const RING = '#B9BDBF';
-const PAPER = '#FAFBF8';
-const ROUTE_GOLD = '#E8B400';
-const PIN_CREAM = '#EAF1E4';
+// DARK-GLASS v3: đảo hệ giấy/mực → nền tối, đường nét cream/muted sáng lên trên nền tối.
+const INK = colors.text.primary; // Cream #EAF1E4 — chữ/đường nét chính trên nền tối
+const MUTE = colors.text.secondary; // Muted — nhãn phụ, headSub
+const RING = colors.text.faint; // Faint — vòng la bàn / halo mờ trên nền tối
+const PAPER = colors.bg.surface; // Card glass tối #121B15 (thay nền giấy trắng)
+const ROUTE_GOLD = '#E8B400'; // Track GPX vàng — vẫn nổi rõ trên nền tối, giữ nhận diện
+const PIN_CREAM = '#EAF1E4'; // Đầu pin cream
+const PIN_INK = colors.text.onLime; // Glyph tối #182200 trên đầu pin cream
 
 function fmtDMS(v: number, isLat: boolean): string {
   const d = Math.floor(Math.abs(v));
@@ -29,11 +32,11 @@ function fmtDMS(v: number, isLat: boolean): string {
   return `${d}°${String(m).padStart(2, '0')}′${isLat ? (v >= 0 ? 'N' : 'S') : (v >= 0 ? 'E' : 'W')}`;
 }
 
-/** Màu bình độ theo style đảo: thấp = xám nhạt, cao = mực đen (như preview đã chốt). */
+/** Bình độ trên nền tối (đảo hệ mực→sáng): thấp = xám mờ, cao = cream sáng nổi bật. */
 function inkContourColor(hN: number): string {
-  const r = Math.round(165 - hN * 140);
-  const g = Math.round(167 - hN * 140);
-  const b = Math.round(165 - hN * 140);
+  const r = Math.round(88 + hN * 146);
+  const g = Math.round(92 + hN * 149);
+  const b = Math.round(84 + hN * 144);
   return `rgb(${r},${g},${b})`;
 }
 
@@ -184,7 +187,7 @@ export function ContourCard({
           <Polyline points={ring} fill="none" stroke={RING} strokeOpacity={0.8} strokeWidth={1.2} />
           <Path d={ticks} stroke={RING} strokeOpacity={0.9} strokeWidth={1} fill="none" />
           {labels.map((l) => (
-            <SvgText key={l.t} x={l.x} y={l.y + 4} fill="rgba(18,19,21,0.8)" fontSize={12} fontWeight="bold" textAnchor="middle">
+            <SvgText key={l.t} x={l.x} y={l.y + 4} fill={INK} fillOpacity={0.8} fontSize={12} fontWeight="bold" textAnchor="middle">
               {l.t}
             </SvgText>
           ))}
@@ -208,10 +211,10 @@ export function ContourCard({
           {/* Pin: chấm chân + thân mảnh + đầu tròn cream, glyph mực (như preview) */}
           {pins.map((p, i) => (
             <React.Fragment key={i}>
-              <Line x1={p.x} y1={p.y} x2={p.baseX} y2={p.baseY} stroke="#43494D" strokeOpacity={0.5} strokeWidth={1.2} />
+              <Line x1={p.x} y1={p.y} x2={p.baseX} y2={p.baseY} stroke={MUTE} strokeOpacity={0.6} strokeWidth={1.2} />
               <Circle cx={p.baseX} cy={p.baseY} r={1.7} fill={RING} />
-              <Circle cx={p.x} cy={p.y - 12} r={11} fill={PIN_CREAM} stroke="#D8DDD4" strokeWidth={1} />
-              <SvgText x={p.x} y={p.y - 8} fill={INK} fontSize={11} fontWeight="bold" textAnchor="middle">
+              <Circle cx={p.x} cy={p.y - 12} r={11} fill={PIN_CREAM} stroke={glass.borderStrong} strokeWidth={1} />
+              <SvgText x={p.x} y={p.y - 8} fill={PIN_INK} fontSize={11} fontWeight="bold" textAnchor="middle">
                 {p.glyph}
               </SvgText>
             </React.Fragment>
@@ -259,7 +262,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E4E7E2',
+    borderColor: glass.border,
+    ...shadow.glass,
   },
   head: { flexDirection: 'row', alignItems: 'center', padding: space[4], paddingBottom: space[2] },
   headTitle: { ...type.h2, color: INK, fontFamily: fonts.display },
@@ -269,7 +273,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: space[3],
-    backgroundColor: INK,
+    backgroundColor: colors.bg.baseDark,
+    borderWidth: 1,
+    borderColor: glass.border,
     borderRadius: radius.pill,
     paddingHorizontal: space[3],
     paddingVertical: 5,

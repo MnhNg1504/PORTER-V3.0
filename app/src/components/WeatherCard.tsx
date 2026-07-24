@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Pressable } from 'react-native';
-import { brandPalette, colors, radius, space, type } from '../theme';
+import { brandPalette, colors, radius, space, shadow, type } from '../theme';
+import { glass } from '../theme/tokens';
 import {
   RouteWeather, fetchRouteWeather, wmoInfo, assessTrekSafety, TrekSafety,
 } from '../lib/weather';
@@ -99,11 +100,12 @@ export function WeatherCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.bg.surface,
-    borderRadius: radius.md,
+    backgroundColor: glass.fill,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
     overflow: 'hidden',
+    ...shadow.glass,
   },
   center: { alignItems: 'center', justifyContent: 'center', paddingVertical: space[6], gap: space[2] },
   dim: { ...type.meta, color: colors.text.secondary },
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
   days: { paddingHorizontal: space[3], gap: space[2], paddingBottom: space[3] },
   day: {
     alignItems: 'center',
-    backgroundColor: colors.bg.base,
+    backgroundColor: glass.fillSunk,
     borderRadius: radius.sm,
     paddingVertical: space[2],
     paddingHorizontal: space[3],
@@ -128,9 +130,11 @@ const styles = StyleSheet.create({
   dayEmoji: { fontSize: 18 },
   dayTemp: { ...type.caption, color: colors.text.primary, fontWeight: '700' },
   dayRain: { ...type.caption, color: brandPalette.mist },
-  safety: { padding: space[3] },
-  safetyOk: { backgroundColor: '#E4EFDD' },
-  safetyCaution: { backgroundColor: '#F4EAD1' },
-  safetyDanger: { backgroundColor: '#F9DAD3' },
+  // Dải an toàn trên nền tối: nền chìm glass + vạch trái màu semantic (giữ ngữ nghĩa,
+  // không dùng nền sáng cũ gây mất chữ cream).
+  safety: { padding: space[3], borderLeftWidth: 3 },
+  safetyOk: { backgroundColor: glass.fillSunk, borderLeftColor: colors.success },
+  safetyCaution: { backgroundColor: glass.fillSunk, borderLeftColor: colors.warning },
+  safetyDanger: { backgroundColor: glass.fillSunk, borderLeftColor: colors.danger },
   safetyText: { ...type.meta, color: colors.text.primary },
 });

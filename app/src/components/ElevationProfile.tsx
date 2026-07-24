@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import { colors, radius, space, type } from '../theme';
+import { glass } from '../theme/tokens';
 import { GpxPoint, TrackStats, haversine } from '../lib/gpx';
 import { gradeColor } from '../lib/nav';
 
@@ -80,8 +81,10 @@ export function ElevationProfile({
 
 const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: colors.bg.base,
+    backgroundColor: glass.fill,
     borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: glass.border,
     padding: space[3],
   },
   lbl: { ...type.caption, color: colors.text.secondary, marginBottom: space[1] },

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet, GestureResponderEvent } from 'react-native';
 import { createBottomTabNavigator, BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 import { colors, space, shadow, type } from '../theme';
+import { glass } from '../theme/tokens';
 import { TabParamList } from './types';
 import { BrandIcon, BrandIconName } from '../components/BrandIcon';
 
@@ -19,11 +20,11 @@ function TabIcon({ icon, label, focused }: { icon: BrandIconName; label: string;
   return (
     <View style={styles.tabItem}>
       {focused && <View style={styles.tabIndicator} />}
-      <BrandIcon name={icon} size={22} color={focused ? colors.text.primary : colors.rock} />
+      <BrandIcon name={icon} size={22} color={focused ? colors.brand.primary : colors.rock} />
       <Text
         style={[
           styles.tabLabel,
-          focused && { color: colors.text.primary, fontWeight: '700' },
+          focused && { color: colors.brand.primary, fontWeight: '700' },
         ]}
         numberOfLines={1}
       >
@@ -93,8 +94,8 @@ const styles = StyleSheet.create({
     height: 74 + space[2],
     paddingTop: space[1],
     backgroundColor: colors.bg.base,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
+    borderTopWidth: 1,
+    borderTopColor: glass.border,
   },
   tabItem: { alignItems: 'center', justifyContent: 'center', width: 72, gap: 3 },
   tabIndicator: {
@@ -111,10 +112,10 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    // CTA thương hiệu: Lime Signal, glyph Pine (Porter Brand Guidelines)
-    backgroundColor: colors.brand.primaryLight,
+    // CTA thương hiệu v3: Lime Signal + quầng lime, glyph ink tối (onLime)
+    backgroundColor: colors.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.fab,
+    ...shadow.limeGlow,
   },
 });

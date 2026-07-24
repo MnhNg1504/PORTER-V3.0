@@ -12,6 +12,7 @@ import MapLibreGL, {
 } from '@maplibre/maplibre-react-native';
 
 import { colors, radius, space, shadow, type } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { RootStackParamList } from '../../navigation/types';
 import {
   computeStats,
@@ -339,28 +340,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 3,
     borderColor: '#FFFFFF',
-    ...shadow.fab,
+    ...shadow.sos,
   },
   sosText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15, letterSpacing: 1 },
   navCard: {
     position: 'absolute',
     left: space[3],
     right: space[3],
-    backgroundColor: 'rgba(255,255,255,0.97)',
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     borderRadius: radius.lg,
     padding: space[4],
-    ...shadow.fab,
+    ...shadow.glass,
   },
   main: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   arrow: {
     width: 52,
     height: 52,
     borderRadius: 16,
-    backgroundColor: colors.map.trackPlanned,
+    backgroundColor: colors.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.limeGlow,
   },
-  arrowIcon: { color: '#fff', fontSize: 26 },
+  arrowIcon: { color: colors.text.onLime, fontSize: 26 },
   instrMain: { fontSize: 22, fontWeight: '800', color: colors.text.primary },
   instrSub: { ...type.meta, color: colors.text.secondary, marginTop: 2 },
   foot: {
@@ -379,15 +383,24 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     paddingVertical: space[4],
     alignItems: 'center',
-    ...shadow.fab,
+    ...shadow.limeGlow,
   },
-  simText: { color: '#fff', ...type.h2 },
+  simText: { ...type.h2, color: colors.text.onLime },
   center: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
 
   // Checkpoint modal
   cpBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', padding: space[5] },
-  cpBox: { width: '100%', maxWidth: 340, backgroundColor: colors.bg.base, borderRadius: radius.lg, overflow: 'hidden' },
-  cpImg: { height: 140, backgroundColor: colors.bg.surface, alignItems: 'center', justifyContent: 'center', gap: space[2] },
+  cpBox: {
+    width: '100%',
+    maxWidth: 340,
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: glass.border,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    ...shadow.glass,
+  },
+  cpImg: { height: 140, backgroundColor: glass.fillSunk, alignItems: 'center', justifyContent: 'center', gap: space[2] },
   cpImgText: { ...type.caption, color: colors.rock },
   cpBody: { padding: space[4] },
   cpHead: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
@@ -417,11 +430,14 @@ const styles = StyleSheet.create({
   // Finish sheet
   finBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   finSheet: {
-    backgroundColor: colors.bg.base,
+    backgroundColor: colors.bg.surface,
+    borderTopWidth: 1,
+    borderColor: glass.border,
     borderTopLeftRadius: radius.lg + 6,
     borderTopRightRadius: radius.lg + 6,
     padding: space.screen,
     paddingBottom: space[8],
+    ...shadow.glass,
   },
   finTitle: { fontFamily: fonts.display, fontSize: 19, color: colors.text.primary },
   finCert: {

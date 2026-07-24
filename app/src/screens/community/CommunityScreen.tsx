@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { DifficultyChip } from '../../components/DifficultyChip';
 import { colors, radius, space, shadow, type, sizing } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { mockPosts, Post } from '../../lib/mockData';
 
 // TAB 1 — Mạng xã hội trekker: feed + post card + tương tác.
@@ -53,6 +54,11 @@ function PostCard({ post }: { post: Post }) {
       </View>
       <View style={styles.image}>
         <Text style={styles.imageGlyph}>⛰</Text>
+        {post.routeRef && (
+          <View style={styles.verifiedBadge}>
+            <Text style={styles.verifiedText}>✓ GPX kiểm chứng</Text>
+          </View>
+        )}
         <Text style={styles.imageText}>{post.routeRef ? post.routeRef.name : post.author}</Text>
       </View>
       <Text style={styles.caption}>{post.caption}</Text>
@@ -100,28 +106,34 @@ function PostCard({ post }: { post: Post }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg.surface },
+  container: { flex: 1, backgroundColor: colors.bg.base },
   seg: { flexDirection: 'row', gap: space[3] },
   segText: { ...type.meta, color: colors.text.secondary },
   segTextOn: { color: colors.brand.primary, fontWeight: '700' },
-  card: { backgroundColor: colors.bg.base, borderRadius: radius.md, padding: space[4], marginBottom: space.cardGap, ...shadow.card },
+  // Feed card dark-glass: nền glass đặc + viền lime mờ + bóng sâu
+  card: { backgroundColor: glass.fill, borderRadius: radius.lg, borderWidth: 1, borderColor: glass.border, padding: space[4], marginBottom: space.cardGap, ...shadow.glass },
   head: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginBottom: space[3] },
-  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brand.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  avatarInitial: { ...type.meta, color: colors.brand.primaryDark, fontWeight: '800' },
+  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center' },
+  avatarInitial: { ...type.meta, color: colors.text.onLime, fontWeight: '800' },
   author: { ...type.h2, color: colors.text.primary },
   level: { ...type.caption, color: colors.brand.primary },
   time: { ...type.caption, color: colors.text.secondary },
-  image: { height: 200, borderRadius: radius.md, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  imageGlyph: { position: 'absolute', fontSize: 128, color: colors.brand.primaryDark, opacity: 0.3 },
-  imageText: { color: colors.text.onBrand, ...type.meta, fontWeight: '700', opacity: 0.95 },
+  // Ảnh: vùng chìm dark-glass thay vì khối lime chói trên nền tối
+  image: { height: 200, borderRadius: radius.md, backgroundColor: glass.fillSunk, borderWidth: 1, borderColor: glass.border, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  imageGlyph: { position: 'absolute', fontSize: 128, color: colors.earth, opacity: 0.16 },
+  imageText: { color: colors.text.secondary, ...type.meta, fontWeight: '700' },
+  // Badge "GPX kiểm chứng" — pill Lime nổi trên ảnh
+  verifiedBadge: { position: 'absolute', top: space[3], left: space[3], backgroundColor: colors.brand.primary, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1], ...shadow.limeGlow },
+  verifiedText: { ...type.caption, color: colors.text.onLime, fontWeight: '800', letterSpacing: 0.3 },
   caption: { ...type.body, color: colors.text.primary, marginTop: space[3] },
-  routeChip: { backgroundColor: colors.bg.surface, borderRadius: radius.md, padding: space[3], marginTop: space[3] },
+  routeChip: { backgroundColor: glass.fillSunk, borderRadius: radius.md, borderWidth: 1, borderColor: glass.border, padding: space[3], marginTop: space[3] },
   routeChipName: { ...type.meta, color: colors.text.primary, fontWeight: '700' },
   routeChipMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space[2] },
   routeChipText: { ...type.meta, color: colors.text.secondary },
   actions: { flexDirection: 'row', gap: space[4], marginTop: space[3] },
   actionBtn: { minWidth: sizing.touchMin, minHeight: sizing.touchMin, alignItems: 'center', justifyContent: 'center' },
-  action: { ...type.meta, color: colors.text.secondary },
+  // Icon hành động rõ trên nền tối (mức ink thay vì muted)
+  action: { ...type.meta, color: colors.text.primary },
   composeFab: {
     position: 'absolute',
     right: space[4],
@@ -132,7 +144,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.fab,
+    ...shadow.limeGlow,
   },
-  composeIcon: { color: '#fff', fontSize: 28, lineHeight: 30 },
+  // Chữ ＋ trên nền Lime: dùng onLime (tránh trắng-trên-lime mất chữ)
+  composeIcon: { color: colors.text.onLime, fontSize: 28, lineHeight: 30 },
 });

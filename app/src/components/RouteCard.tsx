@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { colors, radius, space, shadow, type } from '../theme';
+import { glass } from '../theme/tokens';
 import { Route, currentUser } from '../lib/mockData';
 import { DifficultyChip } from './DifficultyChip';
 import { StatCell } from './StatCell';
@@ -61,19 +62,21 @@ export function RouteCard({ route, onPress }: { route: Route; onPress?: () => vo
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.bg.base,
-    borderRadius: radius.md,
+    backgroundColor: glass.fill,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: glass.border,
     marginBottom: space.cardGap,
     overflow: 'hidden',
-    ...shadow.card,
+    ...shadow.glass,
   },
   hero: {
     height: 140,
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: glass.fillSunk,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroText: { color: colors.brand.primaryDark, ...type.meta },
+  heroText: { color: colors.text.secondary, ...type.meta },
   hotBadge: {
     position: 'absolute',
     top: space[3],
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space[2],
     paddingVertical: space[1],
   },
-  hotBadgeText: { color: '#fff', ...type.caption, fontWeight: '700' },
+  hotBadgeText: { color: colors.text.primary, ...type.caption, fontWeight: '700' },
   chipOnHero: { position: 'absolute', top: space[3], right: space[3] },
   body: { padding: space[4] },
   name: { ...type.h2, color: colors.text.primary },

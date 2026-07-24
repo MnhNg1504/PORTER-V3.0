@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { colors, radius, space, type } from '../../theme';
+import { colors, radius, space, type, shadow } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { mockChat, mockConversations, ChatMessage } from '../../lib/mockData';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -56,25 +57,59 @@ export function ChatScreen({ route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg.surface },
-  routeCtx: { backgroundColor: colors.brand.primaryLight, padding: space[3] },
-  routeCtxText: { ...type.meta, color: colors.brand.primaryDark, fontWeight: '700' },
+  container: { flex: 1, backgroundColor: colors.bg.base },
+  routeCtx: {
+    backgroundColor: colors.bg.surface,
+    padding: space[3],
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+  },
+  routeCtxText: { ...type.meta, color: colors.brand.primary, fontWeight: '700' },
   bubble: { maxWidth: '78%', borderRadius: radius.md, padding: space[3], marginBottom: space[2] },
-  bubbleMe: { alignSelf: 'flex-end', backgroundColor: colors.brand.primary },
-  bubbleOther: { alignSelf: 'flex-start', backgroundColor: colors.bg.base },
-  textMe: { color: '#fff', ...type.body },
+  bubbleMe: {
+    alignSelf: 'flex-end',
+    backgroundColor: colors.brand.primary,
+    borderBottomRightRadius: space[1],
+    ...shadow.glassSoft,
+  },
+  bubbleOther: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: glass.border,
+    borderBottomLeftRadius: space[1],
+  },
+  textMe: { color: colors.text.onLime, ...type.body },
   textOther: { color: colors.text.primary, ...type.body },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[2],
     padding: space[3],
-    backgroundColor: colors.bg.base,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    backgroundColor: colors.bg.surface,
+    borderTopWidth: 1,
     borderColor: colors.border,
   },
   attach: { fontSize: 24, color: colors.brand.primary },
-  input: { flex: 1, backgroundColor: colors.bg.surface, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: space[2], ...type.body, color: colors.text.primary },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center' },
-  sendIcon: { color: '#fff', fontSize: 18 },
+  input: {
+    flex: 1,
+    backgroundColor: glass.fillSunk,
+    borderWidth: 1,
+    borderColor: glass.border,
+    borderRadius: radius.pill,
+    paddingHorizontal: space[4],
+    paddingVertical: space[2],
+    ...type.body,
+    color: colors.text.primary,
+  },
+  sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.brand.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadow.limeGlow,
+  },
+  sendIcon: { color: colors.text.onLime, fontSize: 18 },
 });

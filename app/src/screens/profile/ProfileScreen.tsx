@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, space, shadow, type } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { StatCell } from '../../components/StatCell';
 import { currentUser, mockBadges } from '../../lib/mockData';
 
@@ -70,28 +71,31 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg.surface },
-  cover: { backgroundColor: colors.brand.primaryDark, alignItems: 'center', paddingBottom: space[5] },
-  avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.brand.primaryLight, marginBottom: space[3] },
-  name: { ...type.h1, color: '#fff' },
-  level: { ...type.meta, color: colors.brand.primaryLight, marginTop: space[1] },
-  repBar: { width: 200, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.25)', marginTop: space[3], overflow: 'hidden' },
-  repFill: { height: 6, backgroundColor: colors.accent.summit },
-  repText: { ...type.caption, color: '#fff', marginTop: space[2] },
+  container: { flex: 1, backgroundColor: colors.bg.base },
+  // Hero tối kiểu "Oura": nền glass đặc + viền dưới lime mờ + bóng sâu
+  cover: { backgroundColor: colors.bg.surface, alignItems: 'center', paddingBottom: space[5], borderBottomWidth: 1, borderColor: glass.border, ...shadow.glass },
+  avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.brand.primary, marginBottom: space[3] },
+  name: { ...type.h1, color: colors.text.primary },
+  level: { ...type.meta, color: colors.brand.primary, marginTop: space[1] },
+  // Vòng/thanh uy tín Lime trên rãnh chìm tối
+  repBar: { width: 200, height: 8, borderRadius: radius.pill, backgroundColor: colors.bg.baseDark, borderWidth: 1, borderColor: glass.border, marginTop: space[3], overflow: 'hidden' },
+  repFill: { height: '100%', backgroundColor: colors.brand.primary, borderRadius: radius.pill },
+  repText: { ...type.caption, color: colors.text.secondary, marginTop: space[2] },
   body: { padding: space.screen },
   section: { ...type.h2, color: colors.text.primary, marginTop: space[4], marginBottom: space[3] },
-  stats: { flexDirection: 'row', backgroundColor: colors.bg.base, borderRadius: radius.md, paddingVertical: space[4], ...shadow.card },
+  stats: { flexDirection: 'row', backgroundColor: glass.fill, borderRadius: radius.lg, borderWidth: 1, borderColor: glass.border, paddingVertical: space[4], ...shadow.glass },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
-  badge: { backgroundColor: colors.bg.base, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[2], ...shadow.card },
+  badge: { backgroundColor: glass.fillAlt, borderRadius: radius.pill, borderWidth: 1, borderColor: glass.border, paddingHorizontal: space[3], paddingVertical: space[2], ...shadow.glassSoft },
   badgeText: { ...type.meta, color: colors.earth },
-  manageList: { backgroundColor: colors.bg.base, borderRadius: radius.md, ...shadow.card, overflow: 'hidden' },
+  manageList: { backgroundColor: glass.fill, borderRadius: radius.lg, borderWidth: 1, borderColor: glass.border, ...shadow.glass, overflow: 'hidden' },
   manageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space[4], paddingVertical: space[3], borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
   manageRowLast: { borderBottomWidth: 0 },
   manageLabel: { ...type.body, color: colors.text.primary },
-  soonTag: { backgroundColor: colors.bg.surface, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1] },
+  soonTag: { backgroundColor: glass.fillSunk, borderRadius: radius.pill, borderWidth: 1, borderColor: glass.border, paddingHorizontal: space[3], paddingVertical: space[1] },
   soonText: { ...type.caption, color: colors.text.faint, fontWeight: '600' },
   paragraph: { ...type.body, color: colors.text.secondary, marginBottom: space[2] },
-  premium: { backgroundColor: colors.brand.primaryLight, borderRadius: radius.md, padding: space[4], marginTop: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  premiumText: { ...type.meta, color: colors.brand.primaryDark, fontWeight: '700' },
-  premiumHint: { ...type.caption, color: colors.brand.primaryDark, fontWeight: '600', opacity: 0.7 },
+  // Card premium glass + nhãn Lime (thay khối lime chói chữ-lime-trên-lime)
+  premium: { backgroundColor: glass.fill, borderRadius: radius.lg, borderWidth: 1, borderColor: glass.borderStrong, padding: space[4], marginTop: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', ...shadow.glass },
+  premiumText: { ...type.meta, color: colors.brand.primary, fontWeight: '700' },
+  premiumHint: { ...type.caption, color: colors.text.secondary, fontWeight: '600' },
 });

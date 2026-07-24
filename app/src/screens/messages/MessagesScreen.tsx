@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
   },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.brand.primaryLight },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.bg.surfaceDark, borderWidth: 1, borderColor: colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
   name: { ...type.h2, color: colors.text.primary },
   guideTag: {
@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
   },
   time: { ...type.caption, color: colors.text.secondary, marginLeft: 'auto' },
   last: { ...type.meta, color: colors.text.secondary, marginTop: 2 },
-  badge: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: colors.accent.summit, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  badgeText: { color: '#fff', ...type.caption, fontWeight: '700' },
+  badge: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: colors.brand.primary, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  badgeText: { color: colors.text.onLime, ...type.caption, fontWeight: '700' },
 });

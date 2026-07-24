@@ -3,7 +3,8 @@ import {
   Modal, View, Text, Pressable, StyleSheet, Platform, Linking, Share, ActivityIndicator,
 } from 'react-native';
 import * as Location from 'expo-location';
-import { brandPalette, colors, radius, space, type } from '../theme';
+import { brandPalette, colors, radius, space, shadow, type } from '../theme';
+import { glass } from '../theme/tokens';
 import {
   SosPosition, EMERGENCY_NUMBERS, formatSosMessage, formatShareMessage,
   speakableCoords, smsUrl, telUrl,
@@ -131,19 +132,22 @@ export function SosSheet({
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(14,18,14,0.55)' },
   sheet: {
-    backgroundColor: colors.bg.base,
-    borderTopLeftRadius: radius.lg,
-    borderTopRightRadius: radius.lg,
+    backgroundColor: colors.bg.surface,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
+    borderTopWidth: 1,
+    borderColor: glass.borderStrong,
     padding: space.screen,
     paddingBottom: space[8],
     gap: space[2],
+    ...shadow.glass,
   },
   title: { ...type.h1, color: brandPalette.ember, marginBottom: space[1] },
   posBox: {
-    backgroundColor: colors.bg.surface,
+    backgroundColor: glass.fillSunk,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
     padding: space[3],
     marginBottom: space[2],
   },
@@ -151,11 +155,11 @@ const styles = StyleSheet.create({
   posLabel: { ...type.caption, color: colors.text.secondary },
   posCoords: { ...type.h2, color: colors.text.primary, marginVertical: 2 },
   posNote: { ...type.caption, color: colors.text.secondary },
-  callBtn: { backgroundColor: brandPalette.ember, borderRadius: radius.md, padding: space[3] },
-  callText: { ...type.body, color: '#FFFFFF', fontWeight: '700' },
-  smsBtn: { backgroundColor: brandPalette.pine, borderRadius: radius.md, padding: space[3] },
+  callBtn: { backgroundColor: brandPalette.ember, borderRadius: radius.md, padding: space[3], ...shadow.sos },
+  callText: { ...type.body, color: colors.text.primary, fontWeight: '700' },
+  smsBtn: { backgroundColor: glass.fillAlt, borderRadius: radius.md, padding: space[3], borderWidth: 1, borderColor: glass.border },
   smsText: { ...type.meta, color: brandPalette.cream, fontWeight: '600' },
-  shareBtn: { backgroundColor: colors.bg.surface, borderRadius: radius.md, padding: space[3], borderWidth: 1, borderColor: colors.border },
+  shareBtn: { backgroundColor: glass.fillSunk, borderRadius: radius.md, padding: space[3], borderWidth: 1, borderColor: glass.border },
   shareText: { ...type.meta, color: colors.text.primary, fontWeight: '600' },
   disabled: { opacity: 0.45 },
   note: { ...type.caption, color: colors.text.secondary, marginTop: space[1] },

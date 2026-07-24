@@ -5,6 +5,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, radius, space, shadow, type, sizing } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { RootStackParamList } from '../../navigation/types';
 import {
   getOrder, paySandbox, completeOrder, cancelOrder,
@@ -249,7 +250,7 @@ export function OrderStatusScreen({ route }: Props) {
                 <Text style={styles.cancelDismissText}>Giữ đơn</Text>
               </Pressable>
               <Pressable style={styles.cancelConfirm} onPress={onConfirmCancel} disabled={acting}>
-                {acting ? <ActivityIndicator color="#fff" /> : <Text style={styles.cancelConfirmText}>Xác nhận hủy</Text>}
+                {acting ? <ActivityIndicator color={colors.text.primary} /> : <Text style={styles.cancelConfirmText}>Xác nhận hủy</Text>}
               </Pressable>
             </View>
           </View>
@@ -333,7 +334,7 @@ const styles = StyleSheet.create({
   statusValue: { ...type.h1, color: colors.text.primary, marginTop: space[1] },
   orderMeta: { ...type.meta, color: colors.text.secondary, marginTop: space[2] },
 
-  ttlCard: { padding: space[4], borderRadius: radius.md, backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.warning, marginBottom: space[4], alignItems: 'center' },
+  ttlCard: { padding: space[4], borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: colors.warning, marginBottom: space[4], alignItems: 'center', ...shadow.glassSoft },
   ttlExpired: { borderColor: colors.danger },
   ttlLabel: { ...type.meta, color: colors.text.secondary },
   ttlValue: { ...type.display, color: colors.accent.summit, marginTop: space[1], fontVariant: ['tabular-nums'] },
@@ -345,27 +346,27 @@ const styles = StyleSheet.create({
   // Nối tâm dot hiện tại về tâm dot trước: neo mép phải vào giữa step, kéo rộng 1 step.
   stepLine: { position: 'absolute', right: '50%', width: '100%', top: 13, height: 2, backgroundColor: colors.border },
   stepLineDone: { backgroundColor: colors.brand.primary },
-  stepDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.bg.surface, borderWidth: 2, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', zIndex: 1 },
+  stepDot: { width: 28, height: 28, borderRadius: 14, backgroundColor: glass.fillSunk, borderWidth: 2, borderColor: glass.border, alignItems: 'center', justifyContent: 'center', zIndex: 1 },
   stepDotDone: { backgroundColor: colors.brand.primary, borderColor: colors.brand.primary },
-  stepDotCurrent: { borderColor: colors.brand.primaryLight },
+  stepDotCurrent: { borderColor: colors.brand.primaryLight, ...shadow.limeGlow },
   stepCheck: { color: colors.text.onBrand, fontSize: 14, fontWeight: '700' },
   stepText: { ...type.caption, color: colors.text.secondary, textAlign: 'center', marginTop: space[2] },
   stepTextCurrent: { color: colors.text.primary, fontWeight: '700' },
 
-  moneyCard: { padding: space[4], borderRadius: radius.md, backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.border, marginBottom: space[4] },
+  moneyCard: { padding: space[4], borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: glass.border, marginBottom: space[4], ...shadow.glassSoft },
   moneyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: space[1] },
   moneyLabel: { ...type.body, color: colors.text.secondary },
   moneyValue: { ...type.body, color: colors.text.primary, fontWeight: '600' },
   moneyHighlight: { ...type.h2, color: colors.accent.summit },
   moneyMono: { fontFamily: 'monospace', fontWeight: '400' },
 
-  ledgerCard: { padding: space[4], borderRadius: radius.md, backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.border, marginBottom: space[4] },
+  ledgerCard: { padding: space[4], borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: glass.border, marginBottom: space[4], ...shadow.glassSoft },
   ledgerTitle: { ...type.h2, color: colors.text.primary, marginBottom: space[2] },
   ledgerRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: space[1] },
   ledgerKind: { ...type.meta, color: colors.text.secondary },
   ledgerAmount: { ...type.meta, color: colors.text.primary, fontWeight: '600' },
 
-  refundCard: { padding: space[4], borderRadius: radius.md, backgroundColor: colors.bg.surface, borderWidth: 1, borderColor: colors.danger, marginBottom: space[4] },
+  refundCard: { padding: space[4], borderRadius: radius.lg, backgroundColor: glass.fill, borderWidth: 1, borderColor: colors.danger, marginBottom: space[4], ...shadow.glassSoft },
   refundTitle: { ...type.h2, color: colors.text.primary, marginBottom: space[3] },
   refundRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: space[2], paddingHorizontal: space[3], borderRadius: radius.sm },
   refundRowActive: { backgroundColor: colors.brand.primaryLight },
@@ -380,13 +381,13 @@ const styles = StyleSheet.create({
   cancelDismiss: { flex: 1, height: sizing.buttonHeight, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
   cancelDismissText: { ...type.h2, color: colors.text.primary },
   cancelConfirm: { flex: 1, height: sizing.buttonHeight, borderRadius: radius.md, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' },
-  cancelConfirmText: { ...type.h2, color: '#fff' },
+  cancelConfirmText: { ...type.h2, color: colors.text.primary },
 
   doneBtn: { height: sizing.buttonHeight, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginTop: space[2] },
   doneBtnText: { ...type.h2, color: colors.text.primary },
 
   ctaBar: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: space.screen, gap: space[3], backgroundColor: colors.bg.base, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border, ...shadow.card },
-  primaryCta: { backgroundColor: colors.brand.primaryLight, borderRadius: radius.md, height: sizing.buttonHeight, alignItems: 'center', justifyContent: 'center' },
+  primaryCta: { backgroundColor: colors.brand.primary, borderRadius: radius.md, height: sizing.buttonHeight, alignItems: 'center', justifyContent: 'center', ...shadow.limeGlow },
   primaryCtaText: { ...type.h2, color: colors.text.onLime, fontWeight: '700' },
   ctaDisabled: { opacity: 0.5 },
   waitHint: { ...type.meta, color: colors.text.secondary, textAlign: 'center', paddingVertical: space[2] },

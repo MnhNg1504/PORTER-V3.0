@@ -5,6 +5,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors, radius, space, shadow, type, sizing } from '../../theme';
+import { glass, brandPalette } from '../../theme/tokens';
 import { DifficultyChip } from '../../components/DifficultyChip';
 import { mockRoutes } from '../../lib/mockData';
 import { RootStackParamList } from '../../navigation/types';
@@ -209,10 +210,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space[3],
     padding: space[4],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
+    borderRadius: radius.lg,
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     marginBottom: space[4],
-    ...shadow.card,
+    ...shadow.glassSoft,
   },
   routeName: { ...type.h2, color: colors.text.primary },
   routeMeta: { ...type.meta, color: colors.text.secondary, marginTop: space[1] },
@@ -227,12 +230,12 @@ const styles = StyleSheet.create({
     paddingVertical: space[2],
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.bg.surface,
+    borderColor: glass.border,
+    backgroundColor: glass.fillSunk,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dayChipActive: { backgroundColor: colors.brand.primary, borderColor: colors.brand.primary },
+  dayChipActive: { backgroundColor: colors.brand.primary, borderColor: colors.brand.primary, ...shadow.limeGlow },
   dayWd: { ...type.caption, color: colors.text.secondary },
   dayNum: { ...type.meta, color: colors.text.primary, fontWeight: '700' },
   dayTextActive: { color: colors.text.onBrand },
@@ -244,19 +247,21 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.brand.primary,
+    backgroundColor: glass.fill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepBtnDisabled: { borderColor: colors.border, opacity: 0.5 },
+  stepBtnDisabled: { borderColor: colors.border, backgroundColor: glass.fillSunk, opacity: 0.5 },
   stepSign: { ...type.h1, color: colors.brand.primary, lineHeight: 26 },
   stepValue: { ...type.display, color: colors.text.primary, minWidth: 40, textAlign: 'center' },
 
   priceCard: {
     padding: space[4],
-    borderRadius: radius.md,
-    backgroundColor: colors.bg.surface,
+    borderRadius: radius.lg,
+    backgroundColor: glass.fill,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
+    ...shadow.glassSoft,
   },
   priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: space[1] },
   priceLabel: { ...type.body, color: colors.text.secondary },
@@ -269,8 +274,26 @@ const styles = StyleSheet.create({
   priceNote: { ...type.caption, color: colors.rock, marginTop: space[3] },
   refundPolicyNote: { ...type.caption, color: colors.text.secondary, marginTop: space[2] },
 
-  waiverWarn: { ...type.meta, color: colors.danger, marginTop: space[4] },
-  waiverOk: { ...type.meta, color: colors.success, marginTop: space[4] },
+  waiverWarn: {
+    ...type.meta,
+    color: brandPalette.emberSoft,
+    marginTop: space[4],
+    padding: space[3],
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,82,51,0.35)',
+    backgroundColor: 'rgba(255,82,51,0.08)',
+  },
+  waiverOk: {
+    ...type.meta,
+    color: brandPalette.sageTeal,
+    marginTop: space[4],
+    padding: space[3],
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: glass.borderStrong,
+    backgroundColor: 'rgba(159,203,181,0.08)',
+  },
 
   ctaBar: {
     position: 'absolute', left: 0, right: 0, bottom: 0,
@@ -286,11 +309,12 @@ const styles = StyleSheet.create({
   ctaSummaryValue: { ...type.h2, color: colors.text.primary },
   cta: {
     flex: 1,
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: colors.brand.primary,
     borderRadius: radius.md,
     height: sizing.buttonHeight,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadow.limeGlow,
   },
   ctaDisabled: { opacity: 0.6 },
   ctaText: { ...type.h2, color: colors.text.onLime, fontWeight: '700' },

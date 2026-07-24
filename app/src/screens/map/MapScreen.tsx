@@ -13,6 +13,7 @@ import MapLibreGL, {
 import * as Location from 'expo-location';
 
 import { colors, radius, space, shadow, type, sizing } from '../../theme';
+import { glass } from '../../theme/tokens';
 import {
   computeStats,
   toLineFeature,
@@ -216,7 +217,7 @@ export function MapScreen() {
 function ToolButton({ label, active, onPress }: { label: string; active?: boolean; onPress: () => void }) {
   return (
     <Pressable style={[styles.tool, active && styles.toolOn]} onPress={onPress}>
-      <Text style={[styles.toolIcon, active && { color: '#fff' }]}>{label}</Text>
+      <Text style={[styles.toolIcon, active && { color: colors.text.onLime }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -229,36 +230,46 @@ const styles = StyleSheet.create({
     width: sizing.touchMin,
     height: sizing.touchMin,
     borderRadius: radius.md,
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     alignItems: 'center',
     justifyContent: 'center',
-    ...shadow.card,
+    ...shadow.glass,
   },
-  toolOn: { backgroundColor: colors.brand.primary },
-  toolIcon: { fontSize: 18 },
+  toolOn: {
+    backgroundColor: colors.brand.primary,
+    borderColor: colors.brand.primary,
+    ...shadow.limeGlow,
+  },
+  toolIcon: { fontSize: 18, color: colors.text.primary },
   baseSeg: {
     position: 'absolute',
     left: space[3],
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     borderRadius: radius.md,
     padding: 4,
     gap: 4,
-    ...shadow.card,
+    ...shadow.glass,
   },
   segBtn: { paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.sm },
   segBtnOn: { backgroundColor: colors.brand.primary },
   segText: { ...type.meta, color: colors.text.secondary },
-  segTextOn: { color: '#fff', fontWeight: '700' },
+  segTextOn: { color: colors.text.onLime, fontWeight: '700' },
   bottomPanel: {
     position: 'absolute',
     left: space.screen,
     right: space.screen,
     bottom: space[4],
-    backgroundColor: 'rgba(255,255,255,0.96)',
+    backgroundColor: glass.fill,
+    borderWidth: 1,
+    borderColor: glass.border,
     borderRadius: radius.lg,
     padding: space[3],
-    ...shadow.card,
+    ...shadow.glass,
   },
   statRow: { flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[2] },
   statBig: { ...type.stat, color: colors.brand.primary },
@@ -274,5 +285,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: space[3],
   },
-  bannerText: { ...type.meta, color: colors.text.primary },
+  bannerText: { ...type.meta, color: colors.text.onBrand, fontWeight: '600' },
 });

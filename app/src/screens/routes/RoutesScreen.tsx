@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { RouteCard } from '../../components/RouteCard';
 import { colors, radius, sizing, space, type } from '../../theme';
+import { glass } from '../../theme/tokens';
 import { mockRoutes, hotDestinations, Difficulty } from '../../lib/mockData';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -91,7 +92,7 @@ export function RoutesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg.surface },
+  container: { flex: 1, backgroundColor: colors.bg.base },
   searchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.brand.primary,
-    backgroundColor: colors.bg.base,
+    backgroundColor: glass.fillSunk,
   },
   searchIcon: { ...type.meta, color: colors.brand.primary },
   searchLabel: { ...type.meta, color: colors.brand.primary, fontWeight: '700' },
@@ -115,23 +116,28 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: space[4],
     paddingVertical: space[2],
+    minHeight: sizing.touchMin,
+    justifyContent: 'center',
     borderRadius: radius.pill,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: glass.border,
+    backgroundColor: glass.fill,
   },
   chipOn: { backgroundColor: colors.brand.primary, borderColor: colors.brand.primary },
   chipText: { ...type.meta, color: colors.text.secondary },
-  chipTextOn: { color: '#fff', fontWeight: '700' },
+  chipTextOn: { color: colors.text.onLime, fontWeight: '700' },
   sectionTitle: { ...type.h2, color: colors.text.primary, marginBottom: space[3] },
   hotCard: { width: 130, marginRight: space[3] },
   hotThumb: {
     height: 90,
     borderRadius: radius.md,
-    backgroundColor: colors.brand.primaryLight,
+    backgroundColor: glass.fillSunk,
+    borderWidth: 1,
+    borderColor: glass.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  hotThumbText: { color: colors.brand.primaryDark, ...type.caption },
+  hotThumbText: { color: colors.text.secondary, ...type.caption },
   hotName: { ...type.meta, color: colors.text.primary, marginTop: space[1] },
   hotMeta: { ...type.caption, color: colors.accent.summit },
   empty: { ...type.body, color: colors.text.secondary, textAlign: 'center', marginTop: space[8] },
