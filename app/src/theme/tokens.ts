@@ -38,47 +38,49 @@ export const brandPalette = {
   borderLime: 'rgba(201,226,101,0.16)', // Viền glass phát sáng lime
 } as const;
 
-// ---- MÀU NGỮ NGHĨA (giữ nguyên key cũ — mọi màn hình không phải sửa) ----
+// ---- MÀU NGỮ NGHĨA — DEFAULT = DARK-GLASS v3 (port toàn app sang v3) ----
+// Giữ nguyên MỌI key cũ; chỉ đổi VALUE sang hệ dark-glass (nền near-black, chữ cream,
+// hành động = Lime). Bản light cũ xem trong git history (trước commit port v3).
 export const colors = {
   brand: {
-    primary: brandPalette.pine, // Nút chính, active tab, header
-    primaryDark: brandPalette.night, // Pressed
-    primaryLight: brandPalette.lime, // Nền nhấn / chip active (Lime Signal)
+    primary: brandPalette.lime, // Hành động chính / active tab / accent trên nền tối (Lime)
+    primaryDark: '#B5CE55', // Lime pressed
+    primaryLight: brandPalette.limeHi, // Lime hover / nhấn mạnh (#DFF19A)
   },
   accent: {
-    summit: brandPalette.ember, // "Độ hot", track đang ghi, CTA phụ
+    summit: brandPalette.ember, // "Độ hot", track đang ghi, SOS
   },
-  earth: brandPalette.forest, // Icon địa hình, nhãn mùa
-  rock: brandPalette.sage, // Text phụ, phân cách
+  earth: brandPalette.sageTeal, // Icon địa hình / thông tin mềm trên nền tối
+  rock: brandPalette.mutedOnDark, // Text phụ / phân cách (muted trên nền tối)
 
-  danger: brandPalette.ember, // Dốc đứng, lệch hướng, cung Khó, SOS
+  danger: brandPalette.ember, // Lệch hướng, cung Khó, SOS
   warning: brandPalette.gold, // Cung Chuẩn, cần chú ý
-  success: brandPalette.forest, // Cung Dễ, hoàn thành
+  success: brandPalette.sageTeal, // Cung Dễ, hoàn thành (mềm trên nền tối)
 
   bg: {
-    base: brandPalette.cream, // Nền sáng chính (Cream)
-    baseDark: brandPalette.pine, // Nền dark chính (Pine)
-    surface: '#F2F6ED', // Card trên nền cream
-    surfaceDark: brandPalette.pineMid,
+    base: brandPalette.void, // Nền chính near-black #080B08
+    baseDark: '#050705', // Vùng chìm sâu nhất
+    surface: brandPalette.surfaceGlass, // Card glass #121B15
+    surfaceDark: brandPalette.surfaceGlassAlt, // Card glass biến thể #18271B
   },
   text: {
-    primary: brandPalette.pine,
-    secondary: '#5A6552', // Xám rêu (từ guidelines)
-    faint: brandPalette.sage, // Text mức 3 — nhãn phụ, fine print
-    onBrand: brandPalette.cream, // Chữ trên nền pine
-    onLime: brandPalette.pine, // Chữ trên nút Lime (tương phản cao)
+    primary: brandPalette.inkOnDark, // Ink cream #EAF1E4
+    secondary: brandPalette.mutedOnDark, // Muted #93A090 (sàn tương phản đọc ngoài nắng)
+    faint: brandPalette.faintOnDark, // Faint #6F7A6E — nhãn phụ, fine print
+    onBrand: brandPalette.pine, // Chữ trên nền Lime (brand.primary) — tương phản cao
+    onLime: brandPalette.onLime, // Chữ trên nút Lime #182200
   },
-  // Màu track/route trên map — nền map sáng nên cần line đậm tương phản
+  // Màu track/route trên map (nền map tối/vệ tinh) — line sáng tương phản
   map: {
-    trackPlanned: '#2F6BFF', // Track dự kiến (xanh điều hướng — giữ để dễ đọc)
+    trackPlanned: '#7CC0FF', // Track dự kiến (xanh sáng dễ đọc trên nền tối)
     trackRecording: brandPalette.ember, // Track đang ghi
-    trackSample: brandPalette.forest, // Track cung mẫu (đã mua)
-    start: brandPalette.forest, // Điểm đầu
+    trackSample: brandPalette.lime, // Track cung mẫu (đã mua) — Lime nổi trên map
+    start: brandPalette.sageTeal, // Điểm đầu
     end: brandPalette.ember, // Điểm cuối
-    me: '#2F6BFF', // Vị trí người dùng
-    casing: '#FFFFFF', // Viền bọc line
+    me: '#7CC0FF', // Vị trí người dùng
+    casing: '#0A0F0B', // Viền bọc line (tối, tách line sáng khỏi nền)
   },
-  border: brandPalette.sand,
+  border: brandPalette.borderDark, // Viền card trên nền tối #24331F
 } as const;
 
 /** Nới literal type của bảng màu `as const` thành string để theme dark gán giá trị khác */
