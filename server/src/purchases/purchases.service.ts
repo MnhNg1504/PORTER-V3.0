@@ -44,14 +44,19 @@ export class PurchasesService {
       }),
     );
 
-    // H10: báo người bán có khách mua (best-effort — sendToUser không ném lỗi)
+    // H10: báo người bán có khách mua. BEST-EFFORT tuyệt đối — kể cả lỗi DB token
+    // cũng không được làm hỏng giao dịch đã lưu (bọc try/catch tại điểm gọi).
     if (route.seller?.id && route.seller.id !== user.sub) {
-      await this.notifications.sendToUser(
-        route.seller.id,
-        'Có khách mua cung của bạn 🎉',
-        `Cung "${route.name}" vừa có 1 lượt đặt. Vào chuẩn bị đón đoàn.`,
-        { routeSlug: route.slug, purchaseId: purchase.id },
-      );
+      try {
+        await this.notifications.sendToUser(
+          route.seller.id,
+          'Có khách mua cung của bạn 🎉',
+          `Cung "${route.name}" vừa có 1 lượt đặt. Vào chuẩn bị đón đoàn.`,
+          { routeSlug: route.slug, purchaseId: purchase.id },
+        );
+      } catch {
+        /* nuốt lỗi — thông báo là phụ, không chặn mua cung */
+      }
     }
     return purchase;
   }

@@ -18,12 +18,14 @@
 | **QĐ-9** | Giá sàn/trần cung | **Giá sàn mềm; chưa cần trần** |
 | **QĐ-10** | Ngân sách war room AI | **Đã nâng lại credit** |
 
-## B. Còn MỞ (chờ phiên sau)
+## B. Nhân sự & thuê ngoài (ĐÃ DUYỆT — chi tiết docs/17)
 
-| Mã | Nội dung | Trạng thái |
+| Mã | Nội dung | **Quyết định** |
 |---|---|---|
-| **QĐ-11** | Nhân sự cho payments + backend chợ | Chưa chốt — CEO trình phương án tuyển/hợp đồng ở phiên sau |
-| **QĐ-12** | Thuê tư vấn pháp lý (waiver, escrow, bảo hiểm) | Chưa nhắc — CEO khuyến nghị bàn trước khi vào Giai đoạn 1 (giữ tiền hộ = nhạy cảm pháp lý) |
+| **QĐ-11** | Nhân sự cho payments + backend chợ | **Duyệt tuyển** — hồ sơ tuyển: docs/17 §1 (1 Senior Backend + 1 Mobile RN + 1 contractor Payments) |
+| **QĐ-12** | Thuê tư vấn pháp lý (waiver, escrow, bảo hiểm, dữ liệu cá nhân) | **Duyệt thuê** — phạm vi & mô hình: docs/17 §2 (ưu tiên chốt cấu trúc escrow hợp pháp TRƯỚC Giai đoạn 1) |
+
+> Lưu ý CEO: tôi (CEO-AI) không ký hợp đồng lao động với người thật. docs/17 là **hồ sơ tuyển dụng** để Chủ tịch/HR tuyển; trong lúc chờ, đội agent lấp tạm để không chặn Giai đoạn 1.
 
 ## C. Bộ LUẬT nghiệp vụ suy ra (áp dụng khi dựng payments — Giai đoạn 1)
 
