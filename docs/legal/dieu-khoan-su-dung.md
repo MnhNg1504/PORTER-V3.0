@@ -1,10 +1,11 @@
+> ⚠️ DRAFT — chưa có giá trị pháp lý tới khi luật sư có chứng chỉ rà soát (docs/17 §0).
+
 # Điều khoản sử dụng POTTER
 
-> ⚠️ **BẢN THẢO — cần luật sư rà soát trước khi công bố. Không phải tư vấn pháp lý.**
-> Tài liệu do đội dự án soạn theo khung docs/04 (hệ 3 cấp + waiver) và docs/05 (quyết định đã chốt).
-> Mọi con số (thời hạn, mức phạt, tuổi tối thiểu) là **đề xuất**, luật sư chuẩn hoá trước khi phát hành.
+> Tài liệu do đội dự án soạn theo khung docs/04 (hệ 3 cấp + waiver), docs/05 và Nghị quyết HĐQT docs/16 (QĐ-1 hoàn cọc, QĐ-2 phí 10% chia đôi, QĐ-5 bất khả kháng, mục C escrow/cọc).
+> Mọi con số (thời hạn, mức phạt, tuổi tối thiểu) là **đề xuất**, luật sư có chứng chỉ chuẩn hoá trước khi phát hành.
 
-*Phiên bản: 0.1 (bản thảo) — Ngày soạn: 2026-07-22 — Hiệu lực: [chưa công bố]*
+*Phiên bản: 0.2 (bản thảo) — Ngày soạn: 2026-07-22 — Cập nhật: 2026-07-24 (đồng bộ docs/16) — Hiệu lực: [chưa công bố]*
 
 ---
 
@@ -61,13 +62,23 @@ Nền tảng phân người dùng thành 3 cấp (chi tiết kỹ thuật tại 
 | **Người bán (Cấp 2/3)** | Bên cung cấp dịch vụ: nội dung cung, ảnh điểm xuất phát, dẫn đường/support đã cam kết | Tính chính xác của GPX và cảnh báo mình đăng; chất lượng hướng dẫn/support; nghĩa vụ thuế; (Cấp 3) toàn bộ nghĩa vụ theo luật lữ hành |
 | **Người mua** | Bên sử dụng dịch vụ | Tự đánh giá năng lực bản thân; tuân thủ cảnh báo, checklist an toàn; chuẩn bị thể chất/thiết bị |
 
-4.2. **Hợp đồng dịch vụ hình thành trực tiếp giữa người mua và người bán.** POTTER không phải là một bên của hợp đồng đó, chỉ thu phí trung gian (hoa hồng marketplace) theo biểu phí công bố.
+4.2. **Hợp đồng dịch vụ hình thành trực tiếp giữa người mua và người bán.** POTTER **không phải là một bên** của hợp đồng đó — POTTER là **trung gian kỹ thuật**, chỉ thu **phí nền tảng** theo biểu phí công bố (mục 4.3).
 
-4.3. **Thanh toán:** trạng thái giao dịch trên hệ thống gồm chờ thanh toán / đã thanh toán / hoàn tiền / huỷ. *(Ghi chú trung thực: cổng thanh toán trực tuyến chưa được kích hoạt ở phiên bản hiện tại; khi tích hợp, điều khoản thanh toán — đối tác cổng thanh toán, thời điểm ghi nhận, quy trình hoàn tiền — sẽ được bổ sung và người dùng được thông báo.)*
+4.3. **Biểu phí nền tảng (phí 10% chia đôi — QĐ-2):** với mỗi đơn có giá gốc **G** do người bán đặt:
+- **Người mua trả** `G × 1,05` (giá gốc **+ 5%** phí Potter cộng vào);
+- **Người bán nhận** `G × 0,95` (bị **trừ 5%** phí Potter khỏi payout);
+- **POTTER giữ** `G × 0,10` (tổng phí nền tảng, đã bao gồm gánh phí cổng thanh toán ở giai đoạn đầu — QĐ-3).
+- Hiển thị minh bạch cho cả hai bên trước khi đặt ("khách trả X → anh nhận Y").
 
-4.4. **Hoàn tiền & tranh chấp giao dịch:** người mua khiếu nại qua kênh hỗ trợ trong vòng [7 ngày] kể từ ngày kết thúc dự kiến của cung. POTTER đóng vai trò hỗ trợ đối chiếu (log chat, thông tin booking) nhưng quyết định bồi hoàn cuối cùng thuộc thoả thuận giữa hai bên hoặc cơ quan có thẩm quyền, trừ trường hợp lỗi kỹ thuật của Nền tảng.
+4.4. **Cọc & giữ hộ (escrow):** mỗi đơn đặt **cọc 30%** giá trị, được **bên giữ hộ (đối tác cổng thanh toán/PSP) giữ trong escrow** tới khi chuyến hoàn tất/hết hạn khiếu nại. **POTTER không tự ôm quỹ tiền của người dùng.** Payout cho người bán thực hiện **T+24h** sau khi người mua xác nhận "kết thúc tốt đẹp", hoặc **tự động T+72h** nếu không có khiếu nại.
 
-4.5. **Hoá đơn:** chỉ người bán Cấp 3 xuất hoá đơn VAT cho người mua. Nền tảng xuất hoá đơn cho phần phí trung gian của mình theo luật hiện hành.
+> *Ghi chú trung thực:* cổng thanh toán/escrow đang ở giai đoạn **sandbox (Giai đoạn 1)**; luồng tiền thật (Giai đoạn 2) chỉ bật khi có **pháp nhân + hợp đồng PSP giữ hộ hợp pháp** và luật sư có chứng chỉ rà bản thảo (docs/17 §0). Trước đó các quy tắc phí/cọc/hoàn ở đây là **dự kiến**.
+
+4.5. **Hoàn tiền, huỷ đơn & bất khả kháng:** thang hoàn cọc khi khách huỷ (≥7 ngày: 100% · 3–7 ngày: 50% · <72h: 0% — QĐ-1), quy tắc người bán huỷ, và **bất khả kháng do thiên tai** (hoàn 100% hoặc đổi ngày miễn phí — QĐ-5) quy định chi tiết tại [Chính sách hoàn/huỷ](chinh-sach-hoan-huy.md).
+
+4.6. **Tranh chấp giao dịch:** người mua khiếu nại qua kênh hỗ trợ trong vòng [7 ngày] kể từ ngày kết thúc dự kiến của cung. POTTER đóng vai trò **trung gian hỗ trợ đối chiếu** (log chat, thông tin booking) nhưng quyết định bồi hoàn cuối cùng thuộc thoả thuận giữa hai bên hoặc cơ quan có thẩm quyền, trừ trường hợp lỗi kỹ thuật của Nền tảng.
+
+4.7. **Hoá đơn:** chỉ người bán Cấp 3 xuất hoá đơn VAT cho người mua. Nền tảng xuất hoá đơn cho phần phí trung gian của mình theo luật hiện hành.
 
 ## 5. Nội dung người dùng và sở hữu trí tuệ
 
@@ -81,7 +92,7 @@ Nền tảng phân người dùng thành 3 cấp (chi tiết kỹ thuật tại 
 
 6.1. **Trekking/hiking là hoạt động có rủi ro cao**: chấn thương, lạc đường, thời tiết xấu, địa hình nguy hiểm, thú rừng, và trong trường hợp xấu nhất là tử vong. Bạn tham gia hoàn toàn **tự nguyện** và **tự chịu trách nhiệm** về quyết định của mình.
 
-6.2. **Waiver điện tử bắt buộc:** trước khi bắt đầu điều hướng bất kỳ cung có độ khó từ CHUẨN (Moderate) trở lên — áp dụng cho **mọi cấp tài khoản** — bạn phải xác nhận văn bản miễn trừ trách nhiệm điện tử, trong đó bạn:
+6.2. **Waiver điện tử bắt buộc:** trước khi bắt đầu điều hướng bất kỳ cung có độ khó từ CHUẨN (Moderate) trở lên — áp dụng cho **mọi cấp tài khoản** — bạn phải xác nhận văn bản miễn trừ trách nhiệm điện tử ([Bản miễn trừ trách nhiệm & Cam kết tự chịu rủi ro](waiver-mien-tru-trach-nhiem.md)), trong đó bạn:
 - Xác nhận tự nguyện tham gia hoạt động có rủi ro cao;
 - Xác nhận đủ điều kiện thể chất và trang thiết bị theo checklist của cung;
 - Chấp nhận rằng POTTER **chỉ cung cấp công cụ bản đồ và thông tin tham khảo**, không đảm bảo an toàn;
