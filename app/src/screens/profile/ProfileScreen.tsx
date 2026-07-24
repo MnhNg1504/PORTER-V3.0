@@ -42,11 +42,17 @@ export function ProfileScreen() {
           ))}
         </View>
 
-        {/* Danh sách quản lý (mock) */}
-        <View style={styles.tabRow}>
-          <Text style={styles.tabItem}>Cung của tôi</Text>
-          <Text style={styles.tabItem}>Đã mua</Text>
-          <Text style={styles.tabItem}>Track</Text>
+        {/* Danh sách quản lý — nhãn tĩnh, chưa mở cho DEMO1 */}
+        <Text style={styles.section}>QUẢN LÝ</Text>
+        <View style={styles.manageList}>
+          {['Cung của tôi', 'Đã mua', 'Track'].map((label, i, arr) => (
+            <View key={label} style={[styles.manageRow, i === arr.length - 1 && styles.manageRowLast]}>
+              <Text style={styles.manageLabel}>{label}</Text>
+              <View style={styles.soonTag}>
+                <Text style={styles.soonText}>Sắp có</Text>
+              </View>
+            </View>
+          ))}
         </View>
 
         <Text style={styles.section}>🔬 R&D / Nghiên cứu</Text>
@@ -55,7 +61,8 @@ export function ProfileScreen() {
         <Text style={styles.paragraph}>• Gửi phản hồi cải thiện</Text>
 
         <View style={styles.premium}>
-          <Text style={styles.premiumText}>⭐ Nâng cấp Premium · Đồng bộ · Offline</Text>
+          <Text style={styles.premiumText}>⭐ Premium · Đồng bộ · Offline</Text>
+          <Text style={styles.premiumHint}>Sắp có</Text>
         </View>
       </View>
     </ScrollView>
@@ -77,9 +84,14 @@ const styles = StyleSheet.create({
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
   badge: { backgroundColor: colors.bg.base, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[2], ...shadow.card },
   badgeText: { ...type.meta, color: colors.earth },
-  tabRow: { flexDirection: 'row', gap: space[4], marginTop: space[5], borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border, paddingBottom: space[3] },
-  tabItem: { ...type.meta, color: colors.text.primary, fontWeight: '600' },
+  manageList: { backgroundColor: colors.bg.base, borderRadius: radius.md, ...shadow.card, overflow: 'hidden' },
+  manageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space[4], paddingVertical: space[3], borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
+  manageRowLast: { borderBottomWidth: 0 },
+  manageLabel: { ...type.body, color: colors.text.primary },
+  soonTag: { backgroundColor: colors.bg.surface, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1] },
+  soonText: { ...type.caption, color: colors.text.faint, fontWeight: '600' },
   paragraph: { ...type.body, color: colors.text.secondary, marginBottom: space[2] },
-  premium: { backgroundColor: colors.brand.primaryLight, borderRadius: radius.md, padding: space[4], marginTop: space[5], alignItems: 'center' },
+  premium: { backgroundColor: colors.brand.primaryLight, borderRadius: radius.md, padding: space[4], marginTop: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   premiumText: { ...type.meta, color: colors.brand.primaryDark, fontWeight: '700' },
+  premiumHint: { ...type.caption, color: colors.brand.primaryDark, fontWeight: '600', opacity: 0.7 },
 });

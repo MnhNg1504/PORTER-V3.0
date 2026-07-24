@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { RouteCard } from '../../components/RouteCard';
-import { colors, radius, space, type } from '../../theme';
-import { mockRoutes, hotDestinations, currentUser, Difficulty } from '../../lib/mockData';
+import { colors, radius, sizing, space, type } from '../../theme';
+import { mockRoutes, hotDestinations, Difficulty } from '../../lib/mockData';
 import { RootStackParamList } from '../../navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -28,8 +28,14 @@ export function RoutesScreen() {
       <ScreenHeader
         title="Cung đường"
         right={
-          <Pressable hitSlop={8} onPress={() => nav.navigate('Search')}>
-            <Text style={styles.filterIcon}>🔍 Tìm kiếm</Text>
+          <Pressable
+            style={styles.searchBtn}
+            onPress={() => nav.navigate('Search')}
+            accessibilityRole="button"
+            accessibilityLabel="Tìm kiếm cung đường"
+          >
+            <Text style={styles.searchIcon}>🔍</Text>
+            <Text style={styles.searchLabel}>Tìm kiếm</Text>
           </Pressable>
         }
       />
@@ -77,20 +83,28 @@ export function RoutesScreen() {
         ListEmptyComponent={<Text style={styles.empty}>Chưa có cung khớp bộ lọc</Text>}
       />
 
-      {/* Nút "Mở cung mới" chỉ cho Cấp 2+ (docs 02) */}
-      {currentUser.level >= 2 && (
-        <Pressable style={styles.openBtn}>
-          {/* TODO(api): mở màn "Mở cung mới" (upload GPX + ảnh điểm XP + gửi kiểm duyệt) */}
-          <Text style={styles.openBtnText}>＋ Mở cung</Text>
-        </Pressable>
-      )}
+      {/* Nút "Mở cung mới" (Cấp 2+, docs 02) — ẨN cho DEMO1: chưa có màn upload
+          (GPX + ảnh điểm XP + kiểm duyệt) nên bấm sẽ ra no-op. Bật lại khi có màn. */}
+      {/* P1-3: intentionally hidden for DEMO1 (see docs/20 punch-list) */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg.surface },
-  filterIcon: { ...type.meta, color: colors.brand.primary },
+  searchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[1],
+    minHeight: sizing.touchMin,
+    paddingHorizontal: space[4],
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.brand.primary,
+    backgroundColor: colors.bg.base,
+  },
+  searchIcon: { ...type.meta, color: colors.brand.primary },
+  searchLabel: { ...type.meta, color: colors.brand.primary, fontWeight: '700' },
   chips: {
     flexDirection: 'row',
     gap: space[2],
@@ -121,14 +135,4 @@ const styles = StyleSheet.create({
   hotName: { ...type.meta, color: colors.text.primary, marginTop: space[1] },
   hotMeta: { ...type.caption, color: colors.accent.summit },
   empty: { ...type.body, color: colors.text.secondary, textAlign: 'center', marginTop: space[8] },
-  openBtn: {
-    position: 'absolute',
-    right: space[4],
-    bottom: 90,
-    backgroundColor: colors.accent.summit,
-    borderRadius: radius.pill,
-    paddingHorizontal: space[5],
-    paddingVertical: space[3],
-  },
-  openBtnText: { color: '#fff', ...type.meta, fontWeight: '700' },
 });

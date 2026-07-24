@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { DifficultyChip } from '../../components/DifficultyChip';
-import { colors, radius, space, shadow, type } from '../../theme';
+import { colors, radius, space, shadow, type, sizing } from '../../theme';
 import { mockPosts, Post } from '../../lib/mockData';
 
 // TAB 1 — Mạng xã hội trekker: feed + post card + tương tác.
@@ -66,10 +66,34 @@ function PostCard({ post }: { post: Post }) {
         </View>
       )}
       <View style={styles.actions}>
-        <Text style={styles.action}>♥ {post.likes}</Text>
-        <Text style={styles.action}>💬 {post.comments}</Text>
-        <Text style={styles.action}>↗</Text>
-        <Text style={styles.action}>🔖</Text>
+        <Pressable
+          style={styles.actionBtn}
+          hitSlop={8}
+          onPress={() => Alert.alert('Đã thích', 'Tính năng sẽ có ở bản đầy đủ.')}
+        >
+          <Text style={styles.action}>♥ {post.likes}</Text>
+        </Pressable>
+        <Pressable
+          style={styles.actionBtn}
+          hitSlop={8}
+          onPress={() => Alert.alert('Bình luận', 'Tính năng sẽ có ở bản đầy đủ.')}
+        >
+          <Text style={styles.action}>💬 {post.comments}</Text>
+        </Pressable>
+        <Pressable
+          style={styles.actionBtn}
+          hitSlop={8}
+          onPress={() => Alert.alert('Chia sẻ', 'Tính năng sẽ có ở bản đầy đủ.')}
+        >
+          <Text style={styles.action}>↗</Text>
+        </Pressable>
+        <Pressable
+          style={styles.actionBtn}
+          hitSlop={8}
+          onPress={() => Alert.alert('Đã lưu', 'Tính năng sẽ có ở bản đầy đủ.')}
+        >
+          <Text style={styles.action}>🔖</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -95,7 +119,8 @@ const styles = StyleSheet.create({
   routeChipName: { ...type.meta, color: colors.text.primary, fontWeight: '700' },
   routeChipMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space[2] },
   routeChipText: { ...type.meta, color: colors.text.secondary },
-  actions: { flexDirection: 'row', gap: space[6], marginTop: space[3] },
+  actions: { flexDirection: 'row', gap: space[4], marginTop: space[3] },
+  actionBtn: { minWidth: sizing.touchMin, minHeight: sizing.touchMin, alignItems: 'center', justifyContent: 'center' },
   action: { ...type.meta, color: colors.text.secondary },
   composeFab: {
     position: 'absolute',

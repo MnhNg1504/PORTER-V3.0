@@ -138,12 +138,16 @@ export function BookingScreen({ route }: Props) {
         <Text style={styles.section}>Bảng giá</Text>
         <View style={styles.priceCard}>
           <PriceRow label={`Giá cung × ${headcount}`} value={formatVnd(pricing.subtotalVnd)} />
-          <PriceRow label="Phí dịch vụ (5%)" value={`+${formatVnd(pricing.buyerTotalVnd - pricing.subtotalVnd)}`} />
+          <PriceRow label="Phí dịch vụ (+5%)" value={`+${formatVnd(pricing.buyerTotalVnd - pricing.subtotalVnd)}`} />
+          <Text style={styles.priceSubNote}>Potter thu 10%, chia đôi khách–người dẫn (docs/16).</Text>
           <View style={styles.priceDivider} />
           <PriceRow label="Khách trả" value={formatVnd(pricing.buyerTotalVnd)} strong />
           <PriceRow label="Cọc giữ chỗ (30%)" value={formatVnd(pricing.depositVnd)} highlight />
           <Text style={styles.priceNote}>
             Cọc 30% giữ trong ví ký quỹ (escrow). Phần còn lại thanh toán khi gặp người dẫn.
+          </Text>
+          <Text style={styles.refundPolicyNote}>
+            Chính sách hoàn cọc theo thời điểm hủy: ≥7 ngày 100% · 3–7 ngày 50% · &lt;72h 0%.
           </Text>
         </View>
 
@@ -261,7 +265,9 @@ const styles = StyleSheet.create({
   priceValueStrong: { ...type.h2, color: colors.text.primary },
   priceValueHighlight: { ...type.h2, color: colors.accent.summit },
   priceDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginVertical: space[2] },
+  priceSubNote: { ...type.caption, color: colors.rock, marginTop: space[1] },
   priceNote: { ...type.caption, color: colors.rock, marginTop: space[3] },
+  refundPolicyNote: { ...type.caption, color: colors.text.secondary, marginTop: space[2] },
 
   waiverWarn: { ...type.meta, color: colors.danger, marginTop: space[4] },
   waiverOk: { ...type.meta, color: colors.success, marginTop: space[4] },

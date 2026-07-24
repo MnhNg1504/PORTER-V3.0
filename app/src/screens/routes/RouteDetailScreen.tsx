@@ -154,11 +154,11 @@ const styles = StyleSheet.create({
     ...shadow.card,
   },
   buyBtn: {
-    backgroundColor: colors.brand.primary,
+    backgroundColor: colors.brand.primaryLight,
     borderRadius: radius.md,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buyText: { color: '#fff', ...type.h2 },
+  buyText: { color: colors.brand.primary, ...type.h2 },
 });
